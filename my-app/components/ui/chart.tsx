@@ -57,6 +57,7 @@ const ChartContainer = React.forwardRef<
         {...props}
       >
         <ChartStyle id={chartId} config={config} />
+          <Candlestick
         <RechartsPrimitive.ResponsiveContainer>
           {children}
         </RechartsPrimitive.ResponsiveContainer>
@@ -66,39 +67,66 @@ const ChartContainer = React.forwardRef<
 })
 ChartContainer.displayName = "Chart"
 
-const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
-  const colorConfig = Object.entries(config).filter(
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    ([_, config]) => config.theme || config.color
-  )
-
-  if (!colorConfig.length) {
-    return null
-  }
-
-  return (
-    <style
-      dangerouslySetInnerHTML={{
-        __html: Object.entries(THEMES)
-          .map(
-            ([theme, prefix]) => `
-${prefix} [data-chart=${id}] {
-${colorConfig
-  .map(([key, itemConfig]) => {
-    const color =
-      itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
-      itemConfig.color
-    return color ? `  --color-${key}: ${color};` : null
-  })
-  .join("\n")}
-}
-`
-          )
-          .join("\n"),
-      }}
-    />
-  )
-}
+const Candlestick = props => {
+    const {
+        fill,
+        x,
+        y,
+        width,
+        height,
+        low,
+        high,
+        openClose: [open, close],
+    } = props;
+    const isGrowing = open < close;
+    const color = isGrowing ? 'green' : 'red';
+    const ratio = Math.abs(height / (open - close));
+    return (
+        <g stroke={color} fill="none" strokeWidth="2">
+            <path
+                d={`
+          M ${x},${y}
+          L ${x},${y + height}
+          L ${x + width},${y + height}
+          L ${x + width},${y}
+          L ${x},${y}
+        `}
+            />
+            {/* bottom line */}
+            {isGrowing ? (
+                <path
+                    d={`
+            M ${x + width / 2}, ${y + height}
+            v ${(open - low) * ratio}
+          `}
+                />
+            ) : (
+                <path
+                    d={`
+            M ${x + width / 2}, ${y}
+            v ${(close - low) * ratio}
+          `}
+                />
+            )}
+            {/* top line */}
+            {isGrowing ? (
+                <path
+                    d={`
+            M ${x + width / 2}, ${y}
+            v ${(close - high) * ratio}
+          `}
+                />
+            ) : (
+                <path
+                    d={`
+            M ${x + width / 2}, ${y + height}
+            v ${(open - high) * ratio}
+          `}
+                />
+            )}
+        </g>
+    );
+};
 
 const ChartTooltip = RechartsPrimitive.Tooltip
 
