@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dialog"
 // import {CategoricalChartState} from "recharts/types/chart/types";
 import CandleStickChart from "@/components/ui/candleStickChart";
+import {generateData} from "@/utils";
 
 const calculatePnL = (trade: Trade, data: { date: string; value: number }[]) => {
     const startValue = data.find(d => d.date === trade.startDate)?.value || 0
