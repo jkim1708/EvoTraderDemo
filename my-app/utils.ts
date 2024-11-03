@@ -19,7 +19,6 @@ export const generateData = (startDate: Date, endDate: Date, asset: string) => {
         currentDate = addMinutesToDate(currentDate, 5) // Increment by 1 hour for granularity
     }
 
-    console.log(data);
     return data
 }
 
@@ -44,7 +43,7 @@ export function transformToCandleStickData(tickData: { date: string, value: stri
     };
 }
 
-export function transformToCandleStickSeries(tickData: { date: string, value: string }[]) {
+export function transformToCandleStickSeries(tickData: { date: Date, value: string }[]) {
     const groupedData = tickData.reduce((acc, tick) => {
         const hour = new Date(tick.date).getUTCHours();
         if (!acc[hour]) {
@@ -52,14 +51,14 @@ export function transformToCandleStickSeries(tickData: { date: string, value: st
         }
         acc[hour].push(tick);
         return acc;
-    }, {} as { [key: number]: { date: string, value: string }[] });
+    }, {} as { [key: number]: { date: Date, value: string }[] });
 
     return Object.values(groupedData).map(group => {
         const high = Math.max(...group.map(tick => parseFloat(tick.value))).toFixed(12);
         const low = Math.min(...group.map(tick => parseFloat(tick.value))).toFixed(12);
         const open = group[0].value;
         const close = group[group.length - 1].value;
-        const ts = group[0].date;
+        const ts = convertDate(group[0].date);
 
         return {
             high,
@@ -69,4 +68,14 @@ export function transformToCandleStickSeries(tickData: { date: string, value: st
             ts
         };
     });
+}
+
+export function convertDate(date: Date): string {
+    const day = date.getDate();
+    const dayStr = day < 10 ? "0" + day : day;
+    const month = date.getMonth() + 1;
+    const monthStr = month < 10 ? "0" + month : month;
+    const year = date.getFullYear();
+    const hour = date.getHours();
+    return `${year}.${monthStr}.${dayStr} ${hour}`;
 }

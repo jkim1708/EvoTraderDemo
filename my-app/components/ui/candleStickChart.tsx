@@ -302,7 +302,7 @@ const CandleStickChart = () => {
             data={data}
             margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
         >
-            <XAxis dataKey="dd/mm hh:mm" />
+            <XAxis dataKey="ts" />
             <YAxis domain={['auto', 'auto']} allowDecimals={true} padding={{top:20, bottom:20}}/>
             <CartesianGrid strokeDasharray="3 3" />
             <Bar
