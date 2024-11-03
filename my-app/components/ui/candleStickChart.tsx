@@ -278,9 +278,9 @@ const prepareData = data => {
 };
 
 const CandleStickChart = () => {
-    const tickSeries = generateData(new Date('2024-01-01'), new Date('2024-01-02'), 'EURUSD');
-    const candleStickSeries = transformToCandleStickSeries(tickSeries);
-    const data = prepareData(candleStickSeries);
+    // const tickSeries = generateData(new Date('2024-01-01'), new Date('2024-01-02'), 'EURUSD');
+    // const candleStickSeries = transformToCandleStickSeries(tickSeries);
+    const data = prepareData(rawData);
     data.reduce((acc, item) => console.log(item), 0);
     const minValue = data.reduce(
         (minValue, { low, openClose: [open, close] }) => {
