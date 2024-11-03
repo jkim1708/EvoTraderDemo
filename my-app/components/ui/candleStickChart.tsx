@@ -7,8 +7,7 @@ import {
     CartesianGrid,
     Cell,
 } from 'recharts';
-import {generateData} from "@/components/enhanced-trading-asset-viewer";
-import {transformToCandleStickSeries} from "@/utils";
+import {generateData, transformToCandleStickSeries} from "@/utils";
 const colors = [
     '#1f77b4',
     '#ff7f0e',
@@ -278,9 +277,9 @@ const prepareData = data => {
 };
 
 const CandleStickChart = () => {
-    // const tickSeries = generateData(new Date('2024-01-01'), new Date('2024-01-02'), 'EURUSD');
-    // const candleStickSeries = transformToCandleStickSeries(tickSeries);
-    const data = prepareData(rawData);
+    const tickSeries = generateData(new Date('2024-01-01'), new Date('2024-01-02'), 'EURUSD');
+    const candleStickSeries = transformToCandleStickSeries(tickSeries);
+    const data = prepareData(candleStickSeries);
     data.reduce((acc, item) => console.log(item), 0);
     const minValue = data.reduce(
         (minValue, { low, openClose: [open, close] }) => {
