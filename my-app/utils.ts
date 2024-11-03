@@ -2,7 +2,7 @@
 export const generateData = (startDate: Date, endDate: Date, asset: string) => {
     const data = []
     let currentDate = new Date(startDate)
-    let value = 100
+    let value = 1
     const volatility = {
         'EURUSD': 0.0005,
         'GBPUSD': 0.0006,

@@ -219,7 +219,6 @@ const Candlestick = props => {
     const isGrowing = open < close;
     const color = isGrowing ? 'green' : 'red';
     const ratio = Math.abs(height / (open - close));
-    console.log(props);
     return (
         <g stroke={color} fill="none" strokeWidth="2">
             <path
@@ -280,21 +279,22 @@ const CandleStickChart = () => {
     const tickSeries = generateData(new Date('2024-01-01'), new Date('2024-01-02'), 'EURUSD');
     const candleStickSeries = transformToCandleStickSeries(tickSeries);
     const data = prepareData(candleStickSeries);
-    data.reduce((acc, item) => console.log(item), 0);
     const minValue = data.reduce(
-        (minValue, { low, openClose: [open, close] }) => {
-            const currentMin = Math.min(low, open, close);
-            return minValue === null || currentMin < minValue ? currentMin : minValue;
+        (minValue, low) => {
+            // const currentMin = Math.min(low, minValue);
+            return low < minValue ? low : minValue;
         },
-        null,
+        data[0].low,
     );
     const maxValue = data.reduce(
-        (maxValue, { high, openClose: [open, close] }) => {
-            const currentMax = Math.max(high, open, close);
+        (maxValue, { high }) => {
+            const currentMax = Math.max(high, maxValue);
             return currentMax > maxValue ? currentMax : maxValue;
         },
         minValue,
     );
+
+    console.log(minValue, maxValue);
     return (
         <BarChart
             width={600}
@@ -303,7 +303,7 @@ const CandleStickChart = () => {
             margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
         >
             <XAxis dataKey="dd/mm hh:mm" />
-            <YAxis domain={[minValue, maxValue]} />
+            <YAxis domain={['auto', 'auto']} allowDecimals={true} padding={{top:20, bottom:20}}/>
             <CartesianGrid strokeDasharray="3 3" />
             <Bar
                 dataKey="openClose"
