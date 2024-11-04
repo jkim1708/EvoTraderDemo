@@ -1,4 +1,4 @@
-import {generateData, transformToCandleStickData, transformToCandleStickSeries} from "@/utils";
+import {transformToCandleStickData, transformToCandleStickSeries} from "@/utils";
 
 describe('CandleStickChart', () => {
     it('should render', () => {

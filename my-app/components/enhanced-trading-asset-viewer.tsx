@@ -6,8 +6,6 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/compo
 import {Input} from "@/components/ui/input"
 import {Label} from "@/components/ui/label"
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
-// import {ChartContainer} from "@/components/ui/chart"
-import { ResponsiveContainer} from "recharts"
 import {ArrowUpCircle, ArrowDownCircle, Edit2, Trash2} from "lucide-react"
 import {
     Dialog,
@@ -22,12 +20,12 @@ import {
 import CandleStickChart from "@/components/ui/candleStickChart";
 import {generateData} from "@/utils";
 
-const calculatePnL = (trade: Trade, data: { date: string; value: number }[]) => {
-    const startValue = data.find(d => d.date === trade.startDate)?.value || 0
-    const endValue = data.find(d => d.date === trade.endDate)?.value || 0
-    const pnl = trade.type === 'long' ? endValue - startValue : startValue - endValue
-    return pnl.toFixed(4)
-}
+// const calculatePnL = (trade: Trade, data: { date: string; value: number }[]) => {
+//     const startValue = data.find(d => d.date === trade.startDate)?.value || 0
+//     const endValue = data.find(d => d.date === trade.endDate)?.value || 0
+//     const pnl = trade.type === 'long' ? endValue - startValue : startValue - endValue
+//     return pnl.toFixed(4)
+// }
 
 type Trade = {
     id: number;
@@ -60,6 +58,8 @@ export function EnhancedTradingAssetViewer() {
         // setSelectedRange(null)
         setTrades([])
     }
+
+
 
     // const handleChartClick = (props: CategoricalChartState) => {
     //     if (props && props.activeLabel) {
@@ -99,7 +99,7 @@ export function EnhancedTradingAssetViewer() {
     const saveEditedTrade = (editedTrade: Trade) => {
         const updatedTrade = {
             ...editedTrade,
-            pnl: calculatePnL(editedTrade, data)
+            // pnl: calculatePnL(editedTrade, data)
         }
         setTrades(trades.map(trade => trade.id === updatedTrade.id ? updatedTrade : trade))
         setEditingTrade(null)
@@ -181,6 +181,8 @@ export function EnhancedTradingAssetViewer() {
                     </Button>
                 </div>
                 <CandleStickChart />
+
+                <div hidden={true}>{data.toString()}</div>
 
                 {/*<ChartContainer*/}
                 {/*    config={{*/}
