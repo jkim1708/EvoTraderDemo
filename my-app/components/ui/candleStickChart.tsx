@@ -27,7 +27,7 @@ const Candlestick = props => {
     const color = isGrowing ? 'green' : 'red';
     const ratio = Math.abs(height / (open - close));
     return (
-        <g stroke={color} fill="none" strokeWidth="2">
+        <g stroke={color} fill={color} strokeWidth="2">
             <path
                 d={`
           M ${x},${y}
@@ -138,13 +138,7 @@ const CandleStickChart =
                 dataKey="openClose"
                 fill="#8884d8"
                 shape={<Candlestick />}
-                // label={{ position: 'top' }}
             >
-                {/*{data.map((entry, index) => (*/}
-                {/*    <Cell key={`cell-${index}`} fill={colors[index % 20]} />*/}
-                {/*))}*/}
-
-                {/*<Cell key={`cell-${1}`} fill={colors[2]} />*/}
             </Bar>
         </BarChart>
     );

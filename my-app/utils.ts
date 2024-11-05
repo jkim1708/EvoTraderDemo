@@ -48,6 +48,11 @@ export function transformToCandleStickData(tickData: { date: string, value: stri
     };
 }
 
+export enum CANDLESTICK_FREQUENCY {
+    HOURLY,
+    FOUR_HOURLY,
+}
+
 export function transformToCandleStickSeries(tickData: { date: Date, value: string }[]) {
 
     if (tickData === undefined || tickData === null ) return;

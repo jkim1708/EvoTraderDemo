@@ -1,5 +1,6 @@
 "use client"
 
+// import dynamic from 'next/dynamic'
 import {useState} from "react"
 import {Button} from "@/components/ui/button"
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
@@ -124,7 +125,11 @@ const EnhancedTradingAssetViewer = observer(() => {
                     <div className="flex space-x-4">
                         <div className="flex-1">
                             <Label htmlFor="asset">Asset</Label>
-                            <Select value={asset} onValueChange={setAsset}>
+                            <Select value={asset} onValueChange={(asset) => {
+                                setAsset(asset);
+
+                                setData(generateData(new Date(startDate), new Date(endDate), asset))
+                            }}>
                                 <SelectTrigger id="asset">
                                     <SelectValue/>
                                 </SelectTrigger>
@@ -161,14 +166,17 @@ const EnhancedTradingAssetViewer = observer(() => {
                         </div>
                         <div className="flex-1">
                             <Label htmlFor="frequency">Frequency</Label>
-                            <Select value={frequency} onValueChange={setFrequency}>
+                            <Select value={frequency} onValueChange={ frequency => {
+                                setFrequency(frequency);
+
+                                setData(generateData(new Date(startDate), new Date(endDate), asset))
+                            }}>
                                 <SelectTrigger id="frequency">
                                     <SelectValue/>
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="hourly">Hourly</SelectItem>
-                                    <SelectItem value="daily">Daily</SelectItem>
-                                    <SelectItem value="weekly">Weekly</SelectItem>
+                                    <SelectItem value="4 hourly">4 Hourly</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
