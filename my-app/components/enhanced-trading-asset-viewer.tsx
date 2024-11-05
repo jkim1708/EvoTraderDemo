@@ -16,9 +16,9 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog"
-// import {CategoricalChartState} from "recharts/types/chart/types";
-import CandleStickChart from "@/components/ui/candleStickChart";
 import {generateData} from "@/utils";
+import CandleStickChart from "@/components/ui/candleStickChart";
+import {observer} from "mobx-react-lite";
 
 // const calculatePnL = (trade: Trade, data: { date: string; value: number }[]) => {
 //     const startValue = data.find(d => d.date === trade.startDate)?.value || 0
@@ -37,7 +37,8 @@ type Trade = {
 
 const assets = ['EURUSD', 'GBPUSD', 'EURCHF', 'EURNOK']
 
-export function EnhancedTradingAssetViewer() {
+
+const EnhancedTradingAssetViewer = observer(() => {
     const today = new Date()
     const twoDaysAgo = new Date(today)
     twoDaysAgo.setDate(today.getDate() - 2)
@@ -58,7 +59,6 @@ export function EnhancedTradingAssetViewer() {
         // setSelectedRange(null)
         setTrades([])
     }
-
 
 
     // const handleChartClick = (props: CategoricalChartState) => {
@@ -109,6 +109,10 @@ export function EnhancedTradingAssetViewer() {
         setEditingTrade(null)
     }
 
+    // const DynamicCandleStickChart = dynamic(() => import('../components/ui/candleStickChart'), {
+    //     ssr: false,
+    // })
+
     return (
         <Card className="w-full max-w-4xl">
             <CardHeader>
@@ -137,7 +141,10 @@ export function EnhancedTradingAssetViewer() {
                                 id="startDate"
                                 type="date"
                                 value={startDate}
-                                onChange={(e) => setStartDate(e.target.value)}
+                                onChange={(e) => {
+                                    setStartDate(e.target.value)
+                                    setData(generateData(new Date(e.target.value), new Date(endDate), asset))
+                                }}
                             />
                         </div>
                         <div className="flex-1">
@@ -146,7 +153,10 @@ export function EnhancedTradingAssetViewer() {
                                 id="endDate"
                                 type="date"
                                 value={endDate}
-                                onChange={(e) => setEndDate(e.target.value)}
+                                onChange={(e) => {
+                                    setEndDate(e.target.value)
+                                    setData(generateData(new Date(startDate), new Date(e.target.value), asset))
+                                }}
                             />
                         </div>
                         <div className="flex-1">
@@ -180,23 +190,9 @@ export function EnhancedTradingAssetViewer() {
                         <ArrowDownCircle className="mr-2 h-4 w-4"/> Short
                     </Button>
                 </div>
-                <CandleStickChart />
+                <CandleStickChart generatedData={data}/>
 
                 <div hidden={true}>{data.toString()}</div>
-
-                {/*<ChartContainer*/}
-                {/*    config={{*/}
-                {/*        value: {*/}
-                {/*            label: `${asset} Value`,*/}
-                {/*            color: "hsl(var(--chart-1))",*/}
-                {/*        },*/}
-                {/*    }}*/}
-                {/*    className="h-[400px]"*/}
-                {/*>*/}
-                {/*    <ResponsiveContainer width="100%" height="100%">*/}
-                {/*        <CandleStickChart />*/}
-                {/*    </ResponsiveContainer>*/}
-                {/*</ChartContainer>*/}
 
                 <div className="mt-6">
                     <h3 className="text-lg font-semibold mb-2">Selected Trades</h3>
@@ -281,3 +277,5 @@ export function EnhancedTradingAssetViewer() {
         </Card>
     )
 }
+);
+export default EnhancedTradingAssetViewer;

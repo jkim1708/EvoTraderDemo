@@ -1,3 +1,5 @@
+"use client"
+
 import React from 'react';
 import {
     BarChart,
@@ -6,8 +8,8 @@ import {
     YAxis,
     CartesianGrid,
 } from 'recharts';
-import {generateData, transformToCandleStickSeries} from "@/utils";
-
+import {SampleAssetData, transformToCandleStickSeries} from "@/utils";
+import {observer} from "mobx-react-lite";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
@@ -88,8 +90,17 @@ type CandleStickChart = {
     ts: string,
 };
 
-const CandleStickChart = () => {
-    const tickSeries = generateData(new Date('2024-01-01'), new Date('2024-01-02'), 'EURUSD');
+export type CandleStickChartProps = {
+    generatedData: SampleAssetData
+}
+
+const CandleStickChart =
+    observer((props: CandleStickChartProps) => {
+
+    const generateData = props.generatedData;
+
+    // const genData = generateData(new Date('2024-01-01'), new Date('2024-01-02'), 'EURUSD');
+    const tickSeries: SampleAssetData = generateData;
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
     const candleStickSeries: CandleStickChart[] = transformToCandleStickSeries(tickSeries);
@@ -137,6 +148,6 @@ const CandleStickChart = () => {
             </Bar>
         </BarChart>
     );
-};
+});
 
 export default CandleStickChart;

@@ -1,5 +1,10 @@
+export type SampleAssetData = {
+    date: Date
+    value: number
+}[]
+
 // Generate sample data
-export const generateData = (startDate: Date, endDate: Date, asset: string) => {
+export const generateData = (startDate: Date, endDate: Date, asset: string): SampleAssetData => {
     const data = []
     let currentDate = new Date(startDate)
     let value = 1
@@ -44,6 +49,8 @@ export function transformToCandleStickData(tickData: { date: string, value: stri
 }
 
 export function transformToCandleStickSeries(tickData: { date: Date, value: string }[]) {
+
+    if (tickData === undefined || tickData === null ) return;
     const groupedData = tickData.reduce((acc, tick) => {
         const hour = new Date(tick.date).getUTCHours();
         if (!acc[hour]) {
