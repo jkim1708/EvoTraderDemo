@@ -126,8 +126,8 @@ const CandleStickChart =
 
     return (
         <BarChart
-            width={600}
-            height={300}
+            width={1000}
+            height={500}
             data={data}
             margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
         >

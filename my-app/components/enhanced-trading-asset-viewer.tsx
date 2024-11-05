@@ -115,7 +115,7 @@ const EnhancedTradingAssetViewer = observer(() => {
     // })
 
     return (
-        <Card className="w-full max-w-4xl">
+        <Card className="w-full max-w-6xl">
             <CardHeader>
                 <CardTitle>Enhanced Trading Asset Viewer</CardTitle>
                 <CardDescription>Select asset, date range, and manage trades</CardDescription>
