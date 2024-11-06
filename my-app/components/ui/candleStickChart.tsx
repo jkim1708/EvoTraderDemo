@@ -1,6 +1,6 @@
 "use client"
 
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {
     BarChart,
     Bar,
@@ -15,6 +15,7 @@ import {
 } from "@/utils";
 import {observer} from "mobx-react-lite";
 import {CategoricalChartState} from "recharts/types/chart/types";
+import {MobxContext} from "@/app/_app";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
@@ -109,6 +110,11 @@ export type ReferencedArea = {
 const CandleStickChart =
     observer((props: CandleStickChartProps) => {
 
+        const {
+            // tradingRules,
+            setTradingRule
+        } = useContext(MobxContext);
+
         const generateData = props.generatedData;
         const asset = props.asset;
         // const handleChartClick = props.handleChartClick;
@@ -160,7 +166,7 @@ const CandleStickChart =
             )
         }
 
-        function resetRefAreaSelectin(){
+        function resetRefAreaSelection(){
             setRefAreaLeft('');
             setRefAreaRight('');
         }
@@ -173,14 +179,24 @@ const CandleStickChart =
             definedRefArea.push({referencedAreaLeft: refAreaLeft, referencedAreaRight: refAreaRight});
         }
 
+        function createTrade() {
+            setTradingRule([{kind: 'short', startTime: refAreaLeft, endTime: refAreaRight, asset: asset, profitNLoss: 0}]);
+        }
+
         const defineReferenceArea = () => {
 
             console.log('defineReferenceArea refAreaLeft '+refAreaLeft);
             console.log('defineReferenceArea refAreaRight '+refAreaRight);
 
-            if(isRefAreaSelectionDefined()) saveReferenceAreaSelection();
+            if(isRefAreaSelectionDefined()) {
+                saveReferenceAreaSelection();
+
+                createTrade();
+            };
             console.log('defineReferenceArea definedRefArea '+JSON.stringify(definedRefArea));
-            resetRefAreaSelectin();
+            resetRefAreaSelection();
+
+
         }
 
         return (
