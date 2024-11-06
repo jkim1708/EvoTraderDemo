@@ -9,7 +9,6 @@ import {
     CartesianGrid, Tooltip, ReferenceArea,
 } from 'recharts';
 import {
-    convertToCustomDate,
     isInExistingInReferenceArea,
     SampleAssetData,
     transformToCandleStickSeries
@@ -106,24 +105,6 @@ export type ReferencedArea = {
     referencedAreaLeft: string,
     referencedAreaRight: string,
 }
-
-type ReferencedAreaProps = {
-    referencedAreas: ReferencedArea[]
-};
-
-const AllReferencedAreas = (props: ReferencedAreaProps) => {
-
-    const {referencedAreas} = props;
-
-    console.log('referencedAreas '+referencedAreas);
-    if(referencedAreas.length === 0) return null;
-
-    referencedAreas.forEach(({referencedAreaLeft, referencedAreaRight}) => {
-        return (
-            <ReferenceArea key={referencedAreaLeft} yAxisId="1" x1={referencedAreaLeft} x2={referencedAreaRight} strokeOpacity={0.3} />
-        )
-    });
-};
 
 const CandleStickChart =
     observer((props: CandleStickChartProps) => {
