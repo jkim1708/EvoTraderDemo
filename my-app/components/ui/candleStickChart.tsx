@@ -180,7 +180,7 @@ const CandleStickChart =
         }
 
         function createTrade() {
-            setTradingRule([{kind: 'short', startTime: refAreaLeft, endTime: refAreaRight, asset: asset, profitNLoss: 0}]);
+            setTradingRule([{kind: 'short', startTime: refAreaLeft, endTime: refAreaRight, asset: 'EURUSD', profitNLoss: 0}]);
         }
 
         const defineReferenceArea = () => {
