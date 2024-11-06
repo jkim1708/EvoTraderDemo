@@ -160,18 +160,27 @@ const CandleStickChart =
             )
         }
 
+        function resetRefAreaSelectin(){
+            setRefAreaLeft('');
+            setRefAreaRight('');
+        }
+
+        function isRefAreaSelectionDefined(){
+            return refAreaLeft && refAreaRight;
+        }
+
+        function saveReferenceAreaSelection(){
+            definedRefArea.push({referencedAreaLeft: refAreaLeft, referencedAreaRight: refAreaRight});
+        }
+
         const defineReferenceArea = () => {
 
             console.log('defineReferenceArea refAreaLeft '+refAreaLeft);
             console.log('defineReferenceArea refAreaRight '+refAreaRight);
 
-            definedRefArea.push({referencedAreaLeft: refAreaLeft, referencedAreaRight: refAreaRight});
+            if(isRefAreaSelectionDefined()) saveReferenceAreaSelection();
             console.log('defineReferenceArea definedRefArea '+JSON.stringify(definedRefArea));
-            setRefAreaLeft('');
-            setRefAreaRight('');
-
-
-
+            resetRefAreaSelectin();
         }
 
         return (
