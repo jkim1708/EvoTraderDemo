@@ -58,13 +58,6 @@ const EnhancedTradingAssetViewer = observer(() => {
             setData(generateData(new Date(startDate), new Date(endDate), asset));
         }, [startDate, endDate, asset, frequency]);
 
-        // const handleSubmit = (e: React.FormEvent) => {
-        //     e.preventDefault()
-        //     // setData(generateData(new Date(startDate), new Date(endDate), asset))
-        //     // // setSelectedRange(null)
-        //     // setTrades([])
-        // }
-
         const removeTrade = (id: number) => {
             setTrades(trades.filter(trade => trade.id !== id))
         }
@@ -175,7 +168,6 @@ const EnhancedTradingAssetViewer = observer(() => {
                                 </Select>
                             </div>
                         </div>
-                        <Button type="submit">Update Chart</Button>
                     </form>
 
                     <div className="flex space-x-4 mb-4">
