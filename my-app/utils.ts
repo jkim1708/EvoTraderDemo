@@ -1,3 +1,5 @@
+import {ReferencedArea} from "@/components/ui/candleStickChart";
+
 export type SampleAssetData = {
     date: Date
     value: number
@@ -23,6 +25,8 @@ export const generateData = (startDate: Date, endDate: Date, asset: string): Sam
         })
         currentDate = addMinutesToDate(currentDate, 5) // Increment by 1 hour for granularity
     }
+
+    console.log("gen data " + data.length + `start Date ${startDate} end Date ${endDate} asset ${asset}`);
 
     return data
 }
@@ -70,7 +74,7 @@ export function transformToCandleStickSeries(tickData: { date: Date, value: stri
         const low = Math.min(...group.map(tick => parseFloat(tick.value))).toFixed(12);
         const open = group[0].value;
         const close = group[group.length - 1].value;
-        const ts = convertDate(group[0].date);
+        const ts = convertToCustomDate(group[0].date);
 
         return {
             high,
@@ -82,12 +86,33 @@ export function transformToCandleStickSeries(tickData: { date: Date, value: stri
     });
 }
 
-export function convertDate(date: Date): string {
+export function convertToCustomDate(date: Date): string {
     const day = date.getDate();
     const dayStr = day < 10 ? "0" + day : day;
     const month = date.getMonth() + 1;
     const monthStr = month < 10 ? "0" + month : month;
     const year = date.getFullYear();
     const hour = date.getHours();
-    return `${year}.${monthStr}.${dayStr} ${hour}`;
+    return `${year}.${monthStr}.${dayStr}, ${hour}:00`;
+}
+
+export function convertToDate(date: string): Date {
+    console.log("date " + date);
+    const dateParts = date.split(",")[0].split(".");
+    const hour = date.split(",")[1].split(":")[0];
+    return new Date(`${dateParts[0]}-${dateParts[1]}-${dateParts[2]}T${hour}:00:00`);
+}
+
+export const isInExistingInReferenceArea = (referencedArea: ReferencedArea[], refAreaLeft: string | undefined, currentCursor: string ) => {
+    if (referencedArea.length === 0 || refAreaLeft === undefined || refAreaLeft === '') {
+        return true;
+    }
+
+    for (let i = 0; i < referencedArea.length; i++) {
+        if (convertToDate(refAreaLeft) >= convertToDate(referencedArea[i].referencedAreaLeft) && convertToDate(currentCursor) <= convertToDate(referencedArea[i].referencedAreaRight)) {
+            return false;
+        }
+    }
+
+    return true;
 }

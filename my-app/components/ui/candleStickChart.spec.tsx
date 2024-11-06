@@ -1,4 +1,5 @@
-import {transformToCandleStickData} from "@/utils";
+import {convertToCustomDate, isInExistingInReferenceArea, transformToCandleStickData} from "@/utils";
+import {ReferencedArea} from "@/components/ui/candleStickChart";
 
 
 describe('CandleStickChart', () => {
@@ -32,6 +33,24 @@ describe('CandleStickChart', () => {
             "open": "100.00015372651269",
             "close": "100.00020475824091",
             "ts": "2024-01-01T00:00:00.000Z",
+        });
+    });
+
+    describe('Reference Area', () => {
+
+        it('should return true if first reference line has been set and if current cursor is not in an existing area', () => {
+            const refAreaLeft1 = convertToCustomDate(new Date('2024-01-01T01:00:00.000Z'));
+            const refAreaRight1 = convertToCustomDate(new Date('2024-01-01T02:00:00.000Z'));
+
+            const refAreaLeft2 = convertToCustomDate(new Date('2024-01-01T05:00:00.000Z'));
+            const refAreaRight2 = convertToCustomDate(new Date('2024-01-01T06:00:00.000Z'));
+
+            const refAreaLeft3 = convertToCustomDate(new Date('2024-01-01T08:00:00.000Z'));
+
+            const currentCursorToSetRefAreaRight3 = convertToCustomDate(new Date('2024-01-01T09:00:00.000Z'));
+
+            const referencedAreas: ReferencedArea[] = [{referencedAreaLeft: refAreaLeft1, referencedAreaRight: refAreaRight1},{referencedAreaLeft: refAreaLeft2, referencedAreaRight: refAreaRight2}];
+            expect(isInExistingInReferenceArea(referencedAreas,refAreaLeft3, currentCursorToSetRefAreaRight3)).toBeTruthy();
         });
     });
 
