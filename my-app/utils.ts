@@ -26,8 +26,6 @@ export const generateData = (startDate: Date, endDate: Date, asset: string): Sam
         currentDate = addMinutesToDate(currentDate, 5) // Increment by 1 hour for granularity
     }
 
-    console.log("gen data " + data.length + `start Date ${startDate} end Date ${endDate} asset ${asset}`);
-
     return data
 }
 
@@ -97,7 +95,6 @@ export function convertToCustomDate(date: Date): string {
 }
 
 export function convertToDate(date: string): Date {
-    console.log("date " + date);
     const dateParts = date.split(",")[0].split(".");
     const hour = date.split(",")[1].split(":")[0];
     return new Date(`${dateParts[0]}-${dateParts[1]}-${dateParts[2]}T${hour}:00:00`);

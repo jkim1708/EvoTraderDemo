@@ -1,6 +1,6 @@
 "use client"
 
-import React, {useContext, useState} from 'react';
+import React, {useState} from 'react';
 import {
     BarChart,
     Bar,
@@ -14,8 +14,7 @@ import {
     transformToCandleStickSeries
 } from "@/utils";
 import {observer} from "mobx-react-lite";
-import {CategoricalChartState} from "recharts/types/chart/types";
-import {MobxContext} from "@/app/_app";
+import {useStores} from "@/store/Provider";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
@@ -99,7 +98,6 @@ type CandleStickChart = {
 export type CandleStickChartProps = {
     generatedData: SampleAssetData,
     asset: string,
-    handleChartClick: (event: CategoricalChartState) => void
 }
 
 export type ReferencedArea = {
@@ -111,9 +109,8 @@ const CandleStickChart =
     observer((props: CandleStickChartProps) => {
 
         const {
-            // tradingRules,
-            setTradingRule
-        } = useContext(MobxContext);
+            tradingRuleStore: { setTradingRule },
+        } = useStores();
 
         const generateData = props.generatedData;
         const asset = props.asset;
@@ -180,20 +177,17 @@ const CandleStickChart =
         }
 
         function createTrade() {
+            console.log("create trade");
             setTradingRule([{kind: 'short', startTime: refAreaLeft, endTime: refAreaRight, asset: 'EURUSD', profitNLoss: 0}]);
         }
 
         const defineReferenceArea = () => {
-
-            console.log('defineReferenceArea refAreaLeft '+refAreaLeft);
-            console.log('defineReferenceArea refAreaRight '+refAreaRight);
 
             if(isRefAreaSelectionDefined()) {
                 saveReferenceAreaSelection();
 
                 createTrade();
             };
-            console.log('defineReferenceArea definedRefArea '+JSON.stringify(definedRefArea));
             resetRefAreaSelection();
 
 
@@ -213,11 +207,9 @@ const CandleStickChart =
                     margin={{top: 20, right: 30, left: 20, bottom: 5}}
                     // onClick={handleChartClick}
                     onMouseDown={(e) => {
-                        console.log('on mouse down'+e.activeLabel);
                         if(e.activeLabel && isInExistingInReferenceArea(definedRefArea, '', e.activeLabel))  setRefAreaLeft(e.activeLabel);
                     }}
                     onMouseMove={(e) => {
-                        console.log('on mouse move'+e.activeLabel);
                         if(e.activeLabel && refAreaLeft && isInExistingInReferenceArea(definedRefArea, refAreaLeft, e.activeLabel))  setRefAreaRight(e.activeLabel)
                     }}
                     // eslint-disable-next-line react/jsx-no-bind

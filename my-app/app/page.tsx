@@ -1,5 +1,12 @@
 import EnhancedTradingAssetViewer from "@/components/enhanced-trading-asset-viewer";
+import React from "react";
+import {StoreWrapper} from "@/store/Provider";
 
-export default function Page() {
-  return <EnhancedTradingAssetViewer />
+//hook to get stores
+
+
+ const Page = () => {
+  return (<StoreWrapper> <EnhancedTradingAssetViewer /> </StoreWrapper>);
 }
+
+export default Page;

@@ -23,7 +23,10 @@ class TradingRuleStore {
     //     this.searchParam = param;
     // };
     //
-    setTradingRule = (tradingRules: TradingRule[]) => (this.tradingRules = tradingRules);
+    setTradingRule = (tradingRules: TradingRule[]) => {
+        console.log("trading rules", this.tradingRules);
+        this.tradingRules = tradingRules
+    };
     //
     // fetchBooks = async () => {
     //     return Promise.resolve(books);

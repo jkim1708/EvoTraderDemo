@@ -17,10 +17,11 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog"
-import {convertToCustomDate, generateData, SampleAssetData} from "@/utils";
+import { generateData, SampleAssetData} from "@/utils";
 import CandleStickChart from "@/components/ui/candleStickChart";
 import {observer} from "mobx-react-lite";
-import {CategoricalChartState} from "recharts/types/chart/types";
+import {TradingRule} from "@/store/TradingRuleStore";
+import {useStores} from "@/store/Provider";
 
 // const calculatePnL = (trade: Trade, data: { date: string; value: number }[]) => {
 //     const startValue = data.find(d => d.date === trade.startDate)?.value || 0
@@ -29,17 +30,13 @@ import {CategoricalChartState} from "recharts/types/chart/types";
 //     return pnl.toFixed(4)
 // }
 
-type Trade = {
-    id: number;
-    type: 'long' | 'short';
-    startDate: string;
-    endDate: string;
-    pnl: string;
-}
-
 const assets = ['EURUSD', 'GBPUSD', 'EURCHF', 'EURNOK']
 
 const EnhancedTradingAssetViewer = observer(() => {
+    const {
+        tradingRuleStore: { tradingRules, setTradingRule },
+    } = useStores();
+
         const today = new Date()
         const twoDaysAgo = new Date(today)
         twoDaysAgo.setDate(today.getDate() - 2)
@@ -50,65 +47,32 @@ const EnhancedTradingAssetViewer = observer(() => {
         const [asset, setAsset] = useState("EURUSD")
         const [data, setData] = useState([] as SampleAssetData)
         // const [selectedRange, setSelectedRange] = useState<[number, number] | null>(null)
-        const [trades, setTrades] = useState<Trade[]>([])
         const [tradeType, setTradeType] = useState<'long' | 'short'>('long')
-        const [editingTrade, setEditingTrade] = useState<Trade | null>(null)
+        const [editingTrade, setEditingTrade] = useState<TradingRule | null>(null)
 
         useEffect(() => {
             setData(generateData(new Date(startDate), new Date(endDate), asset));
         }, [startDate, endDate, asset, frequency]);
 
-        const removeTrade = (id: number) => {
-            setTrades(trades.filter(trade => trade.id !== id))
+        const removeTrade = (startTime: string) => {
+            setTradingRule(tradingRules.filter(trade => trade.startTime !== startTime))
         }
 
-        const startEditTrade = (trade: Trade) => {
+        const startEditTrade = (trade: TradingRule) => {
             setEditingTrade(trade)
         }
 
-        const saveEditedTrade = (editedTrade: Trade) => {
+        const saveEditedTrade = (editedTrade: TradingRule) => {
             const updatedTrade = {
                 ...editedTrade,
                 // pnl: calculatePnL(editedTrade, data)
             }
-            setTrades(trades.map(trade => trade.id === updatedTrade.id ? updatedTrade : trade))
+            setTradingRule(tradingRules.map(trade => trade.startTime === updatedTrade.startTime ? updatedTrade : trade))
             setEditingTrade(null)
         }
 
         const cancelEditTrade = () => {
             setEditingTrade(null)
-        }
-
-        // const DynamicCandleStickChart = dynamic(() => import('../components/ui/candleStickChart'), {
-        //     ssr: false,
-        // })
-
-
-        const handleChartClick = (props: CategoricalChartState) => {
-            if (props && props.activeLabel) {
-
-                const clickedDate = props.activeLabel ? new Date(props.activeLabel) : "";
-
-                const checkedClickedDate = data.findIndex(item => convertToCustomDate(item.date) === clickedDate);
-                // const newTrade: Trade = {
-                //     id: Date.now(),
-                //     type: tradeType,
-                //     startDate: data[startIndex].date,
-                //     endDate: data[endIndex].date,
-                //     pnl: calculatePnL({
-                //         id: Date.now(),
-                //         type: tradeType,
-                //         startDate: data[startIndex].date,
-                //         endDate: data[endIndex].date,
-                //         pnl: ''
-                //     }, data)
-                // }
-
-                console.log("props.activeLabel " + props.activeLabel);
-                console.log("data " + JSON.stringify(data));
-                console.log("checkedClickedDate " + checkedClickedDate);
-
-            }
         }
 
         return (
@@ -186,26 +150,26 @@ const EnhancedTradingAssetViewer = observer(() => {
                     </div>
 
 
-                    <CandleStickChart generatedData={data} asset={asset} handleChartClick={handleChartClick}/>
+                    <CandleStickChart generatedData={data} asset={asset}/>
 
                     <div hidden={true}>{data.toString()}</div>
 
                     <div className="mt-6">
                         <h3 className="text-lg font-semibold mb-2">Selected Trades</h3>
-                        {trades.length === 0 ? (
+                        {tradingRules.length === 0 ? (
                             <p>No trades selected yet. Click on the chart to select trade ranges.</p>
                         ) : (
                             <ul className="space-y-2">
-                                {trades.map((trade) => (
-                                    <li key={trade.id} className="flex items-center justify-between bg-muted p-2 rounded">
+                                {tradingRules.map((trade) => (
+                                    <li key={trade.startTime} className="flex items-center justify-between bg-muted p-2 rounded">
                   <span>
-                    {trade.type === 'long' ? <ArrowUpCircle className="inline mr-2 h-4 w-4 text-green-500"/> :
+                    {trade.kind === 'long' ? <ArrowUpCircle className="inline mr-2 h-4 w-4 text-green-500"/> :
                         <ArrowDownCircle className="inline mr-2 h-4 w-4 text-red-500"/>}
-                      {trade.startDate} to {trade.endDate}
+                      {trade.startTime} to {trade.endTime}
                   </span>
                                         <span
-                                            className={`font-semibold ${parseFloat(trade.pnl) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                    P&L: {trade.pnl}
+                                            className={`font-semibold ${parseFloat(String(trade.profitNLoss)) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                    P&L: {trade.profitNLoss}
                   </span>
                                         <div>
                                             <Dialog>
@@ -228,7 +192,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                                                             <Input
                                                                 id="start-date"
                                                                 type="date"
-                                                                value={editingTrade?.startDate || ''}
+                                                                value={editingTrade?.startTime || ''}
                                                                 onChange={(e) => setEditingTrade(prev => prev ? {
                                                                     ...prev,
                                                                     startDate: e.target.value
@@ -243,7 +207,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                                                             <Input
                                                                 id="end-date"
                                                                 type="date"
-                                                                value={editingTrade?.endDate || ''}
+                                                                value={editingTrade?.endTime || ''}
                                                                 onChange={(e) => setEditingTrade(prev => prev ? {
                                                                     ...prev,
                                                                     endDate: e.target.value
@@ -260,7 +224,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                                                     </DialogFooter>
                                                 </DialogContent>
                                             </Dialog>
-                                            <Button variant="ghost" size="sm" onClick={() => removeTrade(trade.id)}>
+                                            <Button variant="ghost" size="sm" onClick={() => removeTrade(trade.startTime)}>
                                                 <Trash2 className="h-4 w-4"/>
                                             </Button>
                                         </div>
