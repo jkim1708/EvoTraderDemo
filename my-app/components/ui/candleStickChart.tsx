@@ -109,7 +109,7 @@ const CandleStickChart =
     observer((props: CandleStickChartProps) => {
 
         const {
-            tradingRuleStore: { tradingRules, setTradingRule },
+            tradingRuleStore: { tradingRules, setTradingRule, currentSelectedAsset, definedRefArea },
         } = useStores();
 
         const generateData = props.generatedData;
@@ -118,7 +118,6 @@ const CandleStickChart =
 
         const [refAreaLeft, setRefAreaLeft] = useState('');
         const [refAreaRight, setRefAreaRight] = useState('');
-        const [definedRefArea] = useState([] as ReferencedArea[]);
 
         // const genData = generateData(new Date('2024-01-01'), new Date('2024-01-02'), 'EURUSD');
         const tickSeries: SampleAssetData = generateData;
@@ -177,10 +176,8 @@ const CandleStickChart =
         }
 
         function createTrade() {
-            console.log("create trade");
-
             const newTradingRules = tradingRules
-            newTradingRules.push({kind: 'short', startTime: refAreaLeft, endTime: refAreaRight, asset: 'EURUSD', profitNLoss: 0});
+            newTradingRules.push({kind: 'short', startTime: refAreaLeft, endTime: refAreaRight, asset: currentSelectedAsset, profitNLoss: 0});
             setTradingRule(newTradingRules);
         }
 

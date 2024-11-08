@@ -34,7 +34,7 @@ const assets = ['EURUSD', 'GBPUSD', 'EURCHF', 'EURNOK']
 
 const EnhancedTradingAssetViewer = observer(() => {
     const {
-        tradingRuleStore: { tradingRules, setTradingRule },
+        tradingRuleStore: { tradingRules, setTradingRule,setDefinedRefArea },
     } = useStores();
 
         const today = new Date()
@@ -50,7 +50,13 @@ const EnhancedTradingAssetViewer = observer(() => {
         const [tradeType, setTradeType] = useState<'long' | 'short'>('long')
         const [editingTrade, setEditingTrade] = useState<TradingRule | null>(null)
 
+        function resetSelectedTrades() {
+            setTradingRule([]);
+            setDefinedRefArea([]);
+        }
+
         useEffect(() => {
+            resetSelectedTrades();
             setData(generateData(new Date(startDate), new Date(endDate), asset));
         }, [startDate, endDate, asset, frequency]);
 

@@ -13,6 +13,10 @@ class TradingRuleStore {
 
     tradingRules: TradingRule[];
 
+    definedRefArea: { referencedAreaLeft: string, referencedAreaRight: string }[] = [];
+
+    currentSelectedAsset: 'EURUSD' | 'USDJPY' | 'GBPUSD' | 'EURCHF' | 'EURNOK' = 'EURUSD';
+
     constructor() {
         this.tradingRules = [];
         // this.searchParam = "";
@@ -27,6 +31,14 @@ class TradingRuleStore {
         console.log("trading rules", this.tradingRules);
         this.tradingRules = tradingRules
     };
+
+    setDefinedRefArea = (definedRefArea: { referencedAreaLeft: string, referencedAreaRight: string }[]) => {
+        this.definedRefArea = definedRefArea;
+    }
+
+    setCurrentSelectedAsset = (asset: 'EURUSD' | 'USDJPY' | 'GBPUSD' | 'EURCHF' | 'EURNOK') => {
+        this.currentSelectedAsset = asset;
+    }
     //
     // fetchBooks = async () => {
     //     return Promise.resolve(books);
