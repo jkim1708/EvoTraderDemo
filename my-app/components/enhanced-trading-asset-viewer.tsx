@@ -9,7 +9,7 @@ import {Label} from "@/components/ui/label"
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
 import {ArrowUpCircle, ArrowDownCircle, Edit2, Trash2} from "lucide-react"
 import {
-    Dialog,
+    Dialog, DialogClose,
     DialogContent,
     DialogDescription,
     DialogFooter,
@@ -270,11 +270,16 @@ const EnhancedTradingAssetViewer = observer(() => {
                                                         </div>
                                                     </div>
                                                     <DialogFooter>
+                                                        <DialogClose>
                                                         <Button variant="outline"
                                                                 onClick={cancelEditTrade}>Cancel</Button>
+                                                        </DialogClose>
+                                                        <DialogClose>
+
                                                         <Button
                                                             onClick={() => editingTrade && saveEditedTrade(editingTrade)}>Save
                                                             Changes</Button>
+                                                        </DialogClose>
                                                     </DialogFooter>
                                                 </DialogContent>
                                             </Dialog>
