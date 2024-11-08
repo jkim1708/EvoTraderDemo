@@ -111,7 +111,7 @@ const CandleStickChart =
     observer((props: CandleStickChartProps) => {
 
         const {
-            tradingRuleStore: { tradingRules, setTradingRule, currentSelectedAsset, definedRefArea },
+            tradingRuleStore: { tradingRules, setTradingRule, currentSelectedAsset, definedRefArea, currentSelectedTradeKind },
         } = useStores();
 
         const generateData = props.generatedData;
@@ -179,7 +179,7 @@ const CandleStickChart =
 
         function createTrade(profitNLoss: number) {
             const newTradingRules = tradingRules
-            newTradingRules.push({kind: 'short', startTime: refAreaLeft, endTime: refAreaRight, asset: currentSelectedAsset, profitNLoss: profitNLoss});
+            newTradingRules.push({kind: currentSelectedTradeKind, startTime: refAreaLeft, endTime: refAreaRight, asset: currentSelectedAsset, profitNLoss: profitNLoss});
             setTradingRule(newTradingRules);
         }
 
@@ -195,7 +195,6 @@ const CandleStickChart =
 
             switch (kind) {
                 case "short":
-
                     return (refAreaLeftOpenValue - refAreaRightCloseValue);
                     break;
                 case "long":

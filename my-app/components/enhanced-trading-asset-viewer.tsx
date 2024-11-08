@@ -34,7 +34,7 @@ const assets = ['EURUSD', 'GBPUSD', 'EURCHF', 'EURNOK']
 
 const EnhancedTradingAssetViewer = observer(() => {
     const {
-        tradingRuleStore: { tradingRules, setTradingRule,setDefinedRefArea },
+        tradingRuleStore: { tradingRules, setTradingRule,setDefinedRefArea, currentSelectedTradeKind, setCurrentSelectedTradeKind },
     } = useStores();
 
         const today = new Date()
@@ -47,7 +47,7 @@ const EnhancedTradingAssetViewer = observer(() => {
         const [asset, setAsset] = useState("EURUSD")
         const [data, setData] = useState([] as SampleAssetData)
         // const [selectedRange, setSelectedRange] = useState<[number, number] | null>(null)
-        const [tradeType, setTradeType] = useState<'long' | 'short'>('long')
+        // const [tradeType, setTradeType] = useState<'long' | 'short'>('long')
         const [editingTrade, setEditingTrade] = useState<TradingRule | null>(null)
 
         function resetSelectedTrades() {
@@ -62,6 +62,10 @@ const EnhancedTradingAssetViewer = observer(() => {
 
         const removeTrade = (startTime: string) => {
             setTradingRule(tradingRules.filter(trade => trade.startTime !== startTime))
+            setDefinedRefArea(tradingRules.filter(trade => trade.startTime !== startTime).map(trade => ({
+                referencedAreaLeft: trade.startTime,
+                referencedAreaRight: trade.endTime
+            })));
         }
 
         const startEditTrade = (trade: TradingRule) => {
@@ -142,14 +146,14 @@ const EnhancedTradingAssetViewer = observer(() => {
 
                     <div className="flex space-x-4 mb-4">
                         <Button
-                            variant={tradeType === 'long' ? 'default' : 'outline'}
-                            onClick={() => setTradeType('long')}
+                            variant={currentSelectedTradeKind === 'long' ? 'default' : 'outline'}
+                            onClick={() => setCurrentSelectedTradeKind('long')}
                         >
                             <ArrowUpCircle className="mr-2 h-4 w-4"/> Long
                         </Button>
                         <Button
-                            variant={tradeType === 'short' ? 'default' : 'outline'}
-                            onClick={() => setTradeType('short')}
+                            variant={currentSelectedTradeKind === 'short' ? 'default' : 'outline'}
+                            onClick={() => setCurrentSelectedTradeKind('short')}
                         >
                             <ArrowDownCircle className="mr-2 h-4 w-4"/> Short
                         </Button>

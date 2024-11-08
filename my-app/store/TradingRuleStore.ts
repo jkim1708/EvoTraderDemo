@@ -17,8 +17,12 @@ class TradingRuleStore {
 
     currentSelectedAsset: 'EURUSD' | 'USDJPY' | 'GBPUSD' | 'EURCHF' | 'EURNOK' = 'EURUSD';
 
+    currentSelectedTradeKind: 'short' | 'long';
+
     constructor() {
         this.tradingRules = [];
+        this.currentSelectedTradeKind = 'long';
+        this.currentSelectedAsset = 'EURUSD';
         // this.searchParam = "";
         makeAutoObservable(this);
     }
@@ -38,6 +42,10 @@ class TradingRuleStore {
 
     setCurrentSelectedAsset = (asset: 'EURUSD' | 'USDJPY' | 'GBPUSD' | 'EURCHF' | 'EURNOK') => {
         this.currentSelectedAsset = asset;
+    }
+
+    setCurrentSelectedTradeKind = (kind: 'short' | 'long') => {
+        this.currentSelectedTradeKind = kind;
     }
     //
     // fetchBooks = async () => {
