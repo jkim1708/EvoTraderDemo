@@ -11,6 +11,12 @@ export interface TradingRule {
 
 class TradingRuleStore {
 
+    currentTradingStrategyName: string;
+
+    setCurrentTradingStrategyName = (name: string) => {
+        this.currentTradingStrategyName = name;
+    }
+
     tradingRules: TradingRule[];
 
     definedRefArea: { referencedAreaLeft: string, referencedAreaRight: string }[] = [];
@@ -23,6 +29,7 @@ class TradingRuleStore {
         this.tradingRules = [];
         this.currentSelectedTradeKind = 'long';
         this.currentSelectedAsset = 'EURUSD';
+        this.currentTradingStrategyName = 'My Trading Strategy Name'
         // this.searchParam = "";
         makeAutoObservable(this);
     }
