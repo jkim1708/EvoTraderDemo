@@ -1,15 +1,25 @@
 import TradingRuleStore, {TradingRule} from "@/store/TradingRuleStore";
+import {makeAutoObservable} from "mobx";
+
+
+export interface TradingStrategy {
+    id: string,
+    name: string,
+    tradingRules: TradingRule[],
+}
 
 class TradingStrategyStore {
 
-    tradingRules: TradingRule[];
+    tradingStrategies: TradingStrategy[];
 
     constructor() {
-        this.tradingRules = [];
+        this.tradingStrategies = [];
+
+        makeAutoObservable(this);
     }
 
-    setTradingRule = (tradingRules: TradingRule[]) => {
-        this.tradingRules = tradingRules
+    setTradingStrategy = (tradingRules: TradingStrategy[]) => {
+        this.tradingStrategies = tradingRules
     };
 
 
@@ -18,6 +28,5 @@ class TradingStrategyStore {
 
 export const RootStore = {
     tradingRuleStore: new TradingRuleStore(),
-
     tradingStrategyStore: new TradingStrategyStore(),
 }
