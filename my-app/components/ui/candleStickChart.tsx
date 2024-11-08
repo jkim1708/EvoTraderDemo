@@ -82,6 +82,8 @@ const prepareData = (data: CandleStickChart[]) => {
     return data.map(({open, close, ...other}) => {
         return {
             ...other,
+            open: parseFloat(open),
+            close: parseFloat(close),
             openClose: [open, close],
         };
     });
@@ -175,18 +177,44 @@ const CandleStickChart =
             definedRefArea.push({referencedAreaLeft: refAreaLeft, referencedAreaRight: refAreaRight});
         }
 
-        function createTrade() {
+        function createTrade(profitNLoss: number) {
             const newTradingRules = tradingRules
-            newTradingRules.push({kind: 'short', startTime: refAreaLeft, endTime: refAreaRight, asset: currentSelectedAsset, profitNLoss: 0});
+            newTradingRules.push({kind: 'short', startTime: refAreaLeft, endTime: refAreaRight, asset: currentSelectedAsset, profitNLoss: profitNLoss});
             setTradingRule(newTradingRules);
+        }
+
+        function calculateProfitNLoss(refAreaLeft: string, refAreaRight: string, kind: "short" | "long") {
+
+            const refAreaLeftOpenValue = data.find((tickData) => tickData.ts === refAreaLeft)?.open;
+            const refAreaRightCloseValue = data.find((tickData) => tickData.ts === refAreaRight)?.close;
+
+            if(refAreaLeftOpenValue === undefined || refAreaRightCloseValue === undefined) {
+                console.error("invalid refAreaLeftOpenValue or refAreaRightCloseValue");
+                return;
+            }
+
+            switch (kind) {
+                case "short":
+
+                    return (refAreaLeftOpenValue - refAreaRightCloseValue);
+                    break;
+                case "long":
+                    return (refAreaRightCloseValue - refAreaLeftOpenValue);
+                    break;
+
+                default:
+                    console.error("invalid kind");
+            }
+
+
         }
 
         const defineReferenceArea = () => {
 
             if(isRefAreaSelectionDefined()) {
                 saveReferenceAreaSelection();
-
-                createTrade();
+                const profitNLoss = calculateProfitNLoss(refAreaLeft, refAreaRight, 'long');
+                createTrade(profitNLoss ?? 0);
             };
             resetRefAreaSelection();
 
