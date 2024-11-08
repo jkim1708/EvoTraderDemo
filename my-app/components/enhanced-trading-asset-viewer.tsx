@@ -201,13 +201,14 @@ const EnhancedTradingAssetViewer = observer(() => {
                                                             </Label>
                                                             <Input
                                                                 id="start-date"
-                                                                type="date"
+                                                                type="datetime-local"
                                                                 value={editingTrade?.startTime || ''}
                                                                 onChange={(e) => setEditingTrade(prev => prev ? {
                                                                     ...prev,
-                                                                    startDate: e.target.value
+                                                                    startTime: e.target.value
                                                                 } : null)}
                                                                 className="col-span-3"
+                                                                step="3600"
                                                             />
                                                         </div>
                                                         <div className="grid grid-cols-4 items-center gap-4">
@@ -216,13 +217,14 @@ const EnhancedTradingAssetViewer = observer(() => {
                                                             </Label>
                                                             <Input
                                                                 id="end-date"
-                                                                type="date"
+                                                                type="datetime-local"
                                                                 value={editingTrade?.endTime || ''}
                                                                 onChange={(e) => setEditingTrade(prev => prev ? {
                                                                     ...prev,
-                                                                    endDate: e.target.value
+                                                                    endTime: e.target.value
                                                                 } : null)}
                                                                 className="col-span-3"
+                                                                step="3600"
                                                             />
                                                         </div>
                                                     </div>
