@@ -107,11 +107,42 @@ export type ReferencedArea = {
     referencedAreaRight: string,
 }
 
+type CustomizedTickProps = {
+    x: number,
+    y: number,
+    payload: {
+        value: string
+    }
+}
+function CustomizedTick(props: CustomizedTickProps) {
+    const {x, y, payload} = props;
+
+    const date = payload.value.split(",")[0];
+    const hour = payload.value.split(",")[1];
+
+    return (
+        <g transform={`translate(${x - 20},${y})`}>
+
+            <text>
+                <tspan x="0" dy="16">{date}</tspan>
+                <tspan x="0" dy="20">{hour}</tspan>
+            </text>
+        </g>
+    )
+        ;
+}
+
 const CandleStickChart =
     observer((props: CandleStickChartProps) => {
 
         const {
-            tradingRuleStore: { tradingRules, setTradingRule, currentSelectedAsset, definedRefArea, currentSelectedTradeKind },
+            tradingRuleStore: {
+                tradingRules,
+                setTradingRule,
+                currentSelectedAsset,
+                definedRefArea,
+                currentSelectedTradeKind
+            },
         } = useStores();
 
         const generateData = props.generatedData;
@@ -127,23 +158,6 @@ const CandleStickChart =
         // @ts-expect-error
         const candleStickSeries: CandleStickChart[] = transformToCandleStickSeries(tickSeries);
 
-        // const minValue = data.reduce(
-        //     (minValue: string, {low}) => {
-        //         // const currentMin = Math.min(low, minValue);
-        //         return parseFloat(low) < parseFloat(minValue) ? low : minValue;
-        //     },
-        //     data[0].low,
-        // );
-        // const maxValue = data.reduce(
-        //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        //     // @ts-expect-error
-        //     (maxValue, { high }) => {
-        //         const currentMax = Math.max(high, maxValue);
-        //         return currentMax > maxValue ? currentMax : maxValue;
-        //     },
-        //     minValue,
-        // );
-
         const data = prepareData(candleStickSeries);
 
         const CustomTooltipCursor = ({x, y, height}: { x: string, y: string, height: string }) => (
@@ -156,30 +170,40 @@ const CandleStickChart =
 
         // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/ban-ts-comment
         // @ts-expect-error
-        const customTooltipContent = ({ payload }) => {
+        const customTooltipContent = ({payload}) => {
+            const open = payload[0] ? parseFloat(payload[0].payload.open).toFixed(4) : "";
+            const close = payload[0] ? parseFloat(payload[0].payload.close).toFixed(4) : "";
+            const high = payload[0] ? parseFloat(payload[0].payload.high).toFixed(4) : "";
+            const low = payload[0] ? parseFloat(payload[0].payload.low).toFixed(4) : "";
 
             return (
 
-                <p> o {payload[0] ? payload[0].value[0] : ""} c {payload[0] ? payload[0].value[1] : ""} </p>
+                <p> o {open} h {high} l {low} c {close} </p>
             )
         }
 
-        function resetRefAreaSelection(){
+        function resetRefAreaSelection() {
             setRefAreaLeft('');
             setRefAreaRight('');
         }
 
-        function isRefAreaSelectionDefined(){
+        function isRefAreaSelectionDefined() {
             return refAreaLeft && refAreaRight;
         }
 
-        function saveReferenceAreaSelection(){
+        function saveReferenceAreaSelection() {
             definedRefArea.push({referencedAreaLeft: refAreaLeft, referencedAreaRight: refAreaRight});
         }
 
         function createTrade(profitNLoss: number) {
             const newTradingRules = tradingRules
-            newTradingRules.push({kind: currentSelectedTradeKind, startTime: refAreaLeft, endTime: refAreaRight, asset: currentSelectedAsset, profitNLoss: profitNLoss});
+            newTradingRules.push({
+                kind: currentSelectedTradeKind,
+                startTime: refAreaLeft,
+                endTime: refAreaRight,
+                asset: currentSelectedAsset,
+                profitNLoss: profitNLoss
+            });
             setTradingRule(newTradingRules);
         }
 
@@ -188,7 +212,7 @@ const CandleStickChart =
             const refAreaLeftOpenValue = data.find((tickData) => tickData.ts === refAreaLeft)?.open;
             const refAreaRightCloseValue = data.find((tickData) => tickData.ts === refAreaRight)?.close;
 
-            if(refAreaLeftOpenValue === undefined || refAreaRightCloseValue === undefined) {
+            if (refAreaLeftOpenValue === undefined || refAreaRightCloseValue === undefined) {
                 console.error("invalid refAreaLeftOpenValue or refAreaRightCloseValue");
                 return;
             }
@@ -210,11 +234,12 @@ const CandleStickChart =
 
         const defineReferenceArea = () => {
 
-            if(isRefAreaSelectionDefined()) {
+            if (isRefAreaSelectionDefined()) {
                 saveReferenceAreaSelection();
                 const profitNLoss = calculateProfitNLoss(refAreaLeft, refAreaRight, 'long');
                 createTrade(profitNLoss ?? 0);
-            };
+            }
+            ;
             resetRefAreaSelection();
 
         }
@@ -230,19 +255,19 @@ const CandleStickChart =
                     width={1000}
                     height={500}
                     data={data}
-                    margin={{top: 20, right: 30, left: 20, bottom: 5}}
+                    margin={{top: 20, right: 30, left: 20, bottom: 20}}
                     // onClick={handleChartClick}
                     onMouseDown={(e) => {
-                        if(e.activeLabel && isInExistingInReferenceArea(definedRefArea, '', e.activeLabel))  setRefAreaLeft(e.activeLabel);
+                        if (e.activeLabel && isInExistingInReferenceArea(definedRefArea, '', e.activeLabel)) setRefAreaLeft(e.activeLabel);
                     }}
                     onMouseMove={(e) => {
-                        if(e.activeLabel && refAreaLeft && isInExistingInReferenceArea(definedRefArea, refAreaLeft, e.activeLabel))  setRefAreaRight(e.activeLabel)
+                        if (e.activeLabel && refAreaLeft && isInExistingInReferenceArea(definedRefArea, refAreaLeft, e.activeLabel)) setRefAreaRight(e.activeLabel)
                     }}
                     // eslint-disable-next-line react/jsx-no-bind
                     onMouseUp={defineReferenceArea.bind(this)}
                 >
-                    <XAxis dataKey="ts" tickCount={data.length}/>
-                    <YAxis yAxisId="1" domain={['auto', 'auto']} allowDecimals={true} />
+                    <XAxis dataKey="ts" tickCount={data.length} tick={CustomizedTick}/>
+                    <YAxis yAxisId="1" domain={['auto', 'auto']} allowDecimals={true}/>
                     <CartesianGrid strokeDasharray="3 3"/>
                     <Bar
                         yAxisId="1"
@@ -254,13 +279,15 @@ const CandleStickChart =
 
                     {/*// eslint-disable-next-line @typescript-eslint/ban-ts-comment*/}
                     {/*// @ts-expect-error take care later*/}
-                    <Tooltip cursor={<CustomTooltipCursor/>} content={customTooltipContent} position={{x: 100, y: -25}}/>
+                    <Tooltip cursor={<CustomTooltipCursor/>} content={customTooltipContent}
+                             position={{x: 100, y: -25}}/>
                     {definedRefArea.map((area, index) => (
-                        <ReferenceArea key={index} yAxisId="1" x1={area.referencedAreaLeft} x2={area.referencedAreaRight} strokeOpacity={0.3} />
+                        <ReferenceArea key={index} yAxisId="1" x1={area.referencedAreaLeft}
+                                       x2={area.referencedAreaRight} strokeOpacity={0.3}/>
                     ))}
                     {(refAreaLeft && refAreaRight) || (definedRefArea.length > 0) ? (
                         // <AllReferencedAreas referencedAreas={definedRefArea}/>
-                        <ReferenceArea yAxisId="1" x1={refAreaLeft} x2={refAreaRight} strokeOpacity={0.3} />
+                        <ReferenceArea yAxisId="1" x1={refAreaLeft} x2={refAreaRight} strokeOpacity={0.3}/>
                     ) : null}
                 </BarChart>
             </div>

@@ -91,11 +91,11 @@ export function convertToCustomDate(date: Date): string {
     const monthStr = month < 10 ? "0" + month : month;
     const year = date.getFullYear();
     const hour = date.getHours();
-    return `${year}.${monthStr}.${dayStr}, ${hour}:00`;
+    return `${year}-${monthStr}-${dayStr}, ${hour}:00`;
 }
 
 export function convertToDate(date: string): Date {
-    const dateParts = date.split(",")[0].split(".");
+    const dateParts = date.split(",")[0].split("-");
     const hour = date.split(",")[1].split(":")[0];
     return new Date(`${dateParts[0]}-${dateParts[1]}-${dateParts[2]}T${hour}:00:00`);
 }
