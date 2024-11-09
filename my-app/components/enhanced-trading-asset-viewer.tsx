@@ -68,9 +68,12 @@ const EnhancedTradingAssetViewer = observer(() => {
         }
 
         useEffect(() => {
-            resetSelectedTrades();
             setData(generateData(new Date(startDate), new Date(endDate), asset));
-        }, [startDate, endDate, asset, frequency]);
+        }, [startDate, endDate, asset]);
+
+    useEffect(() => {
+        resetSelectedTrades();
+    }, [startDate, endDate, asset, frequency]);
 
         const removeTrade = (startTime: string) => {
             setTradingRule(tradingRules.filter(trade => trade.startTime !== startTime))
@@ -160,6 +163,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                                     onChange={(e) => {
                                         setEndDate(e.target.value)
                                     }}
+                                    max={new Date().toJSON().split('T')[0]}
                                 />
                             </div>
                             <div className="flex-1">

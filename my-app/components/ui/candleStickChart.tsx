@@ -151,7 +151,6 @@ const CandleStickChart =
 
         const [refAreaLeft, setRefAreaLeft] = useState('');
         const [refAreaRight, setRefAreaRight] = useState('');
-
         // const genData = generateData(new Date('2024-01-01'), new Date('2024-01-02'), 'EURUSD');
         const tickSeries: SampleAssetData = generateData;
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -266,8 +265,8 @@ const CandleStickChart =
                     // eslint-disable-next-line react/jsx-no-bind
                     onMouseUp={defineReferenceArea.bind(this)}
                 >
-                    <XAxis dataKey="ts" domain={['dataMin', 'dataMax']} tickCount={data.length} tick={CustomizedTick}/>
-                    <YAxis yAxisId="1" domain={['dataMin', 'dataMax']} allowDecimals={true}/>
+                    <XAxis dataKey="ts" tickCount={data.length} tick={CustomizedTick}/>
+                    <YAxis yAxisId="1" domain={['auto', 'auto']} allowDecimals={true}/>
                     <CartesianGrid strokeDasharray="3 3"/>
                     <Bar
                         yAxisId="1"
