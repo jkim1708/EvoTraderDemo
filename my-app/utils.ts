@@ -55,17 +55,30 @@ export enum CANDLESTICK_FREQUENCY {
     FOUR_HOURLY,
 }
 
+function extractDateTime(date: Date): string {
+
+    const day = date.getDate();
+    const dayStr = day < 10 ? "0" + day : day;
+    const month = date.getMonth() + 1;
+    const monthStr = month < 10 ? "0" + month : month;
+    const year = date.getFullYear();
+    const hour = date.getHours();
+    return `${year}-${monthStr}-${dayStr}, ${hour}:00`;
+
+}
+
 export function transformToCandleStickSeries(tickData: { date: Date, value: string }[]) {
 
     if (tickData === undefined || tickData === null ) return;
+
     const groupedData = tickData.reduce((acc, tick) => {
-        const hour = new Date(tick.date).getUTCHours();
-        if (!acc[hour]) {
-            acc[hour] = [];
+        const dateTime = extractDateTime(tick.date);
+        if (!acc[dateTime]) {
+            acc[dateTime] = [];
         }
-        acc[hour].push(tick);
+        acc[dateTime].push(tick);
         return acc;
-    }, {} as { [key: number]: { date: Date, value: string }[] });
+    }, {} as { [key: string]: { date: Date, value: string }[] });
 
     return Object.values(groupedData).map(group => {
         const high = Math.max(...group.map(tick => parseFloat(tick.value))).toFixed(12);

@@ -266,8 +266,8 @@ const CandleStickChart =
                     // eslint-disable-next-line react/jsx-no-bind
                     onMouseUp={defineReferenceArea.bind(this)}
                 >
-                    <XAxis dataKey="ts" tickCount={data.length} tick={CustomizedTick}/>
-                    <YAxis yAxisId="1" domain={['auto', 'auto']} allowDecimals={true}/>
+                    <XAxis dataKey="ts" domain={['dataMin', 'dataMax']} tickCount={data.length} tick={CustomizedTick}/>
+                    <YAxis yAxisId="1" domain={['dataMin', 'dataMax']} allowDecimals={true}/>
                     <CartesianGrid strokeDasharray="3 3"/>
                     <Bar
                         yAxisId="1"
