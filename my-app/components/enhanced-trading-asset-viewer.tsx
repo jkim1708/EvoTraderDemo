@@ -17,7 +17,7 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog"
-import {generateData, SampleAssetData} from "@/utils";
+import {convertToDate, generateData, SampleAssetData} from "@/utils";
 import CandleStickChart from "@/components/ui/candleStickChart";
 import {observer} from "mobx-react-lite";
 import {TradingRule} from "@/store/TradingRuleStore";
@@ -44,7 +44,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                 currentSelectedTradeKind,
                 setCurrentSelectedTradeKind,
                 setCurrentTradingStrategyName,
-                currentTradingStrategyName
+                currentTradingStrategyName,
             },
             tradingStrategyStore: {setTradingStrategy, tradingStrategies},
         } = useStores();
@@ -84,7 +84,8 @@ const EnhancedTradingAssetViewer = observer(() => {
         }
 
         const startEditTrade = (trade: TradingRule) => {
-            setEditingTrade(trade)
+            console.log("trade", JSON.stringify(trade));
+            setEditingTrade(trade);
         }
 
         const saveEditedTrade = (editedTrade: TradingRule) => {
@@ -121,7 +122,34 @@ const EnhancedTradingAssetViewer = observer(() => {
             });
         }
 
-        return (
+    function convertToDatepickerFormat(startTime: string) {
+
+            if(startTime.includes('T')) {
+                return startTime;
+            }
+
+            console.log("startTime" + startTime);
+
+            const date = convertToDate(startTime);
+            console.log("convertToDate" + date);
+
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
+            const monthStr = month < 10 ? "0" + month : month;
+            const day = date.getDate();
+            const dayStr = day < 10 ? "0" + day : day;
+            const hour = date.getHours();
+            const hourStr = hour < 10 ? "0" + hour : hour;
+
+        // '2024-11-09T01:11'
+            return `${year}-${monthStr}-${dayStr}T${hourStr}:00`;
+
+
+
+        return undefined;
+    }
+
+    return (
             <Card className="w-full max-w-6xl">
                 <CardHeader>
                     <CardTitle>Enhanced Trading Asset Viewer</CardTitle>
@@ -152,6 +180,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                                     onChange={(e) => {
                                         setStartDate(e.target.value)
                                     }}
+                                    max={endDate}
                                 />
                             </div>
                             <div className="flex-1">
@@ -247,11 +276,17 @@ const EnhancedTradingAssetViewer = observer(() => {
                                                             <Input
                                                                 id="start-date"
                                                                 type="datetime-local"
-                                                                value={editingTrade?.startTime || ''}
-                                                                onChange={(e) => setEditingTrade(prev => prev ? {
-                                                                    ...prev,
-                                                                    startTime: e.target.value
-                                                                } : null)}
+                                                                value={
+                                                                   editingTrade ? convertToDatepickerFormat(editingTrade.startTime): ''
+                                                                }
+                                                                onChange={(e) => {
+                                                                    setEditingTrade(prev => prev ? {
+                                                                        ...prev,
+                                                                        startTime: e.target.value
+                                                                    } : null)
+
+                                                                    console.log("editingTrade", JSON.stringify(editingTrade));
+                                                                }}
                                                                 className="col-span-3"
                                                                 step="3600"
                                                             />
@@ -263,7 +298,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                                                             <Input
                                                                 id="end-date"
                                                                 type="datetime-local"
-                                                                value={editingTrade?.endTime || ''}
+                                                                value={editingTrade ? convertToDatepickerFormat(editingTrade.endTime): ''}
                                                                 onChange={(e) => setEditingTrade(prev => prev ? {
                                                                     ...prev,
                                                                     endTime: e.target.value

@@ -55,7 +55,9 @@ export enum CANDLESTICK_FREQUENCY {
     FOUR_HOURLY,
 }
 
-function extractDateTime(date: Date): string {
+function extractDateTime(date: Date, frequency: CANDLESTICK_FREQUENCY): string {
+
+    const aggregateForEveryFourHour = frequency === CANDLESTICK_FREQUENCY.FOUR_HOURLY;
 
     const day = date.getDate();
     const dayStr = day < 10 ? "0" + day : day;
@@ -67,12 +69,12 @@ function extractDateTime(date: Date): string {
 
 }
 
-export function transformToCandleStickSeries(tickData: { date: Date, value: string }[]) {
+export function transformToCandleStickSeries(tickData: { date: Date, value: string }[], frequency: CANDLESTICK_FREQUENCY) {
 
     if (tickData === undefined || tickData === null ) return;
 
     const groupedData = tickData.reduce((acc, tick) => {
-        const dateTime = extractDateTime(tick.date);
+        const dateTime = extractDateTime(tick.date, frequency);
         if (!acc[dateTime]) {
             acc[dateTime] = [];
         }
@@ -108,9 +110,14 @@ export function convertToCustomDate(date: Date): string {
 }
 
 export function convertToDate(date: string): Date {
+
     const dateParts = date.split(",")[0].split("-");
-    const hour = date.split(",")[1].split(":")[0];
-    return new Date(`${dateParts[0]}-${dateParts[1]}-${dateParts[2]}T${hour}:00:00`);
+    const hour = date.split(",")[1].split(":")[0].trim();
+
+    const month = dateParts[1];
+    const day = dateParts[2];
+    const hourStr = Number(hour) < 10 ? "0" + hour : hour;
+    return new Date(`${dateParts[0]}-${month}-${day}T${hourStr}:00:00`);
 }
 
 export const isInExistingInReferenceArea = (referencedArea: ReferencedArea[], refAreaLeft: string | undefined, currentCursor: string ) => {
