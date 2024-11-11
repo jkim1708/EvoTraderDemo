@@ -339,7 +339,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                             {/*<Trash2 className="h-4 w-4"/>*/}
                             Cancel
                         </Button>
-                        <Link href="/strategy-manager">
+                        <Link href="/my-app/components/strategy-management">
                             <Button variant="default" size="sm" onClick={handleCreateStrategy}>
                                 {/*<Trash2 className="h-4 w-4"/>*/}
                                 Create

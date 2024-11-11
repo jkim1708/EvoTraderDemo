@@ -16,7 +16,7 @@ export type Strategy = {
     status: 'active' | 'inactive'
 }
 
-export default function StrategyManager() {
+export default function StrategyManagement() {
     const [selectedStrategy, setSelectedStrategy] = useState(null)
 
     const strategies = [
@@ -61,7 +61,7 @@ export default function StrategyManager() {
     return (
         <Card className="w-full max-w-6xl mx-auto">
             <CardHeader>
-                <CardTitle className="text-2xl">EvoFintech - Trading Strategy Creator</CardTitle>
+                <CardTitle className="text-2xl">Trading Strategy Management</CardTitle>
                 <p className="text-muted-foreground">Manage and monitor your trading algorithms</p>
             </CardHeader>
             <CardContent>

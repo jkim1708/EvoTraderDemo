@@ -1,4 +1,4 @@
-import StrategyManager from "@/components/strategy-manager";
+import StrategyManagement from "@/components/strategy-management";
 import React from "react";
 import {StoreWrapper} from "@/store/Provider";
 
@@ -6,7 +6,7 @@ const Page = () => {
 
     return (
         <StoreWrapper>
-            <StrategyManager />
+            <StrategyManagement />
         </StoreWrapper>
     );
 }
