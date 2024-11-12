@@ -5,6 +5,11 @@ import {makeAutoObservable} from "mobx";
 export interface TradingStrategy {
     id: string,
     name: string,
+    indicators: string[],
+    winRate: string,
+    profitFactor: string,
+    sharpeRatio: string,
+    status: 'active' | 'inactive',
     tradingRules: TradingRule[],
 }
 

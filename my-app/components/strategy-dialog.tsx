@@ -79,15 +79,6 @@ export default function StrategyDialog({ strategy, onClose }) {
                     </div>
 
                     <div className="space-y-4">
-                        <h3 className="text-lg font-semibold">Performance Analysis</h3>
-                        <p className="text-muted-foreground">
-                            This algorithm has shown moderate performance with a win rate of {strategy.winRate}.
-                            The profit factor of {strategy.profitFactor} indicates good profitability.
-                            With a Sharpe ratio of {strategy.sharpeRatio}, the algorithm demonstrates reasonable risk-adjusted returns.
-                        </p>
-                    </div>
-
-                    <div className="space-y-4">
                         <h3 className="text-lg font-semibold">Recent Trades</h3>
                         <Tabs defaultValue="all">
                             <TabsList>

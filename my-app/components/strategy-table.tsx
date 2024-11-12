@@ -1,11 +1,19 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
-import {Strategy} from "@/components/strategy-management";
+import {useStores} from "@/store/Provider";
+import {TradingStrategy} from "@/store/RootStore";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
-export default function StrategyTable({ strategies, onAnalyze }) {
+export default function StrategyTable({ onAnalyze }) {
+
+    const {
+        tradingStrategyStore: {tradingStrategies},
+    } = useStores();
+
+    console.log(JSON.stringify(tradingStrategies));
+
     return (
         <Table>
             <TableHeader>
@@ -21,10 +29,10 @@ export default function StrategyTable({ strategies, onAnalyze }) {
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {strategies.map((strategy: Strategy) => (
+                {tradingStrategies.map((strategy: TradingStrategy) => (
                     <TableRow key={strategy.name}>
                         <TableCell className="font-medium">{strategy.name}</TableCell>
-                        <TableCell>{strategy.asset}</TableCell>
+                        <TableCell>{strategy.tradingRules[0].asset}</TableCell>
                         <TableCell>
                             <div className="flex flex-wrap gap-1">
                                 {strategy.indicators.map((indicator) => (

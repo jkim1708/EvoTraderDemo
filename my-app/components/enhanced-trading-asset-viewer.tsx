@@ -24,6 +24,7 @@ import {TradingRule} from "@/store/TradingRuleStore";
 import {useStores} from "@/store/Provider";
 import {v4 as uuidv4} from 'uuid';
 import Link from "next/link";
+import {TradingStrategy} from "@/store/RootStore";
 
 
 // const calculatePnL = (trade: Trade, data: { date: string; value: number }[]) => {
@@ -104,9 +105,14 @@ const EnhancedTradingAssetViewer = observer(() => {
         function createAndSaveTradingStrategy(param: { name: string; rules: TradingRule[] }) {
             const {name, rules} = param;
 
-            const tradingStrategy = {
+            const tradingStrategy :TradingStrategy = {
                 id: uuidv4(),
                 name,
+                indicators: ["RSI", "MACD"],
+                winRate: '62.5%',
+                profitFactor: '62,5%',
+                sharpeRatio: '2',
+                status: "active",
                 tradingRules: rules
             }
 
@@ -339,7 +345,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                             {/*<Trash2 className="h-4 w-4"/>*/}
                             Cancel
                         </Button>
-                        <Link href="/my-app/components/strategy-management">
+                        <Link href="/strategy-management">
                             <Button variant="default" size="sm" onClick={handleCreateStrategy}>
                                 {/*<Trash2 className="h-4 w-4"/>*/}
                                 Create
