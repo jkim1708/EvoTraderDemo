@@ -19,8 +19,11 @@ import {useStores} from "@/store/Provider";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
 const Candlestick = props => {
-    const {
+    let {
         x,
+    } = props;
+
+    const {
         y,
         width,
         height,
@@ -31,6 +34,11 @@ const Candlestick = props => {
     const isGrowing = open < close;
     const color = isGrowing ? 'green' : 'red';
     const ratio = Math.abs(height / (open - close));
+
+    const offset = -(width/2);
+
+    x = x + offset;
+
     return (
         <g stroke={color} fill={color} strokeWidth="2">
             <path
@@ -265,8 +273,8 @@ const CandleStickChart =
                     // eslint-disable-next-line react/jsx-no-bind
                     onMouseUp={defineReferenceArea.bind(this)}
                 >
-                    <XAxis dataKey="ts" tickCount={data.length} tick={CustomizedTick}/>
-                    <YAxis yAxisId="1" domain={['auto', 'auto']} allowDecimals={true}/>
+                    <XAxis dataKey="ts" tickCount={data.length} tick={CustomizedTick} padding={{'left': 5}}/>
+                    <YAxis yAxisId="1" domain={['auto', 'auto']} allowDecimals={true} />
                     <CartesianGrid strokeDasharray="3 3"/>
                     <Bar
                         yAxisId="1"
