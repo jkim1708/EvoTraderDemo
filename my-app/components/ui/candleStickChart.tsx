@@ -19,11 +19,12 @@ import {useStores} from "@/store/Provider";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
 const Candlestick = props => {
-    let {
-        x,
-    } = props;
+    // let {
+    //     x,
+    // } = props;
 
     const {
+        x,
         y,
         width,
         height,
@@ -35,9 +36,9 @@ const Candlestick = props => {
     const color = isGrowing ? 'green' : 'red';
     const ratio = Math.abs(height / (open - close));
 
-    const offset = -(width/2);
+    // const offset = -(width/1);
 
-    x = x + offset;
+    // x = x + offset;
 
     return (
         <g stroke={color} fill={color} strokeWidth="2">
@@ -219,6 +220,10 @@ const CandleStickChart =
             const refAreaLeftOpenValue = data.find((tickData) => tickData.ts === refAreaLeft)?.open;
             const refAreaRightCloseValue = data.find((tickData) => tickData.ts === refAreaRight)?.close;
 
+            console.log("refAreaLeftOpenValue", refAreaLeftOpenValue);
+            console.log("refAreaRightCloseValue", refAreaRightCloseValue);
+            console.log("kind", kind);
+
             if (refAreaLeftOpenValue === undefined || refAreaRightCloseValue === undefined) {
                 console.error("invalid refAreaLeftOpenValue or refAreaRightCloseValue");
                 return;
@@ -243,7 +248,9 @@ const CandleStickChart =
 
             if (isRefAreaSelectionDefined()) {
                 saveReferenceAreaSelection();
-                const profitNLoss = calculateProfitNLoss(refAreaLeft, refAreaRight, 'long');
+                const profitNLoss = calculateProfitNLoss(refAreaLeft, refAreaRight, currentSelectedTradeKind);
+
+                console.log("profitNLoss", profitNLoss);
                 createTrade(profitNLoss ?? 0);
             }
             ;
@@ -273,7 +280,7 @@ const CandleStickChart =
                     // eslint-disable-next-line react/jsx-no-bind
                     onMouseUp={defineReferenceArea.bind(this)}
                 >
-                    <XAxis dataKey="ts" tickCount={data.length} tick={CustomizedTick} padding={{'left': 5}}/>
+                    <XAxis dataKey="ts" tickCount={data.length} tick={CustomizedTick} padding={{'left': 5}} />
                     <YAxis yAxisId="1" domain={['auto', 'auto']} allowDecimals={true} />
                     <CartesianGrid strokeDasharray="3 3"/>
                     <Bar
@@ -287,10 +294,10 @@ const CandleStickChart =
                     {/*// eslint-disable-next-line @typescript-eslint/ban-ts-comment*/}
                     {/*// @ts-expect-error take care later*/}
                     <Tooltip cursor={<CustomTooltipCursor/>} content={customTooltipContent}
-                             position={{x: 100, y: -25}}/>
+                             position={{x: 100, y: -25}} offset={20}/>
                     {definedRefArea.map((area, index) => (
                         <ReferenceArea key={index} yAxisId="1" x1={area.referencedAreaLeft}
-                                       x2={area.referencedAreaRight} strokeOpacity={0.3}/>
+                                       x2={area.referencedAreaRight} strokeOpacity={0.3} />
                     ))}
                     {(refAreaLeft && refAreaRight) || (definedRefArea.length > 0) ? (
                         // <AllReferencedAreas referencedAreas={definedRefArea}/>

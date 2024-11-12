@@ -85,7 +85,6 @@ const EnhancedTradingAssetViewer = observer(() => {
         }
 
         const startEditTrade = (trade: TradingRule) => {
-            console.log("trade", JSON.stringify(trade));
             setEditingTrade(trade);
         }
 
@@ -134,10 +133,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                 return startTime;
             }
 
-            console.log("startTime" + startTime);
-
             const date = convertToDate(startTime);
-            console.log("convertToDate" + date);
 
             const year = date.getFullYear();
             const month = date.getMonth() + 1;
@@ -288,7 +284,6 @@ const EnhancedTradingAssetViewer = observer(() => {
                                                                         startTime: e.target.value
                                                                     } : null)
 
-                                                                    console.log("editingTrade", JSON.stringify(editingTrade));
                                                                 }}
                                                                 className="col-span-3"
                                                                 step="3600"

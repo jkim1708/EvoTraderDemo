@@ -13,8 +13,6 @@ const StrategyTable = observer(({onAnalyze}: {onAnalyze: (strategy: TradingStrat
         tradingStrategyStore: {tradingStrategies},
     } = useStores();
 
-    console.log(JSON.stringify(tradingStrategies));
-
     return (
         <Table>
             <TableHeader>
@@ -49,7 +47,6 @@ const StrategyTable = observer(({onAnalyze}: {onAnalyze: (strategy: TradingStrat
                         <TableCell>
                             <Switch checked={(strategy.status === "active")}
                                     onClick={() => {
-                                        console.log(strategy.status)
                                         strategy.status = (strategy.status === "inactive") ? "active" : "inactive"
                                     }}
                             />

@@ -39,7 +39,6 @@ class TradingRuleStore {
     // };
     //
     setTradingRule = (tradingRules: TradingRule[]) => {
-        console.log("trading rules", this.tradingRules);
         this.tradingRules = tradingRules
     };
 
