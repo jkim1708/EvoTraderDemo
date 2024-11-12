@@ -150,9 +150,6 @@ const EnhancedTradingAssetViewer = observer(() => {
         // '2024-11-09T01:11'
             return `${year}-${monthStr}-${dayStr}T${hourStr}:00`;
 
-
-
-        return undefined;
     }
 
     return (

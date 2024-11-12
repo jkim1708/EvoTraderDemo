@@ -27,9 +27,8 @@ class TradingStrategyStore {
         this.tradingStrategies = tradingRules
     };
 
-
-
 }
+
 
 export const RootStore = {
     tradingRuleStore: new TradingRuleStore(),

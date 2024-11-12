@@ -1,12 +1,13 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Switch } from "@/components/ui/switch"
-import { Button } from "@/components/ui/button"
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table"
+import {Switch} from "@/components/ui/switch"
+import {Button} from "@/components/ui/button"
 import {useStores} from "@/store/Provider";
 import {TradingStrategy} from "@/store/RootStore";
+import {observer} from "mobx-react-lite";
+
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
-export default function StrategyTable({ onAnalyze }) {
+const StrategyTable = observer(({onAnalyze}: {onAnalyze: (strategy: TradingStrategy) => void}) => {
 
     const {
         tradingStrategyStore: {tradingStrategies},
@@ -46,7 +47,12 @@ export default function StrategyTable({ onAnalyze }) {
                         <TableCell>{strategy.profitFactor}</TableCell>
                         <TableCell>{strategy.sharpeRatio}</TableCell>
                         <TableCell>
-                            <Switch checked={strategy.status === 'active'} />
+                            <Switch checked={(strategy.status === "active")}
+                                    onClick={() => {
+                                        console.log(strategy.status)
+                                        strategy.status = (strategy.status === "inactive") ? "active" : "inactive"
+                                    }}
+                            />
                         </TableCell>
                         <TableCell>
                             <Button variant="outline" onClick={() => onAnalyze(strategy)}>
@@ -58,4 +64,6 @@ export default function StrategyTable({ onAnalyze }) {
             </TableBody>
         </Table>
     )
-}
+});
+
+export default StrategyTable;

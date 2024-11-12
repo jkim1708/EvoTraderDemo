@@ -41,7 +41,7 @@ export default function StrategyDialog({ strategy, onClose }) {
                 <DialogHeader>
                     <div className="flex items-center justify-between">
                         <DialogTitle className="text-xl">
-                            {strategy.name} Analysis
+                            {strategy.name} Analysis ({strategy.status})
                         </DialogTitle>
                         <Button variant="ghost" size="icon" onClick={onClose}>
                             <X className="h-4 w-4" />

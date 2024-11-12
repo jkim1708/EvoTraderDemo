@@ -6,6 +6,8 @@ import {Button} from "@/components/ui/button"
 import StrategyTable from './strategy-table'
 import StrategyDialog from './strategy-dialog'
 import Link from "next/link";
+import {observer} from "mobx-react-lite";
+import {TradingStrategy} from "@/store/RootStore";
 
 export type Strategy = {
     name: string
@@ -17,8 +19,8 @@ export type Strategy = {
     status: 'active' | 'inactive'
 }
 
-export default function StrategyManagement() {
-    const [selectedStrategy, setSelectedStrategy] = useState(null)
+const StrategyManagement = observer(() => {
+    const [selectedStrategy, setSelectedStrategy] = useState<TradingStrategy | null>(null);
 
     // const strategies = [
     //     {
@@ -59,6 +61,10 @@ export default function StrategyManagement() {
     //     }
     // ]
 
+    const setStrategy = (strategy: TradingStrategy) => {
+        setSelectedStrategy(strategy);
+    }
+
     return (
         <Card className="w-full max-w-6xl mx-auto">
             <CardHeader>
@@ -68,7 +74,7 @@ export default function StrategyManagement() {
             <CardContent>
                 <div className="space-y-4">
                     <StrategyTable
-                        onAnalyze={setSelectedStrategy}
+                        onAnalyze={setStrategy}
                     />
                     <div className="flex justify-end">
                         <Link href="/">
@@ -87,4 +93,5 @@ export default function StrategyManagement() {
             )}
         </Card>
     )
-}
+});
+export default  StrategyManagement;
