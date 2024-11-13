@@ -3,26 +3,12 @@ import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { X } from "lucide-react"
-import {
-    LineChart,
-    Line,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    ResponsiveContainer,
-} from 'recharts'
+import CandleStickChartDialog from "@/components/ui/candleStickChartDialog";
+import {generateData} from "@/utils";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
 export default function StrategyDialog({ strategy, onClose }) {
-    const chartData = [
-        { date: '2023-01', return: 1.8 },
-        { date: '2023-02', return: -0.9 },
-        { date: '2023-03', return: 2.4 },
-        { date: '2023-04', return: 1.6 },
-        { date: '2023-05', return: -1.1 },
-        { date: '2023-06', return: 2.0 },
-    ]
 
     const recentTrades = [
         {
@@ -34,6 +20,12 @@ export default function StrategyDialog({ strategy, onClose }) {
             profit: '0.0050'
         }
     ]
+
+    function getDateTwoDaysBefore(date: Date): Date {
+        const newDate = new Date(date);
+        newDate.setDate(newDate.getDate() - 2);
+        return newDate;
+    }
 
     return (
         <Dialog open={true} onOpenChange={onClose}>
@@ -68,14 +60,7 @@ export default function StrategyDialog({ strategy, onClose }) {
                     </div>
 
                     <div className="h-[300px]">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={chartData}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="date" />
-                                <YAxis />
-                                <Line type="monotone" dataKey="return" stroke="#8884d8" />
-                            </LineChart>
-                        </ResponsiveContainer>
+                      <CandleStickChartDialog generatedData={generateData(getDateTwoDaysBefore(new Date()), new Date(), "EURUSD")} asset="EURUSD" />
                     </div>
 
                     <div className="space-y-4">

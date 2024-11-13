@@ -72,9 +72,9 @@ const EnhancedTradingAssetViewer = observer(() => {
             setData(generateData(new Date(startDate), new Date(endDate), asset));
         }, [startDate, endDate, asset]);
 
-    useEffect(() => {
-        resetSelectedTrades();
-    }, [startDate, endDate, asset, frequency]);
+        useEffect(() => {
+            resetSelectedTrades();
+        }, [startDate, endDate, asset, frequency]);
 
         const removeTrade = (startTime: string) => {
             setTradingRule(tradingRules.filter(trade => trade.startTime !== startTime))
@@ -104,7 +104,7 @@ const EnhancedTradingAssetViewer = observer(() => {
         function createAndSaveTradingStrategy(param: { name: string; rules: TradingRule[] }) {
             const {name, rules} = param;
 
-            const tradingStrategy :TradingStrategy = {
+            const tradingStrategy: TradingStrategy = {
                 id: uuidv4(),
                 name,
                 indicators: ["RSI", "MACD"],
@@ -127,9 +127,9 @@ const EnhancedTradingAssetViewer = observer(() => {
             });
         }
 
-    function convertToDatepickerFormat(startTime: string) {
+        function convertToDatepickerFormat(startTime: string) {
 
-            if(startTime.includes('T')) {
+            if (startTime.includes('T')) {
                 return startTime;
             }
 
@@ -143,12 +143,12 @@ const EnhancedTradingAssetViewer = observer(() => {
             const hour = date.getHours();
             const hourStr = hour < 10 ? "0" + hour : hour;
 
-        // '2024-11-09T01:11'
+            // '2024-11-09T01:11'
             return `${year}-${monthStr}-${dayStr}T${hourStr}:00`;
 
-    }
+        }
 
-    return (
+        return (
             <Card className="w-full max-w-6xl">
                 <CardHeader>
                     <CardTitle>Enhanced Trading Asset Viewer</CardTitle>
@@ -276,7 +276,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                                                                 id="start-date"
                                                                 type="datetime-local"
                                                                 value={
-                                                                   editingTrade ? convertToDatepickerFormat(editingTrade.startTime): ''
+                                                                    editingTrade ? convertToDatepickerFormat(editingTrade.startTime) : ''
                                                                 }
                                                                 onChange={(e) => {
                                                                     setEditingTrade(prev => prev ? {
@@ -296,7 +296,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                                                             <Input
                                                                 id="end-date"
                                                                 type="datetime-local"
-                                                                value={editingTrade ? convertToDatepickerFormat(editingTrade.endTime): ''}
+                                                                value={editingTrade ? convertToDatepickerFormat(editingTrade.endTime) : ''}
                                                                 onChange={(e) => setEditingTrade(prev => prev ? {
                                                                     ...prev,
                                                                     endTime: e.target.value
@@ -308,14 +308,14 @@ const EnhancedTradingAssetViewer = observer(() => {
                                                     </div>
                                                     <DialogFooter>
                                                         <DialogClose>
-                                                        <Button variant="outline"
-                                                                onClick={cancelEditTrade}>Cancel</Button>
+                                                            <Button variant="outline"
+                                                                    onClick={cancelEditTrade}>Cancel</Button>
                                                         </DialogClose>
                                                         <DialogClose>
 
-                                                        <Button
-                                                            onClick={() => editingTrade && saveEditedTrade(editingTrade)}>Save
-                                                            Changes</Button>
+                                                            <Button
+                                                                onClick={() => editingTrade && saveEditedTrade(editingTrade)}>Save
+                                                                Changes</Button>
                                                         </DialogClose>
                                                     </DialogFooter>
                                                 </DialogContent>
@@ -333,10 +333,12 @@ const EnhancedTradingAssetViewer = observer(() => {
 
                     <div className="flex space-x-4 mb-4 flex justify-end mt-6">
 
-                        <Button variant="outline" size="sm">
-                            {/*<Trash2 className="h-4 w-4"/>*/}
-                            Cancel
-                        </Button>
+                        <Link href="/strategy-management">
+                            <Button variant="outline" size="sm">
+                                {/*<Trash2 className="h-4 w-4"/>*/}
+                                Cancel
+                            </Button>
+                        </Link>
                         <Link href="/strategy-management">
                             <Button variant="default" size="sm" onClick={handleCreateStrategy}>
                                 {/*<Trash2 className="h-4 w-4"/>*/}
