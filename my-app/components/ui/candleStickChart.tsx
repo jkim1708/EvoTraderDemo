@@ -89,11 +89,14 @@ const Candlestick = props => {
 };
 
 const prepareData = (data: CandleStickChart[]) => {
-    return data.map(({open, close, ...other}) => {
+    return data.map(({open, close, low, high, ts}) => {
         return {
-            ...other,
+            ts,
+            low,
+            high,
             open: parseFloat(open),
             close: parseFloat(close),
+            lowHigh: [low, high],
             openClose: [open, close],
         };
     });
@@ -250,18 +253,12 @@ const CandleStickChart =
             referencedAreaLeft: string;
             referencedAreaRight: string
         }[], refAreaLeft: string, refAreaRight: string) {
-
-
-            for(let i = 0; i< definedRefArea.length; i++){
+            for (let i = 0; i < definedRefArea.length; i++) {
                 //intersect condition x1 < y2 && y1 < x2
                 if (convertToDate(definedRefArea[i].referencedAreaLeft) < convertToDate(refAreaRight) && convertToDate(refAreaLeft) < convertToDate(definedRefArea[i].referencedAreaRight)) {
-                    console.log("overlaps");
                     return true;
                 }
-            };
-
-
-                    console.log("overlaps not");
+            }
             return false;
 
         }
@@ -282,10 +279,6 @@ const CandleStickChart =
         return (
             <div>
                 <p> {asset} </p>
-                {/*// eslint-disable-next-line @typescript-eslint/ban-ts-comment*/}
-                {/*// @ts-expect-error take care later*/}
-                <CustomTooltipCursor/>
-
                 <BarChart
                     width={1000}
                     height={500}
@@ -306,7 +299,7 @@ const CandleStickChart =
                     onMouseUp={defineReferenceArea.bind(this)}
                 >
                     <XAxis dataKey="ts" tickCount={data.length} tick={CustomizedTick} padding={{'left': 5}}/>
-                    <YAxis yAxisId="1" domain={['auto', 'auto']} allowDecimals={true}/>
+                    <YAxis yAxisId="1" dataKey="lowHigh" domain={['auto', 'auto']} allowDecimals={true}/>
                     <CartesianGrid strokeDasharray="3 3"/>
                     <Bar
                         yAxisId="1"
