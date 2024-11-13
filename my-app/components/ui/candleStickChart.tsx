@@ -9,6 +9,7 @@ import {
     CartesianGrid, Tooltip, ReferenceArea,
 } from 'recharts';
 import {
+    convertToDate,
     isInExistingInReferenceArea,
     SampleAssetData,
     transformToCandleStickSeries
@@ -123,6 +124,7 @@ type CustomizedTickProps = {
         value: string
     }
 }
+
 function CustomizedTick(props: CustomizedTickProps) {
     const {x, y, payload} = props;
 
@@ -244,16 +246,35 @@ const CandleStickChart =
 
         }
 
+        function isRefAreaSelectionOverlapping(definedRefArea: {
+            referencedAreaLeft: string;
+            referencedAreaRight: string
+        }[], refAreaLeft: string, refAreaRight: string) {
+
+
+            for(let i = 0; i< definedRefArea.length; i++){
+                //intersect condition x1 < y2 && y1 < x2
+                if (convertToDate(definedRefArea[i].referencedAreaLeft) < convertToDate(refAreaRight) && convertToDate(refAreaLeft) < convertToDate(definedRefArea[i].referencedAreaRight)) {
+                    console.log("overlaps");
+                    return true;
+                }
+            };
+
+
+                    console.log("overlaps not");
+            return false;
+
+        }
+
         const defineReferenceArea = () => {
 
-            if (isRefAreaSelectionDefined()) {
+            if (isRefAreaSelectionDefined() && !isRefAreaSelectionOverlapping(definedRefArea, refAreaLeft, refAreaRight)) {
                 saveReferenceAreaSelection();
                 const profitNLoss = calculateProfitNLoss(refAreaLeft, refAreaRight, currentSelectedTradeKind);
 
                 console.log("profitNLoss", profitNLoss);
                 createTrade(profitNLoss ?? 0);
             }
-            ;
             resetRefAreaSelection();
 
         }
@@ -272,16 +293,20 @@ const CandleStickChart =
                     margin={{top: 20, right: 30, left: 20, bottom: 20}}
                     // onClick={handleChartClick}
                     onMouseDown={(e) => {
-                        if (e.activeLabel && isInExistingInReferenceArea(definedRefArea, '', e.activeLabel)) setRefAreaLeft(e.activeLabel);
+                        if (e.activeLabel && !isInExistingInReferenceArea(definedRefArea, e.activeLabel)) {
+                            console.log("e.activeLabel left", e.activeLabel);
+                            setRefAreaLeft(e.activeLabel)
+                        }
+                        ;
                     }}
                     onMouseMove={(e) => {
-                        if (e.activeLabel && refAreaLeft && isInExistingInReferenceArea(definedRefArea, refAreaLeft, e.activeLabel)) setRefAreaRight(e.activeLabel)
+                        if (e.activeLabel && refAreaLeft && !isInExistingInReferenceArea(definedRefArea, e.activeLabel)) setRefAreaRight(e.activeLabel)
                     }}
                     // eslint-disable-next-line react/jsx-no-bind
                     onMouseUp={defineReferenceArea.bind(this)}
                 >
-                    <XAxis dataKey="ts" tickCount={data.length} tick={CustomizedTick} padding={{'left': 5}} />
-                    <YAxis yAxisId="1" domain={['auto', 'auto']} allowDecimals={true} />
+                    <XAxis dataKey="ts" tickCount={data.length} tick={CustomizedTick} padding={{'left': 5}}/>
+                    <YAxis yAxisId="1" domain={['auto', 'auto']} allowDecimals={true}/>
                     <CartesianGrid strokeDasharray="3 3"/>
                     <Bar
                         yAxisId="1"
@@ -297,7 +322,7 @@ const CandleStickChart =
                              position={{x: 100, y: -25}} offset={20}/>
                     {definedRefArea.map((area, index) => (
                         <ReferenceArea key={index} yAxisId="1" x1={area.referencedAreaLeft}
-                                       x2={area.referencedAreaRight} strokeOpacity={0.3} />
+                                       x2={area.referencedAreaRight} strokeOpacity={0.3}/>
                     ))}
                     {(refAreaLeft && refAreaRight) || (definedRefArea.length > 0) ? (
                         // <AllReferencedAreas referencedAreas={definedRefArea}/>

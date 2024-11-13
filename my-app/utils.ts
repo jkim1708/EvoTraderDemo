@@ -120,16 +120,16 @@ export function convertToDate(date: string): Date {
     return new Date(`${dateParts[0]}-${month}-${day}T${hourStr}:00:00`);
 }
 
-export const isInExistingInReferenceArea = (referencedArea: ReferencedArea[], refAreaLeft: string | undefined, currentCursor: string ) => {
-    if (referencedArea.length === 0 || refAreaLeft === undefined || refAreaLeft === '') {
-        return true;
+export const isInExistingInReferenceArea = (referencedArea: ReferencedArea[], currentCursor: string ) => {
+    if (referencedArea.length === 0) {
+        return false;
     }
 
     for (let i = 0; i < referencedArea.length; i++) {
-        if (convertToDate(refAreaLeft) >= convertToDate(referencedArea[i].referencedAreaLeft) && convertToDate(currentCursor) <= convertToDate(referencedArea[i].referencedAreaRight)) {
-            return false;
+        if (convertToDate(currentCursor) >= convertToDate(referencedArea[i].referencedAreaLeft) && convertToDate(currentCursor) <= convertToDate(referencedArea[i].referencedAreaRight)) {
+            return true;
         }
     }
 
-    return true;
+    return false;
 }
