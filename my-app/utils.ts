@@ -69,7 +69,7 @@ function extractDateTime(date: Date, frequency: CANDLESTICK_FREQUENCY): string {
 
 }
 
-export function transformToCandleStickSeries(tickData: { date: Date, value: string }[], frequency: CANDLESTICK_FREQUENCY) {
+export function transformToCandleStickSeries(tickData: { date: Date, value: number }[], frequency: CANDLESTICK_FREQUENCY) {
 
     if (tickData === undefined || tickData === null ) return;
 
@@ -80,21 +80,25 @@ export function transformToCandleStickSeries(tickData: { date: Date, value: stri
         }
         acc[dateTime].push(tick);
         return acc;
-    }, {} as { [key: string]: { date: Date, value: string }[] });
+    }, {} as { [key: string]: { date: Date, value: number }[] });
 
     return Object.values(groupedData).map(group => {
-        const high = Math.max(...group.map(tick => parseFloat(tick.value))).toFixed(12);
-        const low = Math.min(...group.map(tick => parseFloat(tick.value))).toFixed(12);
-        const open = group[0].value;
-        const close = group[group.length - 1].value;
+        const high = Math.max(...group.map(tick => tick.value)).toFixed(12);
+        const low = Math.min(...group.map(tick => tick.value)).toFixed(12);
+        const open = group[0].value.toString();
+        const close = group[group.length - 1].value.toString();
         const ts = convertToCustomDate(group[0].date);
+        const lowHigh = [low, high];
+        const openClose = [open, close];
 
         return {
             high,
             low,
             open,
             close,
-            ts
+            ts,
+            lowHigh,
+            openClose
         };
     });
 }

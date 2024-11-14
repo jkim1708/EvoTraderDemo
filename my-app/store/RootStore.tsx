@@ -1,5 +1,7 @@
 import TradingRuleStore, {TradingRule} from "@/store/TradingRuleStore";
 import {makeAutoObservable} from "mobx";
+import {CANDLESTICK_FREQUENCY} from "@/utils";
+import CandleStickChart from "@/components/ui/candleStickChart";
 
 
 export interface TradingStrategy {
@@ -11,6 +13,11 @@ export interface TradingStrategy {
     sharpeRatio: string,
     status: 'active' | 'inactive',
     tradingRules: TradingRule[],
+    underline: CandleStickChart[],
+    selectedStartDate: string,
+    selectedEndDate: string,
+    frequency: CANDLESTICK_FREQUENCY,
+
 }
 
 class TradingStrategyStore {
@@ -26,6 +33,8 @@ class TradingStrategyStore {
     setTradingStrategy = (tradingRules: TradingStrategy[]) => {
         this.tradingStrategies = tradingRules
     };
+
+
 
 }
 

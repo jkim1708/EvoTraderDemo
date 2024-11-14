@@ -17,7 +17,13 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog"
-import {convertToDate, generateData, SampleAssetData} from "@/utils";
+import {
+    CANDLESTICK_FREQUENCY,
+    convertToDate,
+    generateData,
+    SampleAssetData,
+    transformToCandleStickSeries
+} from "@/utils";
 import CandleStickChart from "@/components/ui/candleStickChart";
 import {observer} from "mobx-react-lite";
 import {TradingRule} from "@/store/TradingRuleStore";
@@ -56,9 +62,9 @@ const EnhancedTradingAssetViewer = observer(() => {
 
         const [startDate, setStartDate] = useState(twoDaysAgo.toISOString().split('T')[0])
         const [endDate, setEndDate] = useState(today.toISOString().split('T')[0])
-        const [frequency, setFrequency] = useState("hourly")
+        const [frequency] = useState(CANDLESTICK_FREQUENCY.HOURLY)
         const [asset, setAsset] = useState("EURUSD")
-        const [data, setData] = useState([] as SampleAssetData)
+        const [data, setData] = useState([] as CandleStickChart[])
         // const [selectedRange, setSelectedRange] = useState<[number, number] | null>(null)
         // const [tradeType, setTradeType] = useState<'long' | 'short'>('long')
         const [editingTrade, setEditingTrade] = useState<TradingRule | null>(null)
@@ -69,7 +75,11 @@ const EnhancedTradingAssetViewer = observer(() => {
         }
 
         useEffect(() => {
-            setData(generateData(new Date(startDate), new Date(endDate), asset));
+
+            const tickSeries: SampleAssetData = generateData(new Date(startDate), new Date(endDate), asset);
+            const candleStickSeries: CandleStickChart[] = transformToCandleStickSeries(tickSeries, frequency) ?? [];
+
+            setData(candleStickSeries);
         }, [startDate, endDate, asset]);
 
         useEffect(() => {
@@ -101,7 +111,7 @@ const EnhancedTradingAssetViewer = observer(() => {
             setEditingTrade(null)
         }
 
-        function createAndSaveTradingStrategy(param: { name: string; rules: TradingRule[] }) {
+        function createAndSaveTradingStrategy(param: { name: string; rules: TradingRule[], selectedStartDate: string; selectedEndDate: string; frequency: CANDLESTICK_FREQUENCY }) {
             const {name, rules} = param;
 
             const tradingStrategy: TradingStrategy = {
@@ -112,7 +122,11 @@ const EnhancedTradingAssetViewer = observer(() => {
                 profitFactor: '62,5%',
                 sharpeRatio: '2',
                 status: "active",
-                tradingRules: rules
+                tradingRules: rules,
+                selectedStartDate: param.selectedStartDate,
+                selectedEndDate: param.selectedEndDate,
+                frequency: param.frequency,
+                underline: data,
             }
 
             setTradingStrategy([...tradingStrategies, tradingStrategy]);
@@ -123,7 +137,10 @@ const EnhancedTradingAssetViewer = observer(() => {
 
             createAndSaveTradingStrategy({
                 name: currentTradingStrategyName,
-                rules: tradingRules
+                rules: tradingRules,
+                selectedStartDate: startDate,
+                selectedEndDate: endDate,
+                frequency: frequency
             });
         }
 
@@ -196,7 +213,9 @@ const EnhancedTradingAssetViewer = observer(() => {
                             </div>
                             <div className="flex-1">
                                 <Label htmlFor="frequency">Frequency</Label>
-                                <Select value={frequency} onValueChange={setFrequency}>
+                                <Select value={'hourly'}
+                                        // onValueChange={setFrequency}
+                                >
                                     <SelectTrigger id="frequency">
                                         <SelectValue/>
                                     </SelectTrigger>
@@ -232,7 +251,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                     </div>
 
 
-                    <CandleStickChart generatedData={data} asset={asset}/>
+                    <CandleStickChart data={data} asset={asset}/>
 
 
                     <div className="mt-6">

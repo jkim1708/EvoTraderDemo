@@ -4,14 +4,22 @@ import {Button} from "@/components/ui/button"
 import {useStores} from "@/store/Provider";
 import {TradingStrategy} from "@/store/RootStore";
 import {observer} from "mobx-react-lite";
+import React from "react";
+import {useRouter} from "next/navigation";
 
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-const StrategyTable = observer(({onAnalyze}: {onAnalyze: (strategy: TradingStrategy) => void}) => {
+const StrategyTable = observer(({onAnalyze}: { onAnalyze: (strategy: TradingStrategy) => void }) => {
 
     const {
         tradingStrategyStore: {tradingStrategies},
     } = useStores();
+
+    const router = useRouter();
+
+    const editStrategyHandler = (strategy: TradingStrategy) => {
+        router.push(`/?strategyName=${strategy.name}`);
+    }
 
     return (
         <Table>
@@ -52,9 +60,15 @@ const StrategyTable = observer(({onAnalyze}: {onAnalyze: (strategy: TradingStrat
                             />
                         </TableCell>
                         <TableCell>
-                            <Button variant="outline" onClick={() => onAnalyze(strategy)}>
-                                Analyze
-                            </Button>
+                            <div className="space-x-2">
+                                <Button variant="outline" onClick={() => onAnalyze(strategy)}>
+                                    Analyze
+                                </Button>
+
+                                <Button variant="outline" onClick={() => editStrategyHandler(strategy)}>
+                                    Edit
+                                </Button>
+                            </div>
                         </TableCell>
                     </TableRow>
                 ))}

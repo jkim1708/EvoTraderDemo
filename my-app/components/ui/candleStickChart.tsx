@@ -11,8 +11,6 @@ import {
 import {
     convertToDate,
     isInExistingInReferenceArea,
-    SampleAssetData,
-    transformToCandleStickSeries
 } from "@/utils";
 import {observer} from "mobx-react-lite";
 import {useStores} from "@/store/Provider";
@@ -88,20 +86,6 @@ const Candlestick = props => {
     );
 };
 
-const prepareData = (data: CandleStickChart[]) => {
-    return data.map(({open, close, low, high, ts}) => {
-        return {
-            ts,
-            low,
-            high,
-            open: parseFloat(open),
-            close: parseFloat(close),
-            lowHigh: [low, high],
-            openClose: [open, close],
-        };
-    });
-};
-
 type CandleStickChart = {
     high: string,
     low: string,
@@ -111,7 +95,7 @@ type CandleStickChart = {
 };
 
 export type CandleStickChartProps = {
-    generatedData: SampleAssetData,
+    data: CandleStickChart[],
     asset: string,
 }
 
@@ -159,19 +143,13 @@ const CandleStickChart =
             },
         } = useStores();
 
-        const generateData = props.generatedData;
         const asset = props.asset;
+        const data = props.data;
         // const handleChartClick = props.handleChartClick;
 
         const [refAreaLeft, setRefAreaLeft] = useState('');
         const [refAreaRight, setRefAreaRight] = useState('');
-        // const genData = generateData(new Date('2024-01-01'), new Date('2024-01-02'), 'EURUSD');
-        const tickSeries: SampleAssetData = generateData;
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        const candleStickSeries: CandleStickChart[] = transformToCandleStickSeries(tickSeries);
 
-        const data = prepareData(candleStickSeries);
 
         const CustomTooltipCursor = ({x, y, height}: { x: string, y: string, height: string }) => (
             <path
@@ -190,7 +168,6 @@ const CandleStickChart =
             const low = payload[0] ? parseFloat(payload[0].payload.low).toFixed(4) : "";
 
             return (
-
                 <p> o {open} h {high} l {low} c {close} </p>
             )
         }
@@ -222,12 +199,8 @@ const CandleStickChart =
 
         function calculateProfitNLoss(refAreaLeft: string, refAreaRight: string, kind: "short" | "long") {
 
-            const refAreaLeftOpenValue = data.find((tickData) => tickData.ts === refAreaLeft)?.open;
-            const refAreaRightCloseValue = data.find((tickData) => tickData.ts === refAreaRight)?.close;
-
-            console.log("refAreaLeftOpenValue", refAreaLeftOpenValue);
-            console.log("refAreaRightCloseValue", refAreaRightCloseValue);
-            console.log("kind", kind);
+            const refAreaLeftOpenValue = parseFloat(data.find((tickData) => tickData.ts === refAreaLeft)?.open ?? "");
+            const refAreaRightCloseValue = parseFloat(data.find((tickData) => tickData.ts === refAreaRight)?.close ?? "");
 
             if (refAreaLeftOpenValue === undefined || refAreaRightCloseValue === undefined) {
                 console.error("invalid refAreaLeftOpenValue or refAreaRightCloseValue");
