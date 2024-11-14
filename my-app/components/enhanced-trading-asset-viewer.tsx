@@ -31,6 +31,7 @@ import {useStores} from "@/store/Provider";
 import {v4 as uuidv4} from 'uuid';
 import Link from "next/link";
 import {TradingStrategy} from "@/store/RootStore";
+import {useRouter, useSearchParams} from "next/navigation";
 
 
 // const calculatePnL = (trade: Trade, data: { date: string; value: number }[]) => {
@@ -65,17 +66,51 @@ const EnhancedTradingAssetViewer = observer(() => {
         const [frequency] = useState(CANDLESTICK_FREQUENCY.HOURLY)
         const [asset, setAsset] = useState("EURUSD")
         const [data, setData] = useState([] as CandleStickChart[])
+
+        enum VIEW_MODE {
+            CREATE,
+            EDIT
+        };
+        const [viewMode, setViewMode] = useState(VIEW_MODE.CREATE)
         // const [selectedRange, setSelectedRange] = useState<[number, number] | null>(null)
         // const [tradeType, setTradeType] = useState<'long' | 'short'>('long')
         const [editingTrade, setEditingTrade] = useState<TradingRule | null>(null)
+        const [isStrategyNameValid, setIsStrategyNameValid] = useState(true);
 
         const resetSelectedTrades = () => {
             setTradingRule([]);
             setDefinedRefArea([]);
         }
+        const searchParams = useSearchParams();
+        const pathStrategyName = searchParams.get('strategyName')
+
+        const appRouterInstance = useRouter();
+
+        useEffect(() => {
+            if(pathStrategyName) {
+                setViewMode(VIEW_MODE.EDIT);
+            }
+        },[]);
 
         useEffect(() => {
 
+
+            if (pathStrategyName) {
+                setCurrentTradingStrategyName(pathStrategyName as string);
+                tradingStrategies.filter(strategy => strategy.name === pathStrategyName).forEach(strategy => {
+                    setStartDate(strategy.selectedStartDate);
+                    setEndDate(strategy.selectedEndDate);
+                    setTradingRule(strategy.tradingRules);
+                    setDefinedRefArea(strategy.tradingRules.map(trade => ({
+                        referencedAreaLeft: trade.startTime,
+                        referencedAreaRight: trade.endTime
+                    })));
+                });
+            }
+
+        }, [pathStrategyName]);
+
+        useEffect(() => {
             const tickSeries: SampleAssetData = generateData(new Date(startDate), new Date(endDate), asset);
             const candleStickSeries: CandleStickChart[] = transformToCandleStickSeries(tickSeries, frequency) ?? [];
 
@@ -111,17 +146,23 @@ const EnhancedTradingAssetViewer = observer(() => {
             setEditingTrade(null)
         }
 
-        function createAndSaveTradingStrategy(param: { name: string; rules: TradingRule[], selectedStartDate: string; selectedEndDate: string; frequency: CANDLESTICK_FREQUENCY }) {
+        function createTradingStrategy(param: {
+            name: string;
+            rules: TradingRule[],
+            selectedStartDate: string;
+            selectedEndDate: string;
+            frequency: CANDLESTICK_FREQUENCY
+        }): TradingStrategy {
             const {name, rules} = param;
 
-            const tradingStrategy: TradingStrategy = {
+            return {
                 id: uuidv4(),
                 name,
                 indicators: ["RSI", "MACD"],
                 winRate: '62.5%',
                 profitFactor: '62,5%',
                 sharpeRatio: '2',
-                status: "active",
+                status: 'active',
                 tradingRules: rules,
                 selectedStartDate: param.selectedStartDate,
                 selectedEndDate: param.selectedEndDate,
@@ -129,19 +170,53 @@ const EnhancedTradingAssetViewer = observer(() => {
                 underline: data,
             }
 
-            setTradingStrategy([...tradingStrategies, tradingStrategy]);
+        }
 
+        function saveTradingStrategy(tradingStrategy: TradingStrategy) {
+            for (let i = 0; i < tradingStrategies.length; i++) {
+                if (tradingStrategies[i].name === tradingStrategy.name) {
+                    tradingStrategies[i] = tradingStrategy;
+                    setTradingStrategy([...tradingStrategies]);
+                    return;
+                }
+            }
+
+            setTradingStrategy([...tradingStrategies, tradingStrategy]);
+            return
         }
 
         function handleCreateStrategy() {
 
-            createAndSaveTradingStrategy({
+            if (viewMode === VIEW_MODE.CREATE) {
+
+                const isNameValid = !isNameExistent(currentTradingStrategyName);
+                setIsStrategyNameValid(isNameValid);
+
+                if (!isNameValid) {
+                    return;
+                }
+            }
+
+            if(tradingRules.length === 0) {
+
+                return;
+            }
+
+            const tradingStrategy = createTradingStrategy({
                 name: currentTradingStrategyName,
                 rules: tradingRules,
                 selectedStartDate: startDate,
                 selectedEndDate: endDate,
                 frequency: frequency
             });
+
+            console.log('tradingStrategy',tradingStrategy);
+
+            saveTradingStrategy(tradingStrategy);
+
+            console.log('tradingStrategies',tradingStrategies);
+
+            appRouterInstance.push('/strategy-management');
         }
 
         function convertToDatepickerFormat(startTime: string) {
@@ -163,6 +238,13 @@ const EnhancedTradingAssetViewer = observer(() => {
             // '2024-11-09T01:11'
             return `${year}-${monthStr}-${dayStr}T${hourStr}:00`;
 
+        }
+
+        const isNameExistent = (value: string) => {
+            if (tradingStrategies.find(strategy => strategy.name === value)) {
+                return true;
+            }
+            return false;
         }
 
         return (
@@ -214,7 +296,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                             <div className="flex-1">
                                 <Label htmlFor="frequency">Frequency</Label>
                                 <Select value={'hourly'}
-                                        // onValueChange={setFrequency}
+                                    // onValueChange={setFrequency}
                                 >
                                     <SelectTrigger id="frequency">
                                         <SelectValue/>
@@ -230,9 +312,10 @@ const EnhancedTradingAssetViewer = observer(() => {
                     <div className="flex space-x-4 mb-4">
                         <div className="flex-4">
                             <Label htmlFor="asset">Trading Rule Name</Label>
-                            <Input id={"tading-rule-name"} defaultValue={"My Trading Rule"} onChange={e => {
+                            <Input className={isStrategyNameValid ? "" : "border-red-500"} id={"tading-rule-name"}
+                                   defaultValue={"My Trading Rule"} onChange={e => {
                                 setCurrentTradingStrategyName(e.target.value)
-                            }}/>
+                            }} disabled={viewMode === VIEW_MODE.EDIT}/>
                         </div>
                     </div>
                     <div className="flex space-x-4 mb-4">
@@ -358,12 +441,10 @@ const EnhancedTradingAssetViewer = observer(() => {
                                 Cancel
                             </Button>
                         </Link>
-                        <Link href="/strategy-management">
-                            <Button variant="default" size="sm" onClick={handleCreateStrategy}>
-                                {/*<Trash2 className="h-4 w-4"/>*/}
-                                Create
-                            </Button>
-                        </Link>
+                        <Button variant="default" size="sm" onClick={handleCreateStrategy}>
+                            {/*<Trash2 className="h-4 w-4"/>*/}
+                            Create
+                        </Button>
                     </div>
                 </CardContent>
             </Card>

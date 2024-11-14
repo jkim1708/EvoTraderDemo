@@ -30,8 +30,8 @@ class TradingStrategyStore {
         makeAutoObservable(this);
     }
 
-    setTradingStrategy = (tradingRules: TradingStrategy[]) => {
-        this.tradingStrategies = tradingRules
+    setTradingStrategy = (tradingStrategies: TradingStrategy[]) => {
+        this.tradingStrategies = tradingStrategies
     };
 
 
