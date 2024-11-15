@@ -150,7 +150,6 @@ const CandleStickChart =
         const [refAreaLeft, setRefAreaLeft] = useState('');
         const [refAreaRight, setRefAreaRight] = useState('');
 
-
         const CustomTooltipCursor = ({x, y, height}: { x: string, y: string, height: string }) => (
             <path
                 d={`M${x},${y} L${x},${y + height}`}

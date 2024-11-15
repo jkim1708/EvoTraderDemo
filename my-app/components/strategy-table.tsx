@@ -21,12 +21,17 @@ const StrategyTable = observer(({onAnalyze}: { onAnalyze: (strategy: TradingStra
         return (Math.random() * (80 - 40) + 40).toFixed(1) + "%";
     };
 
+    const getRandomSharpeRatio = () => {
+        return (Math.random() * (1.8 - 0.5) + 0.5).toFixed(2);
+    };
+
     useEffect(() => {
 
         const updateWinRate = () => {
             tradingStrategies.forEach(strategy => {
                 strategy.winRate = getRandomBetween20And80();
                 strategy.profitFactor = getRandomBetween20And80();
+                strategy.sharpeRatio = getRandomSharpeRatio();
             });
         };
 
