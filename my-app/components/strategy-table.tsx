@@ -17,7 +17,7 @@ const StrategyTable = observer(({onAnalyze}: { onAnalyze: (strategy: TradingStra
 
     const [count, setCount] = useState(0);
 
-    const getRandomWinRate = () => {
+    const getRandomBetween20And80 = () => {
         return (Math.random() * (80 - 40) + 40).toFixed(1) + "%";
     };
 
@@ -25,7 +25,8 @@ const StrategyTable = observer(({onAnalyze}: { onAnalyze: (strategy: TradingStra
 
         const updateWinRate = () => {
             tradingStrategies.forEach(strategy => {
-                strategy.winRate = getRandomWinRate();
+                strategy.winRate = getRandomBetween20And80();
+                strategy.profitFactor = getRandomBetween20And80();
             });
         };
 
