@@ -116,8 +116,6 @@ const EnhancedTradingAssetViewer = observer(() => {
         }, []);
 
         useEffect(() => {
-
-
             if (pathStrategyName) {
                 setCurrentTradingStrategyName(pathStrategyName as string);
                 tradingStrategies.filter(strategy => strategy.name === pathStrategyName).forEach(strategy => {

@@ -4,7 +4,7 @@ import {Button} from "@/components/ui/button"
 import {useStores} from "@/store/Provider";
 import {TradingStrategy} from "@/store/RootStore";
 import {observer} from "mobx-react-lite";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {useRouter} from "next/navigation";
 
 
@@ -14,6 +14,32 @@ const StrategyTable = observer(({onAnalyze}: { onAnalyze: (strategy: TradingStra
     const {
         tradingStrategyStore: {tradingStrategies},
     } = useStores();
+
+    const [count, setCount] = useState(0);
+
+    const getRandomWinRate = () => {
+        return (Math.random() * (80 - 40) + 40).toFixed(1) + "%";
+    };
+
+    useEffect(() => {
+
+        const updateWinRate = () => {
+            tradingStrategies.forEach(strategy => {
+                strategy.winRate = getRandomWinRate();
+            });
+        };
+
+        //change every 10-20 seconds
+        // Math.random() * (2000 - 1000) + 1000)
+        const interval = setInterval(() => {
+            updateWinRate();
+            setCount(count + 1);
+        }, Math.random() * (2000 - 1000) + 1000);
+
+
+        //Clearing the interval
+        return () => clearInterval(interval);
+    }, [count, tradingStrategies]);
 
     const router = useRouter();
 
