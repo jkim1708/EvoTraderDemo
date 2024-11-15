@@ -61,10 +61,32 @@ const EnhancedTradingAssetViewer = observer(() => {
         const twoDaysAgo = new Date(today)
         twoDaysAgo.setDate(today.getDate() - 2)
 
-        const [startDate, setStartDate] = useState(twoDaysAgo.toISOString().split('T')[0])
-        const [endDate, setEndDate] = useState(today.toISOString().split('T')[0])
+    const searchParams = useSearchParams();
+    const pathStrategyName = searchParams.get('strategyName')
+
+    let initialStartDate;
+    let initialEndDate;
+    let initialAsset;
+
+    if (pathStrategyName) {
+        setCurrentTradingStrategyName(pathStrategyName as string);
+        tradingStrategies.filter(strategy => strategy.name === pathStrategyName).forEach(strategy => {
+            initialStartDate = strategy.selectedStartDate;
+            initialEndDate = strategy.selectedEndDate;
+            setTradingRule(strategy.tradingRules);
+            setDefinedRefArea(strategy.tradingRules.map(trade => ({
+                referencedAreaLeft: trade.startTime,
+                referencedAreaRight: trade.endTime
+            })));
+            initialAsset = strategy.tradingRules[0].asset;
+        });
+
+    }
+
+        const [startDate, setStartDate] = useState(initialStartDate ?? twoDaysAgo.toISOString().split('T')[0])
+        const [endDate, setEndDate] = useState(initialEndDate ?? today.toISOString().split('T')[0])
         const [frequency] = useState(CANDLESTICK_FREQUENCY.HOURLY)
-        const [asset, setAsset] = useState("EURUSD")
+        const [asset, setAsset] = useState(initialAsset ?? "EURUSD")
         const [data, setData] = useState([] as CandleStickChart[])
 
         enum VIEW_MODE {
@@ -81,16 +103,17 @@ const EnhancedTradingAssetViewer = observer(() => {
             setTradingRule([]);
             setDefinedRefArea([]);
         }
-        const searchParams = useSearchParams();
-        const pathStrategyName = searchParams.get('strategyName')
+
 
         const appRouterInstance = useRouter();
 
+
+
         useEffect(() => {
-            if(pathStrategyName) {
+            if (pathStrategyName) {
                 setViewMode(VIEW_MODE.EDIT);
             }
-        },[]);
+        }, []);
 
         useEffect(() => {
 
@@ -105,9 +128,10 @@ const EnhancedTradingAssetViewer = observer(() => {
                         referencedAreaLeft: trade.startTime,
                         referencedAreaRight: trade.endTime
                     })));
+                    setAsset(strategy.tradingRules[0].asset);
                 });
-            }
 
+            }
         }, [pathStrategyName]);
 
         useEffect(() => {
@@ -197,7 +221,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                 }
             }
 
-            if(tradingRules.length === 0) {
+            if (tradingRules.length === 0) {
 
                 return;
             }
@@ -210,11 +234,13 @@ const EnhancedTradingAssetViewer = observer(() => {
                 frequency: frequency
             });
 
-            console.log('tradingStrategy',tradingStrategy);
+            console.log('tradingStrategy', tradingStrategy);
+            console.log('tradingStrategy', JSON.stringify(tradingStrategy.tradingRules[0]));
 
             saveTradingStrategy(tradingStrategy);
 
-            console.log('tradingStrategies',tradingStrategies);
+            console.log('tradingStrategies', tradingStrategies);
+            console.log('trading rules', JSON.stringify(tradingRules[0]));
 
             appRouterInstance.push('/strategy-management');
         }
