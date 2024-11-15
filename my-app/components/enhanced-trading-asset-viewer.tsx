@@ -61,27 +61,27 @@ const EnhancedTradingAssetViewer = observer(() => {
         const twoDaysAgo = new Date(today)
         twoDaysAgo.setDate(today.getDate() - 2)
 
-    const searchParams = useSearchParams();
-    const pathStrategyName = searchParams.get('strategyName')
+        const searchParams = useSearchParams();
+        const pathStrategyName = searchParams.get('strategyName')
 
-    let initialStartDate;
-    let initialEndDate;
-    let initialAsset;
+        let initialStartDate;
+        let initialEndDate;
+        let initialAsset;
 
-    if (pathStrategyName) {
-        setCurrentTradingStrategyName(pathStrategyName as string);
-        tradingStrategies.filter(strategy => strategy.name === pathStrategyName).forEach(strategy => {
-            initialStartDate = strategy.selectedStartDate;
-            initialEndDate = strategy.selectedEndDate;
-            setTradingRule(strategy.tradingRules);
-            setDefinedRefArea(strategy.tradingRules.map(trade => ({
-                referencedAreaLeft: trade.startTime,
-                referencedAreaRight: trade.endTime
-            })));
-            initialAsset = strategy.tradingRules[0].asset;
-        });
+        if (pathStrategyName) {
+            setCurrentTradingStrategyName(pathStrategyName as string);
+            tradingStrategies.filter(strategy => strategy.name === pathStrategyName).forEach(strategy => {
+                initialStartDate = strategy.selectedStartDate;
+                initialEndDate = strategy.selectedEndDate;
+                setTradingRule(strategy.tradingRules);
+                setDefinedRefArea(strategy.tradingRules.map(trade => ({
+                    referencedAreaLeft: trade.startTime,
+                    referencedAreaRight: trade.endTime
+                })));
+                initialAsset = strategy.tradingRules[0].asset;
+            });
 
-    }
+        }
 
         const [startDate, setStartDate] = useState(initialStartDate ?? twoDaysAgo.toISOString().split('T')[0])
         const [endDate, setEndDate] = useState(initialEndDate ?? today.toISOString().split('T')[0])
@@ -106,7 +106,6 @@ const EnhancedTradingAssetViewer = observer(() => {
 
 
         const appRouterInstance = useRouter();
-
 
 
         useEffect(() => {
@@ -180,7 +179,7 @@ const EnhancedTradingAssetViewer = observer(() => {
             return {
                 id: uuidv4(),
                 name,
-                indicators: ["RSI", "MACD"],
+                indicators: getRandomIndicators(),
                 winRate: '62.5%',
                 profitFactor: '62,5%',
                 sharpeRatio: '2',
@@ -206,6 +205,13 @@ const EnhancedTradingAssetViewer = observer(() => {
             setTradingStrategy([...tradingStrategies, tradingStrategy]);
             return
         }
+
+        const getRandomIndicators = () => {
+            const indicators = ["MACD", "CCI", "RSI"];
+            const randomCount = Math.floor(Math.random() * indicators.length) + 1;
+            const shuffled = indicators.sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, randomCount);
+        };
 
         function handleCreateStrategy() {
 
