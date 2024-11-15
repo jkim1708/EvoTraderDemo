@@ -29,6 +29,7 @@ const StrategyTable = observer(({onAnalyze}: { onAnalyze: (strategy: TradingStra
 
         const updateWinRate = () => {
             tradingStrategies.forEach(strategy => {
+                if(strategy.status === "inactive") return;
                 strategy.winRate = getRandomBetween20And80();
                 strategy.profitFactor = getRandomBetween20And80();
                 strategy.sharpeRatio = getRandomSharpeRatio();
