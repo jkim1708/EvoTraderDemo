@@ -60,7 +60,7 @@ export default function StrategyDialog({ strategy, onClose }) {
                     </div>
 
                     <div className="h-[300px]">
-                      <CandleStickChartDialog generatedData={generateData(getDateTwoDaysBefore(new Date()), new Date(), "EURUSD")} asset="EURUSD" />
+                      <CandleStickChartDialog generatedData={generateData(new Date('01-01-2013'), new Date(), "EURUSD", 60*24*7)} asset="EURUSD" />
                     </div>
 
                     <div className="space-y-4">

@@ -2,11 +2,13 @@ import {ReferencedArea} from "@/components/ui/candleStickChart";
 
 export type SampleAssetData = {
     date: Date
-    value: number
+    value: number,
+    granularity: number
 }[]
 
 // Generate sample data
-export const generateData = (startDate: Date, endDate: Date, asset: string): SampleAssetData => {
+//granularity: number): SampleAssetData => {
+export const generateData = (startDate: Date, endDate: Date, asset: string, granularity: number): SampleAssetData => {
     const data = []
     let currentDate = new Date(startDate)
     let value = 1
@@ -23,7 +25,7 @@ export const generateData = (startDate: Date, endDate: Date, asset: string): Sam
             date: currentDate,
             value: Math.max(0, value)
         })
-        currentDate = addMinutesToDate(currentDate, 5) // Increment by 1 hour for granularity
+        currentDate = addMinutesToDate(currentDate, granularity) // Increment by 1 hour for granularity
     }
 
     return data

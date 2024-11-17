@@ -132,7 +132,7 @@ const EnhancedTradingAssetViewer = observer(() => {
         }, [pathStrategyName]);
 
         useEffect(() => {
-            const tickSeries: SampleAssetData = generateData(new Date(startDate), new Date(endDate), asset);
+            const tickSeries: SampleAssetData = generateData(new Date(startDate), new Date(endDate), asset,5);
             const candleStickSeries: CandleStickChart[] = transformToCandleStickSeries(tickSeries, frequency) ?? [];
 
             setData(candleStickSeries);
