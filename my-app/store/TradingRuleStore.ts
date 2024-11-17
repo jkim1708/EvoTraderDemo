@@ -19,7 +19,7 @@ class TradingRuleStore {
 
     tradingRules: TradingRule[];
 
-    definedRefArea: { referencedAreaLeft: string, referencedAreaRight: string }[] = [];
+    definedRefArea: { referencedAreaLeft: string, referencedAreaRight: string, tradeKind: 'long' | 'short'  }[] = [];
 
     currentSelectedAsset: 'EURUSD' | 'USDJPY' | 'GBPUSD' | 'EURCHF' | 'EURNOK' = 'EURUSD';
 
@@ -42,7 +42,7 @@ class TradingRuleStore {
         this.tradingRules = tradingRules
     };
 
-    setDefinedRefArea = (definedRefArea: { referencedAreaLeft: string, referencedAreaRight: string }[]) => {
+    setDefinedRefArea = (definedRefArea: { referencedAreaLeft: string, referencedAreaRight: string, tradeKind: 'long' | 'short' }[]) => {
         this.definedRefArea = definedRefArea;
     }
 

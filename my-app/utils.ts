@@ -3,7 +3,6 @@ import {ReferencedArea} from "@/components/ui/candleStickChart";
 export type SampleAssetData = {
     date: Date
     value: number,
-    granularity: number
 }[]
 
 // Generate sample data

@@ -181,7 +181,7 @@ const CandleStickChart =
         }
 
         function saveReferenceAreaSelection() {
-            definedRefArea.push({referencedAreaLeft: refAreaLeft, referencedAreaRight: refAreaRight});
+            definedRefArea.push({referencedAreaLeft: refAreaLeft, referencedAreaRight: refAreaRight, tradeKind: currentSelectedTradeKind});
         }
 
         function createTrade(profitNLoss: number) {
@@ -287,11 +287,11 @@ const CandleStickChart =
                              position={{x: 100, y: -25}} offset={20}/>
                     {definedRefArea.map((area, index) => (
                         <ReferenceArea key={index} yAxisId="1" x1={area.referencedAreaLeft}
-                                       x2={area.referencedAreaRight} strokeOpacity={0.3}/>
+                                       x2={area.referencedAreaRight} strokeOpacity={0.3} fill={area.tradeKind ==='long' ?'#34eb6e': '#eb3434'} opacity={0.3}/>
                     ))}
                     {(refAreaLeft && refAreaRight) || (definedRefArea.length > 0) ? (
                         // <AllReferencedAreas referencedAreas={definedRefArea}/>
-                        <ReferenceArea yAxisId="1" x1={refAreaLeft} x2={refAreaRight} strokeOpacity={0.3}/>
+                        <ReferenceArea yAxisId="1" x1={refAreaLeft} x2={refAreaRight} strokeOpacity={0.3} fill={currentSelectedTradeKind==='long' ?'#34eb6e': '#eb3434'} opacity={0.3}/>
                     ) : null}
                 </BarChart>
             </div>

@@ -76,7 +76,8 @@ const EnhancedTradingAssetViewer = observer(() => {
                 setTradingRule(strategy.tradingRules);
                 setDefinedRefArea(strategy.tradingRules.map(trade => ({
                     referencedAreaLeft: trade.startTime,
-                    referencedAreaRight: trade.endTime
+                    referencedAreaRight: trade.endTime,
+                    tradeKind: trade.kind
                 })));
                 initialAsset = strategy.tradingRules[0].asset;
             });
@@ -123,7 +124,8 @@ const EnhancedTradingAssetViewer = observer(() => {
                     setTradingRule(strategy.tradingRules);
                     setDefinedRefArea(strategy.tradingRules.map(trade => ({
                         referencedAreaLeft: trade.startTime,
-                        referencedAreaRight: trade.endTime
+                        referencedAreaRight: trade.endTime,
+                        tradeKind: trade.kind
                     })));
                     setAsset(strategy.tradingRules[0].asset);
                 });
@@ -146,7 +148,8 @@ const EnhancedTradingAssetViewer = observer(() => {
             setTradingRule(tradingRules.filter(trade => trade.startTime !== startTime))
             setDefinedRefArea(tradingRules.filter(trade => trade.startTime !== startTime).map(trade => ({
                 referencedAreaLeft: trade.startTime,
-                referencedAreaRight: trade.endTime
+                referencedAreaRight: trade.endTime,
+                tradeKind: trade.kind
             })));
         }
 

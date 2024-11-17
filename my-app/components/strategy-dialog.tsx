@@ -20,12 +20,12 @@ export default function StrategyDialog({ strategy, onClose }) {
             profit: '0.0050'
         }
     ]
-
-    function getDateTwoDaysBefore(date: Date): Date {
-        const newDate = new Date(date);
-        newDate.setDate(newDate.getDate() - 2);
-        return newDate;
-    }
+    //
+    // function getDateTwoDaysBefore(date: Date): Date {
+    //     const newDate = new Date(date);
+    //     newDate.setDate(newDate.getDate() - 2);
+    //     return newDate;
+    // }
 
     return (
         <Dialog open={true} onOpenChange={onClose}>
