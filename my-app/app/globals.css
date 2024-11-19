@@ -76,3 +76,11 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.recharts-cartesian-axis-tick {
+  user-select: none; /* Standard syntax */
+}
+
+.recharts-tooltip-wrapper {
+  user-select: none; /* Standard syntax */
+}
