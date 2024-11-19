@@ -351,7 +351,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                             }} disabled={viewMode === VIEW_MODE.EDIT}/>
                         </div>
                     </div>
-                    <div className="flex space-x-4 mb-4">
+                    <div className="flex space-x-4 mb-4 tradeKindButton">
                         <Button
                             variant={currentSelectedTradeKind === 'long' ? 'default' : 'outline'}
                             onClick={() => setCurrentSelectedTradeKind('long')}

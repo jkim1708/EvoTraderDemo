@@ -88,3 +88,7 @@ body {
 .assetName {
   user-select: none; /* Standard syntax */
 }
+
+.tradeKindButton {
+  user-select: none; /* Standard syntax */
+}
