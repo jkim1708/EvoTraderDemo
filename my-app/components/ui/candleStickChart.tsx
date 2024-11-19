@@ -250,7 +250,7 @@ const CandleStickChart =
 
         return (
             <div>
-                <p> {asset} </p>
+                <p className={"assetName"}> {asset} </p>
                 <ResponsiveContainer width="100%"
                                      height={500}>
                 <BarChart

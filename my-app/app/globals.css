@@ -84,3 +84,7 @@ body {
 .recharts-tooltip-wrapper {
   user-select: none; /* Standard syntax */
 }
+
+.assetName {
+  user-select: none; /* Standard syntax */
+}
