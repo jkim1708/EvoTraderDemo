@@ -6,7 +6,7 @@ import {
     Bar,
     XAxis,
     YAxis,
-    CartesianGrid, Tooltip, ReferenceArea,
+    CartesianGrid, Tooltip, ReferenceArea, ResponsiveContainer,
 } from 'recharts';
 import {
     convertToDate,
@@ -251,9 +251,10 @@ const CandleStickChart =
         return (
             <div>
                 <p> {asset} </p>
+                <ResponsiveContainer width="100%"
+                                     height={500}>
                 <BarChart
-                    width={1000}
-                    height={500}
+
                     data={data}
                     margin={{top: 20, right: 30, left: 20, bottom: 20}}
                     // onClick={handleChartClick}
@@ -294,7 +295,9 @@ const CandleStickChart =
                         <ReferenceArea yAxisId="1" x1={refAreaLeft} x2={refAreaRight} strokeOpacity={0.3} fill={currentSelectedTradeKind==='long' ?'#34eb6e': '#eb3434'} opacity={0.3}/>
                     ) : null}
                 </BarChart>
+                </ResponsiveContainer>
             </div>
+
         );
     });
 
