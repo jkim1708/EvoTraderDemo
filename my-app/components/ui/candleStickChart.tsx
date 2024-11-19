@@ -14,6 +14,7 @@ import {
 } from "@/utils";
 import {observer} from "mobx-react-lite";
 import {useStores} from "@/store/Provider";
+import {Button} from "@/components/ui/button";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
@@ -115,6 +116,8 @@ type CustomizedTickProps = {
 function CustomizedTick(props: CustomizedTickProps) {
     const {x, y, payload} = props;
 
+    console.log("payload", payload);
+
     const date = payload.value.split(",")[0];
     const hour = payload.value.split(",")[1];
 
@@ -143,6 +146,10 @@ const CandleStickChart =
             },
         } = useStores();
 
+        const [lastDays, setLastDays] = useState(180); // Bereich der X-Achse
+        // const [isDragging, setIsDragging] = useState(false); // Bereich der X-Achse
+        // const [lastMouseX, setLastMouseX] = useState(0); // Bereich der X-Achse
+console.log(lastDays);
         const asset = props.asset;
         const data = props.data;
         // const handleChartClick = props.handleChartClick;
@@ -181,7 +188,11 @@ const CandleStickChart =
         }
 
         function saveReferenceAreaSelection() {
-            definedRefArea.push({referencedAreaLeft: refAreaLeft, referencedAreaRight: refAreaRight, tradeKind: currentSelectedTradeKind});
+            definedRefArea.push({
+                referencedAreaLeft: refAreaLeft,
+                referencedAreaRight: refAreaRight,
+                tradeKind: currentSelectedTradeKind
+            });
         }
 
         function createTrade(profitNLoss: number) {
@@ -248,14 +259,52 @@ const CandleStickChart =
 
         }
 
+        function handleDButton(numberOfLastDaysToShow: number): void {
+            setLastDays(numberOfLastDaysToShow*24);
+        }
+        //
+        // const handleMouseDown = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        //     if (event.button === 2) { // Right mouse button
+        //         event.preventDefault();
+        //         setIsDragging(true);
+        //         setLastMouseX(event.clientX);
+        //     } else {
+        //         if (event.activeLabel && !isInExistingInReferenceArea(definedRefArea, event.activeLabel)) {
+        //             setRefAreaLeft(event.activeLabel)
+        //         }
+        //     }
+        // }, []);
+        //
+        // const handleMouseMove = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        //     if (isDragging) {
+        //         const deltaX = event.clientX - lastMouseX;
+        //         const scrollAmount = Math.round(deltaX / 10); // Adjust sensitivity here
+        //         setLastDays(prevIndex => {
+        //             const newIndex = Math.max(0, Math.min(data.length - lastDays, prevIndex - scrollAmount));
+        //             return newIndex;
+        //         });
+        //         setLastMouseX(event.clientX);
+        //     }
+        // }, [isDragging, lastMouseX, lastDays, data.length]);
+        //
+        // const handleMouseUp = useCallback(() => {
+        //     setIsDragging(false);
+        // }, []);
+
+
+        console.log('data',data);
+
+        const visibleData = data.slice(data.length-lastDays,data.length)
         return (
             <div>
                 <p className={"assetName"}> {asset} </p>
                 <ResponsiveContainer width="100%"
-                                     height={500}>
-                <BarChart
+                                     height={500}
 
-                    data={data}
+                >
+                    <BarChart
+
+                    data={visibleData}
                     margin={{top: 20, right: 30, left: 20, bottom: 20}}
                     // onClick={handleChartClick}
                     onMouseDown={(e) => {
@@ -282,20 +331,58 @@ const CandleStickChart =
                     >
                     </Bar>
 
-                    {/*// eslint-disable-next-line @typescript-eslint/ban-ts-comment*/}
-                    {/*// @ts-expect-error take care later*/}
-                    <Tooltip cursor={<CustomTooltipCursor/>} content={customTooltipContent}
-                             position={{x: 100, y: -25}} offset={20}/>
-                    {definedRefArea.map((area, index) => (
-                        <ReferenceArea key={index} yAxisId="1" x1={area.referencedAreaLeft}
-                                       x2={area.referencedAreaRight} strokeOpacity={0.3} fill={area.tradeKind ==='long' ?'#34eb6e': '#eb3434'} opacity={0.3}/>
-                    ))}
-                    {(refAreaLeft && refAreaRight) || (definedRefArea.length > 0) ? (
-                        // <AllReferencedAreas referencedAreas={definedRefArea}/>
-                        <ReferenceArea yAxisId="1" x1={refAreaLeft} x2={refAreaRight} strokeOpacity={0.3} fill={currentSelectedTradeKind==='long' ?'#34eb6e': '#eb3434'} opacity={0.3}/>
-                    ) : null}
-                </BarChart>
+                        {/*// eslint-disable-next-line @typescript-eslint/ban-ts-comment*/}
+                        {/*// @ts-expect-error take care later*/}
+                        <Tooltip cursor={<CustomTooltipCursor/>} content={customTooltipContent}
+                                 position={{x: 100, y: -25}} offset={20}/>
+                        {definedRefArea.map((area, index) => (
+                            <ReferenceArea key={index} yAxisId="1" x1={area.referencedAreaLeft}
+                                           x2={area.referencedAreaRight} strokeOpacity={0.3}
+                                           fill={area.tradeKind === 'long' ? '#34eb6e' : '#eb3434'} opacity={0.3}/>
+                        ))}
+                        {(refAreaLeft && refAreaRight) || (definedRefArea.length > 0) ? (
+                            // <AllReferencedAreas referencedAreas={definedRefArea}/>
+                            <ReferenceArea yAxisId="1" x1={refAreaLeft} x2={refAreaRight} strokeOpacity={0.3}
+                                           fill={currentSelectedTradeKind === 'long' ? '#34eb6e' : '#eb3434'}
+                                           opacity={0.3}/>
+                        ) : null}
+                    </BarChart>
                 </ResponsiveContainer>
+                < Button
+                    onClick={()=>handleDButton(1)}
+                >
+                    1D
+                </Button>
+                < Button
+                    onClick={()=>handleDButton(5)}
+                >
+                    5D
+                </Button>
+                < Button
+                    onClick={()=>handleDButton(30)}
+                >
+                    1M
+                </Button>
+                < Button
+                    onClick={()=>handleDButton(90)}
+                >
+                    3M
+                </Button>
+                < Button
+                    onClick={()=>handleDButton(180)}
+                >
+                    6M
+                </Button>
+                < Button
+                    onClick={()=>handleDButton(5)}
+                >
+                    1J
+                </Button>
+                < Button
+                    onClick={()=>handleDButton(5)}
+                >
+                    5J
+                </Button>
             </div>
 
         );

@@ -58,8 +58,7 @@ const EnhancedTradingAssetViewer = observer(() => {
         } = useStores();
 
         const today = new Date()
-        const twoDaysAgo = new Date(today)
-        twoDaysAgo.setDate(today.getDate() - 2)
+        const twoDaysAgo = new Date('2024-01-01')
 
         const searchParams = useSearchParams();
         const pathStrategyName = searchParams.get('strategyName')
