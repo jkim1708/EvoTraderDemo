@@ -1,6 +1,6 @@
 "use client"
 
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {
     BarChart,
     Bar,
@@ -15,6 +15,7 @@ import {
 import {observer} from "mobx-react-lite";
 import {useStores} from "@/store/Provider";
 import {Button} from "@/components/ui/button";
+import {ChartContainer} from "@/components/ui/chart";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
@@ -147,9 +148,12 @@ const CandleStickChart =
         } = useStores();
 
         const [lastDays, setLastDays] = useState(180); // Bereich der X-Achse
-        // const [isDragging, setIsDragging] = useState(false); // Bereich der X-Achse
-        // const [lastMouseX, setLastMouseX] = useState(0); // Bereich der X-Achse
-console.log(lastDays);
+        const [xAxisResolution, setXAxisResolution] = useState(180); // Bereich der X-Achse
+        const [isDragging, setIsDragging] = useState(false); // Bereich der X-Achse
+        const [lastMouseX, setLastMouseX] = useState(0); // Bereich der X-Achse
+        const [startIndex, setStartIndex] = useState(0); // Bereich der X-Achse
+
+        console.log(lastDays);
         const asset = props.asset;
         const data = props.data;
         // const handleChartClick = props.handleChartClick;
@@ -228,8 +232,6 @@ console.log(lastDays);
                 default:
                     console.error("invalid kind");
             }
-
-
         }
 
         function isRefAreaSelectionOverlapping(definedRefArea: {
@@ -243,7 +245,6 @@ console.log(lastDays);
                 }
             }
             return false;
-
         }
 
         const defineReferenceArea = () => {
@@ -256,48 +257,64 @@ console.log(lastDays);
                 createTrade(profitNLoss ?? 0);
             }
             resetRefAreaSelection();
-
         }
 
         function handleDButton(numberOfLastDaysToShow: number): void {
-            setLastDays(numberOfLastDaysToShow*24);
+            setStartIndex(data.length - numberOfLastDaysToShow*24);
+            setXAxisResolution(numberOfLastDaysToShow*24);
         }
         //
-        // const handleMouseDown = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        //     if (event.button === 2) { // Right mouse button
-        //         event.preventDefault();
-        //         setIsDragging(true);
-        //         setLastMouseX(event.clientX);
-        //     } else {
-        //         if (event.activeLabel && !isInExistingInReferenceArea(definedRefArea, event.activeLabel)) {
-        //             setRefAreaLeft(event.activeLabel)
-        //         }
-        //     }
-        // }, []);
-        //
-        // const handleMouseMove = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        //     if (isDragging) {
-        //         const deltaX = event.clientX - lastMouseX;
-        //         const scrollAmount = Math.round(deltaX / 10); // Adjust sensitivity here
-        //         setLastDays(prevIndex => {
-        //             const newIndex = Math.max(0, Math.min(data.length - lastDays, prevIndex - scrollAmount));
-        //             return newIndex;
-        //         });
-        //         setLastMouseX(event.clientX);
-        //     }
-        // }, [isDragging, lastMouseX, lastDays, data.length]);
-        //
-        // const handleMouseUp = useCallback(() => {
-        //     setIsDragging(false);
-        // }, []);
+        const handleMouseDown = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+            if (event.button === 2) { // Right mouse button
+                event.preventDefault();
+                setIsDragging(true);
+                setLastMouseX(event.clientX);
+            }
+        }, []);
+
+        const handleMouseMove = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+            if (isDragging) {
+                const deltaX = event.clientX - lastMouseX;
+                const scrollAmount = Math.round(deltaX / 10); // Adjust sensitivity here
+                setStartIndex(prevIndex => {
+                    const newIndex = Math.max(0, Math.min(data.length - xAxisResolution, prevIndex - scrollAmount));
+                    return newIndex;
+                });
+                setLastMouseX(event.clientX);
+            }
+        }, [isDragging, lastMouseX, xAxisResolution, data.length]);
+
+        const handleMouseUp = useCallback(() => {
+            setIsDragging(false);
+        }, []);
 
 
         console.log('data',data);
 
-        const visibleData = data.slice(data.length-lastDays,data.length)
+        const visibleData = data.slice(startIndex,startIndex+xAxisResolution)
+
+        const handleContextMenu = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+            event.preventDefault();
+        }, []);
+
         return (
             <div>
                 <p className={"assetName"}> {asset} </p>
+                <ChartContainer config={{
+                    value: {
+                        label: "Value",
+                        color: "hsl(var(--chart-1))",
+                    },
+                }}
+                                className="h-[400px]"
+                                onMouseDown={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleMouseDown(e)}
+                                onMouseMove={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleMouseMove(e)}
+                                onMouseUp={handleMouseUp}
+                                onMouseLeave={handleMouseUp}
+                                onContextMenu={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleContextMenu(e)}
+                >
+
+
                 <ResponsiveContainer width="100%"
                                      height={500}
 
@@ -307,18 +324,17 @@ console.log(lastDays);
                     data={visibleData}
                     margin={{top: 20, right: 30, left: 20, bottom: 20}}
                     // onClick={handleChartClick}
-                    onMouseDown={(e) => {
-                        if (e.activeLabel && !isInExistingInReferenceArea(definedRefArea, e.activeLabel)) {
-                            console.log("e.activeLabel left", e.activeLabel);
-                            setRefAreaLeft(e.activeLabel)
-                        }
-                        ;
-                    }}
-                    onMouseMove={(e) => {
-                        if (e.activeLabel && refAreaLeft && !isInExistingInReferenceArea(definedRefArea, e.activeLabel)) setRefAreaRight(e.activeLabel)
-                    }}
-                    // eslint-disable-next-line react/jsx-no-bind
-                    onMouseUp={defineReferenceArea.bind(this)}
+                    // onMouseDown={(e) => {
+                    //     if (e.activeLabel && !isInExistingInReferenceArea(definedRefArea, e.activeLabel)) {
+                    //         console.log("e.activeLabel left", e.activeLabel);
+                    //         setRefAreaLeft(e.activeLabel)
+                    //     };
+                    // }}
+                    // onMouseMove={(e) => {
+                    //     if (e.activeLabel && refAreaLeft && !isInExistingInReferenceArea(definedRefArea, e.activeLabel)) setRefAreaRight(e.activeLabel)
+                    // }}
+                    // // eslint-disable-next-line react/jsx-no-bind
+                    // onMouseUp={defineReferenceArea.bind(this)}
                 >
                     <XAxis dataKey="ts" tickCount={data.length} tick={CustomizedTick} padding={{'left': 5}} />
                     <YAxis yAxisId="1" dataKey="lowHigh" domain={['auto', 'auto']} allowDecimals={true}/>
@@ -348,6 +364,7 @@ console.log(lastDays);
                         ) : null}
                     </BarChart>
                 </ResponsiveContainer>
+                </ChartContainer>
                 < Button
                     onClick={()=>handleDButton(1)}
                 >
