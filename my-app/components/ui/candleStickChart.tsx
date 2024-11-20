@@ -323,7 +323,7 @@ const CandleStickChart =
 
                             data={visibleData}
                             margin={{top: 20, right: 30, left: 20, bottom: 20}}
-                            onMouseDown={(nextState: CategoricalChartState, event: any) => {
+                            onMouseDown={(nextState: CategoricalChartState, event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
                                 if (event.button === 0) {
                                     if (nextState.activeLabel && !isInExistingInReferenceArea(definedRefArea, nextState.activeLabel)) {
                                         setRefAreaLeft(nextState.activeLabel)
@@ -331,7 +331,7 @@ const CandleStickChart =
                                     ;
                                 }
                             }}
-                            onMouseMove={(nextState: CategoricalChartState, event: any) => {
+                            onMouseMove={(nextState: CategoricalChartState, event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
                                 if (event.button === 0) {
                                     if (nextState.activeLabel && refAreaLeft && !isInExistingInReferenceArea(definedRefArea, nextState.activeLabel)) setRefAreaRight(nextState.activeLabel)
                                 }
