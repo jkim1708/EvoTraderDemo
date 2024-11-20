@@ -16,6 +16,7 @@ import {observer} from "mobx-react-lite";
 import {useStores} from "@/store/Provider";
 import {Button} from "@/components/ui/button";
 import {ChartContainer} from "@/components/ui/chart";
+import {CategoricalChartState} from "recharts/types/chart/types";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
@@ -147,13 +148,11 @@ const CandleStickChart =
             },
         } = useStores();
 
-        const [lastDays, setLastDays] = useState(180); // Bereich der X-Achse
         const [xAxisResolution, setXAxisResolution] = useState(180); // Bereich der X-Achse
         const [isDragging, setIsDragging] = useState(false); // Bereich der X-Achse
         const [lastMouseX, setLastMouseX] = useState(0); // Bereich der X-Achse
         const [startIndex, setStartIndex] = useState(0); // Bereich der X-Achse
 
-        console.log(lastDays);
         const asset = props.asset;
         const data = props.data;
         // const handleChartClick = props.handleChartClick;
@@ -260,9 +259,10 @@ const CandleStickChart =
         }
 
         function handleDButton(numberOfLastDaysToShow: number): void {
-            setStartIndex(data.length - numberOfLastDaysToShow*24);
-            setXAxisResolution(numberOfLastDaysToShow*24);
+            setStartIndex(data.length - numberOfLastDaysToShow * 24);
+            setXAxisResolution(numberOfLastDaysToShow * 24);
         }
+
         //
         const handleMouseDown = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
             if (event.button === 2) { // Right mouse button
@@ -289,9 +289,9 @@ const CandleStickChart =
         }, []);
 
 
-        console.log('data',data);
+        console.log('data', data);
 
-        const visibleData = data.slice(startIndex,startIndex+xAxisResolution)
+        const visibleData = data.slice(startIndex, startIndex + xAxisResolution)
 
         const handleContextMenu = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
             event.preventDefault();
@@ -315,88 +315,91 @@ const CandleStickChart =
                 >
 
 
-                <ResponsiveContainer width="100%"
-                                     height={500}
+                    <ResponsiveContainer width="100%"
+                                         height={500}
 
-                >
-                    <BarChart
-
-                    data={visibleData}
-                    margin={{top: 20, right: 30, left: 20, bottom: 20}}
-                    // onClick={handleChartClick}
-                    // onMouseDown={(e) => {
-                    //     if (e.activeLabel && !isInExistingInReferenceArea(definedRefArea, e.activeLabel)) {
-                    //         console.log("e.activeLabel left", e.activeLabel);
-                    //         setRefAreaLeft(e.activeLabel)
-                    //     };
-                    // }}
-                    // onMouseMove={(e) => {
-                    //     if (e.activeLabel && refAreaLeft && !isInExistingInReferenceArea(definedRefArea, e.activeLabel)) setRefAreaRight(e.activeLabel)
-                    // }}
-                    // // eslint-disable-next-line react/jsx-no-bind
-                    // onMouseUp={defineReferenceArea.bind(this)}
-                >
-                    <XAxis dataKey="ts" tickCount={data.length} tick={CustomizedTick} padding={{'left': 5}} />
-                    <YAxis yAxisId="1" dataKey="lowHigh" domain={['auto', 'auto']} allowDecimals={true}/>
-                    <CartesianGrid strokeDasharray="3 3"/>
-                    <Bar
-                        yAxisId="1"
-                        dataKey="openClose"
-                        fill="#8884d8"
-                        shape={<Candlestick/>}
                     >
-                    </Bar>
+                        <BarChart
 
-                        {/*// eslint-disable-next-line @typescript-eslint/ban-ts-comment*/}
-                        {/*// @ts-expect-error take care later*/}
-                        <Tooltip cursor={<CustomTooltipCursor/>} content={customTooltipContent}
-                                 position={{x: 100, y: -25}} offset={20}/>
-                        {definedRefArea.map((area, index) => (
-                            <ReferenceArea key={index} yAxisId="1" x1={area.referencedAreaLeft}
-                                           x2={area.referencedAreaRight} strokeOpacity={0.3}
-                                           fill={area.tradeKind === 'long' ? '#34eb6e' : '#eb3434'} opacity={0.3}/>
-                        ))}
-                        {(refAreaLeft && refAreaRight) || (definedRefArea.length > 0) ? (
-                            // <AllReferencedAreas referencedAreas={definedRefArea}/>
-                            <ReferenceArea yAxisId="1" x1={refAreaLeft} x2={refAreaRight} strokeOpacity={0.3}
-                                           fill={currentSelectedTradeKind === 'long' ? '#34eb6e' : '#eb3434'}
-                                           opacity={0.3}/>
-                        ) : null}
-                    </BarChart>
-                </ResponsiveContainer>
+                            data={visibleData}
+                            margin={{top: 20, right: 30, left: 20, bottom: 20}}
+                            onMouseDown={(nextState: CategoricalChartState, event: any) => {
+                                if (event.button === 0) {
+                                    if (nextState.activeLabel && !isInExistingInReferenceArea(definedRefArea, nextState.activeLabel)) {
+                                        setRefAreaLeft(nextState.activeLabel)
+                                    }
+                                    ;
+                                }
+                            }}
+                            onMouseMove={(nextState: CategoricalChartState, event: any) => {
+                                if (event.button === 0) {
+                                    if (nextState.activeLabel && refAreaLeft && !isInExistingInReferenceArea(definedRefArea, nextState.activeLabel)) setRefAreaRight(nextState.activeLabel)
+                                }
+                            }}
+                            // eslint-disable-next-line react/jsx-no-bind
+                            onMouseUp={defineReferenceArea.bind(this)}
+                        >
+                            <XAxis dataKey="ts" tickCount={data.length} tick={CustomizedTick} padding={{'left': 5}}/>
+                            <YAxis yAxisId="1" dataKey="lowHigh" domain={['auto', 'auto']} allowDecimals={true}/>
+                            <CartesianGrid strokeDasharray="3 3"/>
+                            <Bar
+                                yAxisId="1"
+                                dataKey="openClose"
+                                fill="#8884d8"
+                                shape={<Candlestick/>}
+                            >
+                            </Bar>
+
+                            {/*// eslint-disable-next-line @typescript-eslint/ban-ts-comment*/}
+                            {/*// @ts-expect-error take care later*/}
+                            <Tooltip cursor={<CustomTooltipCursor/>} content={customTooltipContent}
+                                     position={{x: 100, y: -25}} offset={20}/>
+                            {definedRefArea.map((area, index) => (
+                                <ReferenceArea key={index} yAxisId="1" x1={area.referencedAreaLeft}
+                                               x2={area.referencedAreaRight} strokeOpacity={0.3}
+                                               fill={area.tradeKind === 'long' ? '#34eb6e' : '#eb3434'} opacity={0.3}/>
+                            ))}
+                            {(refAreaLeft && refAreaRight) || (definedRefArea.length > 0) ? (
+                                // <AllReferencedAreas referencedAreas={definedRefArea}/>
+                                <ReferenceArea yAxisId="1" x1={refAreaLeft} x2={refAreaRight} strokeOpacity={0.3}
+                                               fill={currentSelectedTradeKind === 'long' ? '#34eb6e' : '#eb3434'}
+                                               opacity={0.3}/>
+                            ) : null}
+                        </BarChart>
+                    </ResponsiveContainer>
                 </ChartContainer>
                 < Button
-                    onClick={()=>handleDButton(1)}
+                    onClick={() => handleDButton(1)}
                 >
                     1D
                 </Button>
                 < Button
-                    onClick={()=>handleDButton(5)}
+                    onClick={() => handleDButton(5)}
                 >
                     5D
                 </Button>
                 < Button
-                    onClick={()=>handleDButton(30)}
+                    onClick={() => handleDButton(30)}
                 >
                     1M
                 </Button>
                 < Button
-                    onClick={()=>handleDButton(90)}
+                    onClick={() => handleDButton(90)}
                 >
                     3M
                 </Button>
                 < Button
-                    onClick={()=>handleDButton(180)}
+                    onClick={() => handleDButton(180)}
                 >
                     6M
                 </Button>
                 < Button
-                    onClick={()=>handleDButton(5)}
+                    onClick={() => handleDButton(5)}
                 >
                     1J
                 </Button>
                 < Button
-                    onClick={()=>handleDButton(5)}
+                    onClick={() => handleDButton(5)}
                 >
                     5J
                 </Button>
