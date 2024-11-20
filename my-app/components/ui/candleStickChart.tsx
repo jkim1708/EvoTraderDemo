@@ -315,9 +315,9 @@ const CandleStickChart =
                 >
 
 
-                    <ResponsiveContainer width="100%"
-                                         height={500}
-
+                    <ResponsiveContainer
+                        width="100%"
+                        height={500}
                     >
                         <BarChart
 
@@ -327,8 +327,7 @@ const CandleStickChart =
                                 if (event.button === 0) {
                                     if (nextState.activeLabel && !isInExistingInReferenceArea(definedRefArea, nextState.activeLabel)) {
                                         setRefAreaLeft(nextState.activeLabel)
-                                    }
-                                    ;
+                                    }                                    ;
                                 }
                             }}
                             onMouseMove={(nextState: CategoricalChartState, event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
