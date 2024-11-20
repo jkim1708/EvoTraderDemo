@@ -275,7 +275,7 @@ const CandleStickChart =
         const handleMouseMove = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
             if (isDragging) {
                 const deltaX = event.clientX - lastMouseX;
-                const scrollAmount = Math.round(deltaX / 10); // Adjust sensitivity here
+                const scrollAmount = Math.round(deltaX / 5); // Adjust sensitivity here
                 setStartIndex(prevIndex => {
                     const newIndex = Math.max(0, Math.min(data.length - xAxisResolution, prevIndex - scrollAmount));
                     return newIndex;
@@ -338,6 +338,9 @@ const CandleStickChart =
                             }}
                             // eslint-disable-next-line react/jsx-no-bind
                             onMouseUp={defineReferenceArea.bind(this)}
+                            onMouseLeave={()=> {
+                                resetRefAreaSelection();
+                            }}
                         >
                             <XAxis dataKey="ts" tickCount={data.length} tick={CustomizedTick} padding={{'left': 5}}/>
                             <YAxis yAxisId="1" dataKey="lowHigh" domain={['auto', 'auto']} allowDecimals={true}/>
@@ -347,6 +350,7 @@ const CandleStickChart =
                                 dataKey="openClose"
                                 fill="#8884d8"
                                 shape={<Candlestick/>}
+                                isAnimationActive={false}
                             >
                             </Bar>
 

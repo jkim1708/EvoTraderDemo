@@ -2,23 +2,23 @@
 
 import * as React from "react"
 import * as RechartsPrimitive from "recharts"
-import { cn } from "@/lib/utils"
+import {cn} from "@/lib/utils"
 //
 // Format: { THEME_NAME: CSS_SELECTOR }
-const THEMES = { light: "", dark: ".dark" } as const
+const THEMES = {light: "", dark: ".dark"} as const
 //
 export type ChartConfig = {
-  [k in string]: {
+    [k in string]: {
     label?: React.ReactNode
     icon?: React.ComponentType
-  } & (
+} & (
     | { color?: string; theme?: never }
     | { color?: never; theme: Record<keyof typeof THEMES, string> }
-  )
+    )
 }
 //
 type ChartContextProps = {
-  config: ChartConfig
+    config: ChartConfig
 }
 
 const ChartContext = React.createContext<ChartContextProps | null>(null)
@@ -31,12 +31,12 @@ const ChartContainer = React.forwardRef<
         typeof RechartsPrimitive.ResponsiveContainer
     >["children"]
 }
->(({ id, className, children, config, ...props }, ref) => {
+>(({id, className, children, config, ...props}, ref) => {
     const uniqueId = React.useId()
     const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`
 
     return (
-        <ChartContext.Provider value={{ config }}>
+        <ChartContext.Provider value={{config}}>
             <div
                 data-chart={chartId}
                 ref={ref}
@@ -46,7 +46,7 @@ const ChartContainer = React.forwardRef<
                 )}
                 {...props}
             >
-                <ChartStyle id={chartId} config={config} />
+                <ChartStyle id={chartId} config={config}/>
                 <RechartsPrimitive.ResponsiveContainer>
                     {children}
                 </RechartsPrimitive.ResponsiveContainer>
@@ -56,7 +56,7 @@ const ChartContainer = React.forwardRef<
 })
 ChartContainer.displayName = "Chart"
 
-const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
+const ChartStyle = ({id, config}: { id: string; config: ChartConfig }) => {
     const colorConfig = Object.entries(config).filter(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         ([_, config]) => config.theme || config.color
@@ -90,5 +90,5 @@ ${colorConfig
     )
 }
 export {
-  ChartContainer,
+    ChartContainer,
 }
