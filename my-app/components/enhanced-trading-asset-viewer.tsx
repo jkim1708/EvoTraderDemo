@@ -266,7 +266,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                 selectedStartDate: param.selectedStartDate,
                 selectedEndDate: param.selectedEndDate,
                 frequency: param.frequency,
-                underline: frequency == CANDLESTICK_FREQUENCY.HOURLY ? data : fourHourData,
+                underline: data,
             }
 
         }

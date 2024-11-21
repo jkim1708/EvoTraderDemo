@@ -1,6 +1,6 @@
 "use client"
 
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
     BarChart,
     Bar,
@@ -11,12 +11,12 @@ import {
 import {
     convertToCustomDate,
     convertToDate,
-    SampleAssetData,
 } from "@/utils";
 import {observer} from "mobx-react-lite";
 import {Label} from "@/components/ui/label";
 import {Button} from "@/components/ui/button";
 import {ChartContainer} from "@/components/ui/chart";
+import CandleStickChart from "@/components/ui/candleStickChart";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
@@ -90,7 +90,7 @@ const Candlestick = props => {
 };
 
 export type CandleStickChartProps = {
-    generatedData: SampleAssetData,
+    generatedData: CandleStickChart[],
     asset: string,
 }
 
@@ -102,9 +102,39 @@ type CustomizedTickProps = {
     }
 }
 
+const prepareData= (data: CandleStickChart[]):{
+    ts: string,
+    low: string,
+    high: string,
+    open: number,
+    close: number,
+    lowHigh: [number, number],
+    openClose: [number, number],
+} [] => {
+    return data.map(({open, close, low, high, ts}) => {
+        return {
+            ts,
+            low,
+            high,
+            open: parseFloat(open),
+            close: parseFloat(close),
+            lowHigh: [parseFloat(low), parseFloat(high)] as [number, number],
+            openClose: [parseFloat(open), parseFloat(close)] as [number, number],
+        };
+    });
+};
+
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
-function transformToFourDayData(candleStickSeries) {
+function transformToFourDayData(candleStickSeries):{
+    ts: string,
+        low: string,
+        high: string,
+        open: number,
+        close: number,
+        lowHigh: [number, number],
+        openClose: [number, number],
+} [] {
 
     // Initialize result array
     const aggregatedData: {
@@ -156,15 +186,15 @@ function transformToFourDayData(candleStickSeries) {
                 ts: convertToCustomDate(currentStartTime), // Start of the 4-hour period
                 lowHigh: [low, high],
                 openClose: [open, close]
-
             });
-
             // Start a new group with the current candle
             currentGroup = [candle];
             currentStartTime = candleTime;
         }
     });
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
     return aggregatedData;
 }
 
@@ -186,20 +216,37 @@ function CustomizedTick(props: CustomizedTickProps) {
         ;
 }
 
+enum X_AXIS_RESOLUTION {
+    ONE_DAY = 24,
+    FIVE_DAYS = 5 * 24,
+    ONE_MONTH = 30 * 24,
+    THREE_MONTH = 3 * 30 * 24,
+    SIX_MONTH = 6 * 30 * 24,
+    ONE_YEAR = 365*24,
+    FIVE_YEARS = 5*365*24
+}
+
 const CandleStickChartDialog =
     observer((props: CandleStickChartProps) => {
 
-        const [xAxisResolution, setXAxisResolution] = useState(180); // Bereich der X-Achse
+        const [xAxisResolution, setXAxisResolution] = useState(X_AXIS_RESOLUTION.SIX_MONTH); // Bereich der X-Achse
         const [isDragging, setIsDragging] = useState(false); // Bereich der X-Achse
         const [lastMouseX, setLastMouseX] = useState(0); // Bereich der X-Achse
         const [startIndex, setStartIndex] = useState(0); // Bereich der X-Achse
 
-        const candleStickSeries = props.generatedData;
+        const data = prepareData(props.generatedData);
+        const fourDayData = transformToFourDayData(data);
+        const [visibleData, setVisibleData] = useState<{
+            ts: string,
+            low: string,
+            high: string,
+            open: number,
+            close: number,
+            lowHigh: [number, number],
+            openClose: [number, number],
+        } []>(fourDayData); // Bereich der X-Achse
+
         const asset = props.asset;
-
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        const data = transformToFourDayData(candleStickSeries);
-
 
         const CustomTooltipCursor = ({x, y, height}: { x: string, y: string, height: string }) => (
             <path
@@ -224,9 +271,9 @@ const CandleStickChartDialog =
         }
 
 
-        function handleDButton(numberOfLastDaysToShow: number): void {
-            setStartIndex(data.length - numberOfLastDaysToShow * 24);
-            setXAxisResolution(numberOfLastDaysToShow * 24);
+        function handleDButton(numberOfLastDaysToShow: X_AXIS_RESOLUTION): void {
+            setStartIndex(data.length - numberOfLastDaysToShow);
+            setXAxisResolution(numberOfLastDaysToShow);
         }
 
         const handleMouseDown = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -253,7 +300,28 @@ const CandleStickChartDialog =
             setIsDragging(false);
         }, []);
 
-        const visibleData = data.slice(startIndex, startIndex + xAxisResolution)
+
+        useEffect(() => {
+
+            switch (xAxisResolution) {
+                case X_AXIS_RESOLUTION.ONE_DAY:
+                case X_AXIS_RESOLUTION.FIVE_DAYS:
+                case X_AXIS_RESOLUTION.ONE_MONTH:
+                case X_AXIS_RESOLUTION.THREE_MONTH:
+                case X_AXIS_RESOLUTION.SIX_MONTH:
+                    setVisibleData(data.slice(startIndex, startIndex + xAxisResolution));
+                    break;
+
+                case X_AXIS_RESOLUTION.ONE_YEAR:
+                case X_AXIS_RESOLUTION.FIVE_YEARS:
+                    setVisibleData(fourDayData.slice(startIndex, startIndex + xAxisResolution));
+                    break;
+                default:
+                    console.error('invalid x axis resolution');
+
+            }
+
+        }, [xAxisResolution]);
 
         const handleContextMenu = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
             event.preventDefault();
@@ -307,27 +375,27 @@ const CandleStickChartDialog =
                 <Label> Range </Label>
                 <div className="flex space-x-4 mb-4 tradeKindButton">
                     < Button
-                        onClick={() => handleDButton(1)}
+                        onClick={() => handleDButton(X_AXIS_RESOLUTION.ONE_DAY)}
                     >
                         1D
                     </Button>
                     < Button
-                        onClick={() => handleDButton(5)}
+                        onClick={() => handleDButton(X_AXIS_RESOLUTION.FIVE_DAYS)}
                     >
                         5D
                     </Button>
                     < Button
-                        onClick={() => handleDButton(30)}
+                        onClick={() => handleDButton(X_AXIS_RESOLUTION.ONE_MONTH)}
                     >
                         1M
                     </Button>
                     < Button
-                        onClick={() => handleDButton(90)}
+                        onClick={() => handleDButton(X_AXIS_RESOLUTION.THREE_MONTH)}
                     >
                         3M
                     </Button>
                     < Button
-                        onClick={() => handleDButton(180)}
+                        onClick={() => handleDButton(X_AXIS_RESOLUTION.SIX_MONTH)}
                     >
                         6M
                     </Button>
