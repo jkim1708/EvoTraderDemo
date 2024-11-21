@@ -315,7 +315,8 @@ const CandleStickChart =
                         height={500}
                     >
                         <BarChart
-
+                            width={800}
+                            height={250}
                             data={visibleData}
                             margin={{top: 20, right: 30, left: 20, bottom: 20}}
                             onMouseDown={(nextState: CategoricalChartState, event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {

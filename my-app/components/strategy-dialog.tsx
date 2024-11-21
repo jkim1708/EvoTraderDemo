@@ -1,10 +1,8 @@
-import {Dialog, DialogContent, DialogHeader, DialogTitle} from "@/components/ui/dialog"
 import {Button} from "@/components/ui/button"
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table"
 import {Tabs, TabsList, TabsTrigger, TabsContent} from "@/components/ui/tabs"
 import {X} from "lucide-react"
 import CandleStickChartDialog from "@/components/ui/candleStickChartDialog";
-import {generateData} from "@/utils";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -21,12 +19,13 @@ export default function StrategyDialog({strategy, onClose}) {
             profit: '0.0050'
         }
     ]
-    //
     // function getDateTwoDaysBefore(date: Date): Date {
     //     const newDate = new Date(date);
     //     newDate.setDate(newDate.getDate() - 2);
     //     return newDate;
     // }
+
+    console.log("underline", JSON.stringify(strategy));
 
     return (
         <Card className="w-11/12 mx-auto" >
@@ -60,9 +59,9 @@ export default function StrategyDialog({strategy, onClose}) {
                 </div>
             </div>
 
-            <div className="h-[300px]">
+            <div>
                 <CandleStickChartDialog
-                    generatedData={generateData(new Date('01-01-2013'), new Date(), "EURUSD", 60 * 24 * 7)}
+                    generatedData={strategy.underline}
                     asset="EURUSD"/>
             </div>
 
@@ -103,8 +102,6 @@ export default function StrategyDialog({strategy, onClose}) {
                 </Tabs>
             </div>
         </div>
-        {/*</DialogContent>*/}
-        {/*</Dialog>*/}
     </CardContent>
         </Card>
 )

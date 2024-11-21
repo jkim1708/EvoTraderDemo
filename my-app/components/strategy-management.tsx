@@ -65,6 +65,8 @@ const StrategyManagement = observer(() => {
         setSelectedStrategy(strategy);
     }
 
+
+
     return (
         <div className="space-y-2">
         <Card className="w-11/12 mx-auto ">

@@ -6,7 +6,8 @@ import {
     Bar,
     XAxis,
     YAxis,
-    CartesianGrid, Tooltip, } from 'recharts';
+    CartesianGrid, Tooltip, ResponsiveContainer,
+} from 'recharts';
 import {
     SampleAssetData,
     transformToCandleStickSeries
@@ -140,17 +141,11 @@ function CustomizedTick(props: CustomizedTickProps) {
 const CandleStickChartDialog =
     observer((props: CandleStickChartProps) => {
 
-        const generateData = props.generatedData;
+        const candleStickSeries = props.generatedData;
         const asset = props.asset;
-        // const handleChartClick = props.handleChartClick;
-
-        // const genData = generateData(new Date('2024-01-01'), new Date('2024-01-02'), 'EURUSD');
-        const tickSeries: SampleAssetData = generateData;
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
-        const candleStickSeries: CandleStickChart[] = transformToCandleStickSeries(tickSeries);
-
         const data = prepareData(candleStickSeries);
 
         const CustomTooltipCursor = ({x, y, height}: { x: string, y: string, height: string }) => (
@@ -178,28 +173,33 @@ const CandleStickChartDialog =
         return (
             <div>
                 <p> {asset} </p>
-                <BarChart
-                    width={800}
-                    height={250}
-                    data={data}
-                    margin={{top: 20, right: 30, left: 20, bottom: 20}}
+                <ResponsiveContainer
+                    width="100%"
+                    height={500}
                 >
-                    <XAxis dataKey="ts" tickCount={data.length} tick={CustomizedTick} padding={{'left': 5}}/>
-                    <YAxis yAxisId="1" dataKey="lowHigh" domain={['auto', 'auto']} allowDecimals={true}/>
-                    <CartesianGrid strokeDasharray="3 3"/>
-                    <Bar
-                        yAxisId="1"
-                        dataKey="openClose"
-                        fill="#8884d8"
-                        shape={<Candlestick/>}
+                    <BarChart
+                        width={800}
+                        height={250}
+                        data={data}
+                        margin={{top: 20, right: 30, left: 20, bottom: 20}}
                     >
-                    </Bar>
+                        <XAxis dataKey="ts" tickCount={data.length} tick={CustomizedTick} padding={{'left': 5}}/>
+                        <YAxis yAxisId="1" dataKey="lowHigh" domain={['auto', 'auto']} allowDecimals={true}/>
+                        <CartesianGrid strokeDasharray="3 3"/>
+                        <Bar
+                            yAxisId="1"
+                            dataKey="openClose"
+                            fill="#8884d8"
+                            shape={<Candlestick/>}
+                        >
+                        </Bar>
 
-                    {/*// eslint-disable-next-line @typescript-eslint/ban-ts-comment*/}
-                    {/*// @ts-expect-error take care later*/}
-                    <Tooltip cursor={<CustomTooltipCursor/>} content={customTooltipContent}
-                             position={{x: 100, y: -25}} offset={20}/>
-                </BarChart>
+                        {/*// eslint-disable-next-line @typescript-eslint/ban-ts-comment*/}
+                        {/*// @ts-expect-error take care later*/}
+                        <Tooltip cursor={<CustomTooltipCursor/>} content={customTooltipContent}
+                                 position={{x: 100, y: -25}} offset={20}/>
+                    </BarChart>
+                </ResponsiveContainer>
             </div>
         );
     });
