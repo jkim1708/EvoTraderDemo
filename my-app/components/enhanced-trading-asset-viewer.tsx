@@ -7,9 +7,10 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/compo
 import {Input} from "@/components/ui/input"
 import {Label} from "@/components/ui/label"
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
-import {ArrowUpCircle, ArrowDownCircle, Edit2, Trash2} from "lucide-react"
+import {ArrowDownCircle, ArrowUpCircle, Edit2, Trash2} from "lucide-react"
 import {
-    Dialog, DialogClose,
+    Dialog,
+    DialogClose,
     DialogContent,
     DialogDescription,
     DialogFooter,
@@ -18,7 +19,7 @@ import {
     DialogTrigger
 } from "@/components/ui/dialog"
 import {
-    CANDLESTICK_FREQUENCY,
+    CANDLESTICK_FREQUENCY, convertToCustomDate,
     convertToDate,
     generateData,
     SampleAssetData,
@@ -85,9 +86,10 @@ const EnhancedTradingAssetViewer = observer(() => {
 
         const [startDate, setStartDate] = useState(initialStartDate ?? twoDaysAgo.toISOString().split('T')[0])
         const [endDate, setEndDate] = useState(initialEndDate ?? today.toISOString().split('T')[0])
-        const [frequency] = useState(CANDLESTICK_FREQUENCY.HOURLY)
+        const [frequency, setFrequency] = useState(CANDLESTICK_FREQUENCY.HOURLY)
         const [asset, setAsset] = useState(initialAsset ?? "EURUSD")
         const [data, setData] = useState([] as CandleStickChart[])
+        const [fourHourData, setFourHourData] = useState([] as CandleStickChart[])
 
         enum VIEW_MODE {
             CREATE,
@@ -132,16 +134,90 @@ const EnhancedTradingAssetViewer = observer(() => {
             }
         }, [pathStrategyName]);
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    function transformToFourHourData(candleStickSeries){
+
+            // Initialize result array
+            const aggregatedData:  {
+                high: string,
+                low: string,
+                open: string,
+                close: string,
+                ts: string, // Start of the 4-hour period
+                lowHigh: [number, number],
+                openClose: [string, string]
+            }[] = [];
+
+            // Start the aggregation process
+            let currentGroup: {
+                high: string,
+                low: string,
+                open: string,
+                close: string,
+                ts: string, // Start of the 4-hour period
+                lowHigh: [number, number],
+                openClose: [number, number]
+            }[] = [];
+            let currentStartTime: Date | null = null;
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+        candleStickSeries.forEach((candle) => {
+                const candleTime = convertToDate(candle.ts);
+
+                // If we haven't started a group or this timestamp is within the same 4-hour interval, add it
+                if (!currentStartTime || candleTime < new Date(currentStartTime.getTime() + 4 * 60 * 60 * 1000)) {
+                    currentGroup.push(candle);
+                    if (!currentStartTime) {
+                        currentStartTime = candleTime;
+                    }
+                } else {
+                    // Aggregate the current group into a single CandleStickChart
+                    const open = currentGroup[0].open;
+                    const close = currentGroup[currentGroup.length - 1].close;
+                    const high = Math.max(...currentGroup.map(c => parseFloat(c.high)));
+                    const low = Math.min(...currentGroup.map(c => parseFloat(c.low)));
+
+                    // Create an aggregated candle for this 4-hour interval
+                    aggregatedData.push({
+                        high: high.toString(),
+                        low: low.toString(),
+                        open,
+                        close,
+                        ts: convertToCustomDate(currentStartTime), // Start of the 4-hour period
+                        lowHigh: [low, high],
+                        openClose: [open, close]
+
+                    });
+
+                    // Start a new group with the current candle
+                    currentGroup = [candle];
+                    currentStartTime = candleTime;
+                }
+            });
+
+            return aggregatedData;
+        }
+
         useEffect(() => {
             const tickSeries: SampleAssetData = generateData(new Date(startDate), new Date(endDate), asset,5);
             const candleStickSeries: CandleStickChart[] = transformToCandleStickSeries(tickSeries, frequency) ?? [];
 
             setData(candleStickSeries);
+
+            const transformedData = transformToFourHourData(candleStickSeries);
+            setFourHourData(transformedData);
+
         }, [startDate, endDate, asset]);
 
-        useEffect(() => {
+
+
+    useEffect(() => {
             resetSelectedTrades();
-        }, [startDate, endDate, asset, frequency]);
+        console.log(data);
+        console.log(fourHourData);
+    }, [startDate, endDate, asset, frequency]);
 
         const removeTrade = (startTime: string) => {
             setTradingRule(tradingRules.filter(trade => trade.startTime !== startTime))
@@ -190,7 +266,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                 selectedStartDate: param.selectedStartDate,
                 selectedEndDate: param.selectedEndDate,
                 frequency: param.frequency,
-                underline: data,
+                underline: frequency == CANDLESTICK_FREQUENCY.HOURLY ? data : fourHourData,
             }
 
         }
@@ -279,6 +355,14 @@ const EnhancedTradingAssetViewer = observer(() => {
             return false;
         }
 
+        function handleFrequencySelect(value: string) {
+            if(value == 'four_hourly'){
+                setFrequency(CANDLESTICK_FREQUENCY.FOUR_HOURLY)
+            } else {
+                setFrequency(CANDLESTICK_FREQUENCY.HOURLY)
+            }
+        }
+
         return (
             <Card className="w-full max-w-full">
                 <CardHeader>
@@ -327,15 +411,15 @@ const EnhancedTradingAssetViewer = observer(() => {
                             </div>
                             <div className="flex-1">
                                 <Label htmlFor="frequency">Frequency</Label>
-                                <Select value={'hourly'}
-                                    // onValueChange={setFrequency}
+                                <Select defaultValue={'hourly'}
+                                    onValueChange={(value) => handleFrequencySelect(value)}
                                 >
                                     <SelectTrigger id="frequency">
                                         <SelectValue/>
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="hourly">Hourly</SelectItem>
-                                        <SelectItem value="4 hourly">4 Hourly</SelectItem>
+                                        <SelectItem value="four_hourly">4 Hourly</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -366,7 +450,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                     </div>
 
 
-                    <CandleStickChart data={data} asset={asset}/>
+                    <CandleStickChart data={frequency == CANDLESTICK_FREQUENCY.HOURLY ? data : fourHourData} asset={asset}/>
 
 
                     <div className="mt-6">

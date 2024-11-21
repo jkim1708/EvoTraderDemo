@@ -17,6 +17,7 @@ import {useStores} from "@/store/Provider";
 import {Button} from "@/components/ui/button";
 import {ChartContainer} from "@/components/ui/chart";
 import {CategoricalChartState} from "recharts/types/chart/types";
+import {Label} from "@/components/ui/label";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
@@ -117,8 +118,6 @@ type CustomizedTickProps = {
 
 function CustomizedTick(props: CustomizedTickProps) {
     const {x, y, payload} = props;
-
-    console.log("payload", payload);
 
     const date = payload.value.split(",")[0];
     const hour = payload.value.split(",")[1];
@@ -252,7 +251,6 @@ const CandleStickChart =
                 saveReferenceAreaSelection();
                 const profitNLoss = calculateProfitNLoss(refAreaLeft, refAreaRight, currentSelectedTradeKind);
 
-                console.log("profitNLoss", profitNLoss);
                 createTrade(profitNLoss ?? 0);
             }
             resetRefAreaSelection();
@@ -287,9 +285,6 @@ const CandleStickChart =
         const handleMouseUp = useCallback(() => {
             setIsDragging(false);
         }, []);
-
-
-        console.log('data', data);
 
         const visibleData = data.slice(startIndex, startIndex + xAxisResolution)
 
@@ -327,7 +322,8 @@ const CandleStickChart =
                                 if (event.button === 0) {
                                     if (nextState.activeLabel && !isInExistingInReferenceArea(definedRefArea, nextState.activeLabel)) {
                                         setRefAreaLeft(nextState.activeLabel)
-                                    }                                    ;
+                                    }
+                                    ;
                                 }
                             }}
                             onMouseMove={(nextState: CategoricalChartState, event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -337,7 +333,7 @@ const CandleStickChart =
                             }}
                             // eslint-disable-next-line react/jsx-no-bind
                             onMouseUp={defineReferenceArea.bind(this)}
-                            onMouseLeave={()=> {
+                            onMouseLeave={() => {
                                 resetRefAreaSelection();
                             }}
                         >
@@ -371,41 +367,34 @@ const CandleStickChart =
                         </BarChart>
                     </ResponsiveContainer>
                 </ChartContainer>
-                < Button
-                    onClick={() => handleDButton(1)}
-                >
-                    1D
-                </Button>
-                < Button
-                    onClick={() => handleDButton(5)}
-                >
-                    5D
-                </Button>
-                < Button
-                    onClick={() => handleDButton(30)}
-                >
-                    1M
-                </Button>
-                < Button
-                    onClick={() => handleDButton(90)}
-                >
-                    3M
-                </Button>
-                < Button
-                    onClick={() => handleDButton(180)}
-                >
-                    6M
-                </Button>
-                < Button
-                    onClick={() => handleDButton(5)}
-                >
-                    1J
-                </Button>
-                < Button
-                    onClick={() => handleDButton(5)}
-                >
-                    5J
-                </Button>
+                <Label> Range </Label>
+                <div className="flex space-x-4 mb-4 tradeKindButton">
+                    < Button
+                        onClick={() => handleDButton(1)}
+                    >
+                        1D
+                    </Button>
+                    < Button
+                        onClick={() => handleDButton(5)}
+                    >
+                        5D
+                    </Button>
+                    < Button
+                        onClick={() => handleDButton(30)}
+                    >
+                        1M
+                    </Button>
+                    < Button
+                        onClick={() => handleDButton(90)}
+                    >
+                        3M
+                    </Button>
+                    < Button
+                        onClick={() => handleDButton(180)}
+                    >
+                        6M
+                    </Button>
+                </div>
             </div>
 
         );
