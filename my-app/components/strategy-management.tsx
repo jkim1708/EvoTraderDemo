@@ -66,7 +66,8 @@ const StrategyManagement = observer(() => {
     }
 
     return (
-        <Card className="w-full max-w-6xl mx-auto">
+        <div className="space-y-2">
+        <Card className="w-11/12 mx-auto ">
             <CardHeader>
                 <CardTitle className="text-2xl">Trading Strategy Management</CardTitle>
                 <p className="text-muted-foreground">Manage and monitor your trading algorithms</p>
@@ -85,13 +86,14 @@ const StrategyManagement = observer(() => {
                     </div>
                 </div>
             </CardContent>
+        </Card>
             {selectedStrategy && (
                 <StrategyDialog
                     strategy={selectedStrategy}
                     onClose={() => setSelectedStrategy(null)}
                 />
             )}
-        </Card>
+        </div>
     )
 });
 export default  StrategyManagement;
