@@ -10,7 +10,6 @@ import {
 } from 'recharts';
 import {
     SampleAssetData,
-    transformToCandleStickSeries
 } from "@/utils";
 import {observer} from "mobx-react-lite";
 
