@@ -21,10 +21,10 @@ export interface TradingStrategy {
     tradingRules: TradingRule[],
 
     //trading algo configured
-    tradingRulesOnSample: TradingRule[];
+    tradeOnSample: TradingRule[];
 
     //trading algo generated
-    tradingRuleOffSample: TradingRule[];
+    tradeOffSample: TradingRule[];
 
 }
 
@@ -60,7 +60,7 @@ class TradingStrategyStore {
         this.tradingStrategies = tradingStrategies
     };
 
-    generateBacktestingTrades = (asset:'EURUSD' | 'USDJPY' | 'GBPUSD' | 'EURCHF' | 'EURNOK' = 'EURUSD') => {
+    createBacktestingTrades = (asset:'EURUSD' | 'USDJPY' | 'GBPUSD' | 'EURCHF' | 'EURNOK' = 'EURUSD') => {
         this.tradeOnSample= generateRandomTrades(asset);
         this.tradeOffSample= generateRandomTrades(asset);
     }

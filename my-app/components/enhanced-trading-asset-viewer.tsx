@@ -42,7 +42,7 @@ import {useRouter, useSearchParams} from "next/navigation";
 //     return pnl.toFixed(4)
 // }
 
-const assets = ['EURUSD', 'GBPUSD', 'EURCHF', 'EURNOK']
+const assets= ['EURUSD', 'GBPUSD', 'EURCHF', 'EURNOK']
 
 const EnhancedTradingAssetViewer = observer(() => {
         const {
@@ -55,7 +55,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                 setCurrentTradingStrategyName,
                 currentTradingStrategyName,
             },
-            tradingStrategyStore: {setTradingStrategy, tradingStrategies},
+            tradingStrategyStore: {setTradingStrategy, tradingStrategies, createBacktestingTrades, tradeOnSample, tradeOffSample},
         } = useStores();
 
         const today = new Date()
@@ -267,6 +267,8 @@ const EnhancedTradingAssetViewer = observer(() => {
                 selectedEndDate: param.selectedEndDate,
                 frequency: param.frequency,
                 underline: data,
+                tradeOnSample,
+                tradeOffSample
             }
 
         }
@@ -307,6 +309,10 @@ const EnhancedTradingAssetViewer = observer(() => {
 
                 return;
             }
+
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            createBacktestingTrades(asset);
 
             const tradingStrategy = createTradingStrategy({
                 name: currentTradingStrategyName,
