@@ -1,6 +1,5 @@
 import {Button} from "@/components/ui/button"
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table"
-import {Tabs, TabsList, TabsTrigger, TabsContent} from "@/components/ui/tabs"
 import {X} from "lucide-react"
 import CandleStickChartDialog from "@/components/ui/candleStickChartDialog";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
@@ -52,13 +51,6 @@ export default function StrategyDialog({strategy, onClose}) {
 
             <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Recent Trades</h3>
-                <Tabs defaultValue="all">
-                    <TabsList>
-                        <TabsTrigger value="all">All Trades</TabsTrigger>
-                        <TabsTrigger value="long">Long Trades</TabsTrigger>
-                        <TabsTrigger value="short">Short Trades</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="all">
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -83,8 +75,6 @@ export default function StrategyDialog({strategy, onClose}) {
                                 ))}
                             </TableBody>
                         </Table>
-                    </TabsContent>
-                </Tabs>
             </div>
         </div>
     </CardContent>

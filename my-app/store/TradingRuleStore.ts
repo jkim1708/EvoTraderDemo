@@ -16,7 +16,6 @@ class TradingRuleStore {
     setCurrentTradingStrategyName = (name: string) => {
         this.currentTradingStrategyName = name;
     }
-
     tradingRules: TradingRule[];
 
     definedRefArea: { referencedAreaLeft: string, referencedAreaRight: string, tradeKind: 'long' | 'short'  }[] = [];
