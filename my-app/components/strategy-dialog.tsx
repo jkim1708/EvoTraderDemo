@@ -4,28 +4,13 @@ import {Tabs, TabsList, TabsTrigger, TabsContent} from "@/components/ui/tabs"
 import {X} from "lucide-react"
 import CandleStickChartDialog from "@/components/ui/candleStickChartDialog";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {TradingRule} from "@/store/TradingRuleStore";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
 export default function StrategyDialog({strategy, onClose}) {
 
-    const recentTrades = [
-        {
-            type: 'SHORT',
-            entryDate: '2023-01-03',
-            entryPrice: '1.2050',
-            exitDate: '2023-01-08',
-            exitPrice: '1.2000',
-            profit: '0.0050'
-        }
-    ]
-    // function getDateTwoDaysBefore(date: Date): Date {
-    //     const newDate = new Date(date);
-    //     newDate.setDate(newDate.getDate() - 2);
-    //     return newDate;
-    // }
-
-    console.log("underline", JSON.stringify(strategy));
+    const recentTrades = strategy.tradingRules;
 
     return (
         <Card className="w-11/12 mx-auto" >
@@ -86,14 +71,14 @@ export default function StrategyDialog({strategy, onClose}) {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {recentTrades.map((trade, index) => (
+                                {recentTrades.map((trade: TradingRule, index: number) => (
                                     <TableRow key={index}>
-                                        <TableCell>{trade.type}</TableCell>
-                                        <TableCell>{trade.entryDate}</TableCell>
-                                        <TableCell>{trade.entryPrice}</TableCell>
-                                        <TableCell>{trade.exitDate}</TableCell>
-                                        <TableCell>{trade.exitPrice}</TableCell>
-                                        <TableCell className="text-green-500">{trade.profit}</TableCell>
+                                        <TableCell>{trade.kind}</TableCell>
+                                        <TableCell>{trade.startTime}</TableCell>
+                                        <TableCell>{""}</TableCell>
+                                        <TableCell>{trade.endTime}</TableCell>
+                                        <TableCell>{""}</TableCell>
+                                        <TableCell className="text-green-500">{trade.profitNLoss}</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>

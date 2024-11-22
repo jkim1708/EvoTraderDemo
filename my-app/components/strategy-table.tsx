@@ -28,7 +28,6 @@ const StrategyTable = observer(({onAnalyze}: { onAnalyze: (strategy: TradingStra
     };
 
     useEffect(() => {
-
         const updateWinRate = () => {
             tradingStrategies.forEach(strategy => {
                 if (strategy.status === "inactive") return;
@@ -44,7 +43,6 @@ const StrategyTable = observer(({onAnalyze}: { onAnalyze: (strategy: TradingStra
             updateWinRate();
             setCount(count + 1);
         }, Math.random() * (2000 - 1000) + 1000);
-
 
         //Clearing the interval
         return () => clearInterval(interval);

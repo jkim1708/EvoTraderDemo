@@ -1,6 +1,6 @@
 "use client"
 
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {
     BarChart,
     Bar,
@@ -102,7 +102,7 @@ type CustomizedTickProps = {
     }
 }
 
-const prepareData= (data: CandleStickChart[]):{
+const prepareData = (data: CandleStickChart[]): {
     ts: string,
     low: string,
     high: string,
@@ -126,14 +126,14 @@ const prepareData= (data: CandleStickChart[]):{
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
-function transformToFourDayData(candleStickSeries):{
+function transformToSevenDayData(candleStickSeries): {
     ts: string,
-        low: string,
-        high: string,
-        open: number,
-        close: number,
-        lowHigh: [number, number],
-        openClose: [number, number],
+    low: string,
+    high: string,
+    open: number,
+    close: number,
+    lowHigh: [number, number],
+    openClose: [number, number],
 } [] {
 
     // Initialize result array
@@ -164,7 +164,7 @@ function transformToFourDayData(candleStickSeries):{
     candleStickSeries.forEach((candle) => {
         const candleTime = convertToDate(candle.ts);
 
-        // If we haven't started a group or this timestamp is within the same 4-day interval, add it
+        // If we haven't started a group or this timestamp is within the same 7-day interval, add it
         if (!currentStartTime || candleTime < new Date(currentStartTime.getTime() + 7 * 24 * 60 * 60 * 1000)) {
             currentGroup.push(candle);
             if (!currentStartTime) {
@@ -177,7 +177,7 @@ function transformToFourDayData(candleStickSeries):{
             const high = Math.max(...currentGroup.map(c => parseFloat(c.high)));
             const low = Math.min(...currentGroup.map(c => parseFloat(c.low)));
 
-            // Create an aggregated candle for this 4-day interval
+            // Create an aggregated candle for this 7-day interval
             aggregatedData.push({
                 high: high.toString(),
                 low: low.toString(),
@@ -222,8 +222,8 @@ enum X_AXIS_RESOLUTION {
     ONE_MONTH = 30 * 24,
     THREE_MONTH = 3 * 30 * 24,
     SIX_MONTH = 6 * 30 * 24,
-    ONE_YEAR = 365*24,
-    FIVE_YEARS = 5*365*24
+    ONE_YEAR = 52, //weeks
+    FIVE_YEARS = 5 * 52 //weeks
 }
 
 const CandleStickChartDialog =
@@ -235,7 +235,7 @@ const CandleStickChartDialog =
         const [startIndex, setStartIndex] = useState(0); // Bereich der X-Achse
 
         const data = prepareData(props.generatedData);
-        const fourDayData = transformToFourDayData(data);
+        const sevenDayData = transformToSevenDayData(data);
         const [visibleData, setVisibleData] = useState<{
             ts: string,
             low: string,
@@ -244,7 +244,7 @@ const CandleStickChartDialog =
             close: number,
             lowHigh: [number, number],
             openClose: [number, number],
-        } []>(fourDayData); // Bereich der X-Achse
+        } []>(sevenDayData); // Bereich der X-Achse
 
         const asset = props.asset;
 
@@ -272,8 +272,34 @@ const CandleStickChartDialog =
 
 
         function handleDButton(numberOfLastDaysToShow: X_AXIS_RESOLUTION): void {
-            setStartIndex(data.length - numberOfLastDaysToShow);
+
             setXAxisResolution(numberOfLastDaysToShow);
+
+            let startIndex;
+
+            switch (xAxisResolution) {
+                case X_AXIS_RESOLUTION.ONE_DAY:
+                case X_AXIS_RESOLUTION.FIVE_DAYS:
+                case X_AXIS_RESOLUTION.ONE_MONTH:
+                case X_AXIS_RESOLUTION.THREE_MONTH:
+                    startIndex = data.length - numberOfLastDaysToShow;
+                    setStartIndex(startIndex);
+                    setVisibleData(data.slice(startIndex, startIndex + numberOfLastDaysToShow));
+                    break;
+
+                case X_AXIS_RESOLUTION.SIX_MONTH:
+                case X_AXIS_RESOLUTION.ONE_YEAR:
+                case X_AXIS_RESOLUTION.FIVE_YEARS:
+                    startIndex = sevenDayData.length - numberOfLastDaysToShow;
+                    setStartIndex(startIndex);
+                    setVisibleData(sevenDayData.slice(startIndex, startIndex + numberOfLastDaysToShow));
+                    console.log('visibleData', visibleData);
+                    break;
+                default:
+                    console.error('invalid x axis resolution');
+
+            }
+
         }
 
         const handleMouseDown = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -293,35 +319,17 @@ const CandleStickChartDialog =
                     return newIndex;
                 });
                 setLastMouseX(event.clientX);
+                if (xAxisResolution == X_AXIS_RESOLUTION.ONE_YEAR || xAxisResolution == X_AXIS_RESOLUTION.FIVE_YEARS || xAxisResolution == X_AXIS_RESOLUTION.SIX_MONTH) {
+                    setVisibleData(sevenDayData.slice(startIndex, startIndex + xAxisResolution));
+                } else {
+                    setVisibleData(data.slice(startIndex, startIndex + xAxisResolution));
+                }
             }
         }, [isDragging, lastMouseX, xAxisResolution, data.length]);
 
         const handleMouseUp = useCallback(() => {
             setIsDragging(false);
         }, []);
-
-
-        useEffect(() => {
-
-            switch (xAxisResolution) {
-                case X_AXIS_RESOLUTION.ONE_DAY:
-                case X_AXIS_RESOLUTION.FIVE_DAYS:
-                case X_AXIS_RESOLUTION.ONE_MONTH:
-                case X_AXIS_RESOLUTION.THREE_MONTH:
-                case X_AXIS_RESOLUTION.SIX_MONTH:
-                    setVisibleData(data.slice(startIndex, startIndex + xAxisResolution));
-                    break;
-
-                case X_AXIS_RESOLUTION.ONE_YEAR:
-                case X_AXIS_RESOLUTION.FIVE_YEARS:
-                    setVisibleData(fourDayData.slice(startIndex, startIndex + xAxisResolution));
-                    break;
-                default:
-                    console.error('invalid x axis resolution');
-
-            }
-
-        }, [xAxisResolution]);
 
         const handleContextMenu = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
             event.preventDefault();
@@ -398,6 +406,16 @@ const CandleStickChartDialog =
                         onClick={() => handleDButton(X_AXIS_RESOLUTION.SIX_MONTH)}
                     >
                         6M
+                    </Button>
+                    < Button
+                        onClick={() => handleDButton(X_AXIS_RESOLUTION.ONE_YEAR)}
+                    >
+                        1Y
+                    </Button>
+                    < Button
+                        onClick={() => handleDButton(X_AXIS_RESOLUTION.FIVE_YEARS)}
+                    >
+                        5Y
                     </Button>
                 </div>
             </div>
