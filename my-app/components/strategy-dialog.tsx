@@ -15,9 +15,9 @@ function generateRandomDateFromLast5Years() {
 
 function generateRandomTrades(): Trade[] {
     const randomTrades: Trade[] = [] as Trade[];
-    for(let i=0; i < 10; i++){
+    for (let i = 0; i < 10; i++) {
         const date = generateRandomDateFromLast5Years();
-        const nextDay = convertToCustomDate(addMinutesToDate(date,60*24)); //one day
+        const nextDay = convertToCustomDate(addMinutesToDate(date, 60 * 24)); //one day
         const ts = convertToCustomDate(date);
         randomTrades.push({
             kind: 'short',
@@ -32,13 +32,13 @@ function generateRandomTrades(): Trade[] {
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 function addTradesToRecentTrades(recentTrades: TradingRule[], randomTrades: Trade[]) {
-    randomTrades.slice(0,1);
+    randomTrades.slice(0, 1);
     randomTrades.forEach((trade: Trade) => {
         recentTrades.push({
             kind: trade.kind,
             startTime: trade.ts,
             endTime: trade.ts,
-            asset:'EURUSD',
+            asset: 'EURUSD',
             profitNLoss: parseFloat((Math.random() * (0.009 - 0.001) + 0.001).toFixed(8)),
         })
     })
@@ -53,7 +53,7 @@ export default function StrategyDialog({strategy, onClose}) {
 
     const randomTrades = generateRandomTrades();
 
-    addTradesToRecentTrades(recentTrades,randomTrades);
+    addTradesToRecentTrades(recentTrades, randomTrades);
 
 
     console.log('recentTrades' + recentTrades);
@@ -63,11 +63,8 @@ export default function StrategyDialog({strategy, onClose}) {
             <CardHeader>
                 <div className="flex items-center justify-between">
                     <CardTitle className="text-xl">
-                        {strategy.name} - Trading Strategy Analyzer (TSA)
-                        {strategy.active == 'active' ?
-                            <div
-                                className="text-2xl font-bold text-orange-500"> {strategy.status}
-                            </div> : <div
+                        {strategy.name} - Trading Strategy Analyzer (TSA) {strategy.status == 'active' ?
+                            <div className="text-2xl font-bold text-orange-500"> {strategy.status}</div> : <div
                                 className="text-2xl font-bold text-grey-500"> {strategy.status}
                             </div>}
 
@@ -76,65 +73,65 @@ export default function StrategyDialog({strategy, onClose}) {
                         <X className="h-4 w-4"/>
                     </Button>
                 </div>
-            <p className="text-sm text-muted-foreground">
-                {strategy.asset} - {strategy.indicators.join(', ')}
-            </p>
+                <p className="text-sm text-muted-foreground">
+                    {strategy.asset} - {strategy.indicators.join(', ')}
+                </p>
 
-        </CardHeader>
-    <CardContent>
-        <div className="space-y-6">
-            <div className="grid grid-cols-3 gap-4">
-                <div>
-                    <div className="text-sm text-muted-foreground">Win Rate</div>
-                    <div className="text-2xl font-bold text-orange-500">{strategy.winRate}</div>
-                </div>
-                <div>
-                    <div className="text-sm text-muted-foreground">Profit Factor</div>
-                    <div className="text-2xl font-bold text-orange-500">{strategy.profitFactor}</div>
-                </div>
-                <div>
-                    <div className="text-sm text-muted-foreground">Sharpe Ratio</div>
-                    <div className="text-2xl font-bold text-orange-500">{strategy.sharpeRatio}</div>
-                </div>
-            </div>
+            </CardHeader>
+            <CardContent>
+                <div className="space-y-6">
+                    <div className="grid grid-cols-3 gap-4">
+                        <div>
+                            <div className="text-sm text-muted-foreground">Win Rate</div>
+                            <div className="text-2xl font-bold text-orange-500">{strategy.winRate}</div>
+                        </div>
+                        <div>
+                            <div className="text-sm text-muted-foreground">Profit Factor</div>
+                            <div className="text-2xl font-bold text-orange-500">{strategy.profitFactor}</div>
+                        </div>
+                        <div>
+                            <div className="text-sm text-muted-foreground">Sharpe Ratio</div>
+                            <div className="text-2xl font-bold text-orange-500">{strategy.sharpeRatio}</div>
+                        </div>
+                    </div>
 
-            <div>
-                <CandleStickChartDialog
-                    generatedData={strategy.underline}
-                    randomTrades = {recentTrades}
-                    asset="EURUSD"/>
-            </div>
+                    <div>
+                        <CandleStickChartDialog
+                            generatedData={strategy.underline}
+                            randomTrades={recentTrades}
+                            asset="EURUSD"/>
+                    </div>
 
-            <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Recent Trades</h3>
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Type</TableHead>
-                            <TableHead>Entry Date</TableHead>
-                            <TableHead>Entry Price</TableHead>
-                            <TableHead>Exit Date</TableHead>
-                            <TableHead>Exit Price</TableHead>
-                            <TableHead>Profit</TableHead>
-                            <TableHead>Action</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {recentTrades.map((trade: TradingRule, index: number) => (
-                            <TableRow key={index}>
-                                <TableCell>{trade.kind}</TableCell>
-                                <TableCell>{trade.startTime}</TableCell>
-                                <TableCell>{""}</TableCell>
-                                <TableCell>{trade.endTime}</TableCell>
-                                <TableCell>{""}</TableCell>
-                                <TableCell className="text-green-500">{trade.profitNLoss}</TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </div>
-        </div>
-    </CardContent>
+                    <div className="space-y-4">
+                        <h3 className="text-lg font-semibold">Recent Trades</h3>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Type</TableHead>
+                                    <TableHead>Entry Date</TableHead>
+                                    <TableHead>Entry Price</TableHead>
+                                    <TableHead>Exit Date</TableHead>
+                                    <TableHead>Exit Price</TableHead>
+                                    <TableHead>Profit</TableHead>
+                                    <TableHead>Action</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {recentTrades.map((trade: TradingRule, index: number) => (
+                                    <TableRow key={index}>
+                                        <TableCell>{trade.kind}</TableCell>
+                                        <TableCell>{trade.startTime}</TableCell>
+                                        <TableCell>{""}</TableCell>
+                                        <TableCell>{trade.endTime}</TableCell>
+                                        <TableCell>{""}</TableCell>
+                                        <TableCell className="text-green-500">{trade.profitNLoss}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
+                </div>
+            </CardContent>
         </Card>
     )
 };
