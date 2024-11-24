@@ -18,13 +18,14 @@ const StrategyTable = observer(({onAnalyze}: { onAnalyze: (strategy: TradingStra
     } = useStores();
 
     const [count, setCount] = useState(0);
+    const [countSharpe, setCountSharpe] = useState(0);
 
     const getRandomBetween20And80 = () => {
         return (Math.random() * (80 - 40) + 40).toFixed(1) + "%";
     };
 
     const getRandomSharpeRatio = () => {
-        return (Math.random() * (1.8 - 0.5) + 0.5).toFixed(2);
+        return (Math.random() * (1.9 - 0.4) + 0.4).toFixed(2);
     };
 
     function getRandomProfitFactor() {
@@ -39,10 +40,8 @@ const StrategyTable = observer(({onAnalyze}: { onAnalyze: (strategy: TradingStra
                 if (strategy.status === "inactive") return;
                 strategy.winRate = getRandomBetween20And80();
                 strategy.profitFactor = getRandomProfitFactor();
-                strategy.sharpeRatio = getRandomSharpeRatio();
             });
         };
-
         //change every 10-20 seconds
         // Math.random() * (2000 - 1000) + 1000)
         const interval = setInterval(() => {
@@ -51,8 +50,31 @@ const StrategyTable = observer(({onAnalyze}: { onAnalyze: (strategy: TradingStra
         }, Math.random() * (2000 - 1000) + 1000);
 
         //Clearing the interval
-        return () => clearInterval(interval);
+        return () => {
+            clearInterval(interval)
+        };
     }, [count, tradingStrategies]);
+
+    useEffect(() => {
+
+        const updateSharpeRatio = () => {
+            tradingStrategies.forEach(strategy => {
+                if (strategy.status === "inactive") return;
+                strategy.sharpeRatio = getRandomSharpeRatio();
+
+            });
+        };
+
+        const intervalSharpeRatio = setInterval(() => {
+            updateSharpeRatio();
+            setCount(countSharpe + 1);
+        }, Math.random() * (4000 - 2000) + 2000);
+
+        //Clearing the interval
+        return () => {
+            clearInterval(intervalSharpeRatio);
+        };
+    }, [countSharpe, tradingStrategies]);
 
     const router = useRouter();
 
