@@ -1,6 +1,6 @@
 import {Button} from "@/components/ui/button"
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table"
-import {ForwardIcon, X} from "lucide-react"
+import {X} from "lucide-react"
 import CandleStickChartDialog, {Trade} from "@/components/ui/candleStickChartDialog";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {TradingRule} from "@/store/TradingRuleStore";
@@ -30,19 +30,21 @@ function generateRandomTrades(): Trade[] {
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-function addTradesToRecentTrades(recentTrades: any, randomTrades: Trade[]) {
+function addTradesToRecentTrades(recentTrades: TradingRule[], randomTrades: Trade[]) {
     randomTrades.slice(0,1);
     randomTrades.forEach((trade: Trade) => {
         recentTrades.push({
             kind: trade.kind,
             startTime: trade.ts,
             endTime: trade.ts,
-            profitNLoss: (Math.random() * (0.009 - 0.001) + 0.001).toFixed(8),
+            asset:'EURUSD',
+            profitNLoss: parseFloat((Math.random() * (0.009 - 0.001) + 0.001).toFixed(8)),
         })
     })
 
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
 export default function StrategyDialog({strategy, onClose}) {
 
