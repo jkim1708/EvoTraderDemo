@@ -28,19 +28,7 @@ export interface TradingStrategy {
 
 }
 
-function generateRandomTrades(asset: 'EURUSD' | 'USDJPY' | 'GBPUSD' | 'EURCHF' | 'EURNOK'): TradingRule[] {
-    const randomTrades: TradingRule[] = [];
-    for(let i=0; i < 10; i++){
-        randomTrades.push({
-            kind: 'short',
-            startTime: convertToCustomDate(new Date()),
-            endTime: convertToCustomDate(new Date()),
-            asset,
-            profitNLoss: 1,
-        })
-    }
-    return randomTrades;
-}
+
 
 class TradingStrategyStore {
 
@@ -59,13 +47,6 @@ class TradingStrategyStore {
     setTradingStrategy = (tradingStrategies: TradingStrategy[]) => {
         this.tradingStrategies = tradingStrategies
     };
-
-    createBacktestingTrades = (asset:'EURUSD' | 'USDJPY' | 'GBPUSD' | 'EURCHF' | 'EURNOK' = 'EURUSD') => {
-        this.tradeOnSample= generateRandomTrades(asset);
-        this.tradeOffSample= generateRandomTrades(asset);
-    }
-
-
 
 }
 

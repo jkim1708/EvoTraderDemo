@@ -55,7 +55,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                 setCurrentTradingStrategyName,
                 currentTradingStrategyName,
             },
-            tradingStrategyStore: {setTradingStrategy, tradingStrategies, createBacktestingTrades, tradeOnSample, tradeOffSample},
+            tradingStrategyStore: {setTradingStrategy, tradingStrategies, tradeOnSample, tradeOffSample},
         } = useStores();
 
         const today = new Date()
@@ -74,14 +74,15 @@ const EnhancedTradingAssetViewer = observer(() => {
                 initialStartDate = strategy.selectedStartDate;
                 initialEndDate = strategy.selectedEndDate;
                 setTradingRule(strategy.tradingRules);
-                setDefinedRefArea(strategy.tradingRules.map(trade => ({
+                setDefinedRefArea(strategy.tradingRules.map(trade => (
+
+                    {
                     referencedAreaLeft: trade.startTime,
                     referencedAreaRight: trade.endTime,
                     tradeKind: trade.kind
                 })));
                 initialAsset = strategy.tradingRules[0].asset;
             });
-
         }
 
         const [startDate, setStartDate] = useState(initialStartDate ?? twoDaysAgo.toISOString().split('T')[0])
@@ -309,10 +310,6 @@ const EnhancedTradingAssetViewer = observer(() => {
 
                 return;
             }
-
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-expect-error
-            createBacktestingTrades(asset);
 
             const tradingStrategy = createTradingStrategy({
                 name: currentTradingStrategyName,

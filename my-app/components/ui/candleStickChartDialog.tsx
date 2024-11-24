@@ -2,11 +2,10 @@
 
 import React, {useCallback, useState} from 'react';
 import {
-    BarChart,
     Bar,
     XAxis,
     YAxis,
-    CartesianGrid, Tooltip, ResponsiveContainer,
+    CartesianGrid, Tooltip, ResponsiveContainer, BarChart, ReferenceArea,
 } from 'recharts';
 import {
     convertToCustomDate,
@@ -17,6 +16,9 @@ import {Label} from "@/components/ui/label";
 import {Button} from "@/components/ui/button";
 import {ChartContainer} from "@/components/ui/chart";
 import CandleStickChart from "@/components/ui/candleStickChart";
+import {Input} from "@/components/ui/input";
+
+
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
@@ -41,6 +43,7 @@ const Candlestick = props => {
     // const offset = -(width/1);
 
     // x = x + offset;
+
 
     return (
         <g stroke={color} fill={color} strokeWidth="2">
@@ -89,8 +92,25 @@ const Candlestick = props => {
     );
 };
 
-export type CandleStickChartProps = {
-    generatedData: CandleStickChart[],
+export interface Trade {
+    kind: 'long' | 'short',
+    entryPrice: number,
+    ts: string,
+    tsEnd: string,
+}
+
+interface CandleStickChartAnalyze {
+    high: string,
+    low: string,
+    open: string,
+    close: string,
+    ts: string,
+    trade: Trade,
+}
+
+export type CandleStickChartAnalyzeProps = {
+    generatedData: CandleStickChartAnalyze[],
+    randomTrades: Trade[],
     asset: string,
 }
 
@@ -110,6 +130,7 @@ const prepareData = (data: CandleStickChart[]): {
     close: number,
     lowHigh: [number, number],
     openClose: [number, number],
+    trade: Trade | null,
 } [] => {
     return data.map(({open, close, low, high, ts}) => {
         return {
@@ -120,6 +141,7 @@ const prepareData = (data: CandleStickChart[]): {
             close: parseFloat(close),
             lowHigh: [parseFloat(low), parseFloat(high)] as [number, number],
             openClose: [parseFloat(open), parseFloat(close)] as [number, number],
+            trade: null,
         };
     });
 };
@@ -134,6 +156,7 @@ function transformToSevenDayData(candleStickSeries): {
     close: number,
     lowHigh: [number, number],
     openClose: [number, number],
+    trade: Trade | null,
 } [] {
 
     // Initialize result array
@@ -221,20 +244,45 @@ enum X_AXIS_RESOLUTION {
     FIVE_DAYS = 5 * 24,
     ONE_MONTH = 30 * 24,
     THREE_MONTH = 3 * 30 * 24,
-    SIX_MONTH = 6 * 30 * 24,
+    SIX_MONTH = 26, //weeks
     ONE_YEAR = 52, //weeks
     FIVE_YEARS = 5 * 52 //weeks
 }
 
-const CandleStickChartDialog =
-    observer((props: CandleStickChartProps) => {
+function randomlyAssignTradeToAnyData(preparedData: {
+    ts: string;
+    low: string;
+    high: string;
+    open: number;
+    close: number;
+    lowHigh: [number, number];
+    openClose: [number, number];
+    trade: Trade | null
+}[], randomTrades: Trade[]) {
+    randomTrades.forEach((trade: Trade) => {
+        const randomIndex = Math.floor(Math.random() * preparedData.length);
+        preparedData[randomIndex].trade = trade;
+    });
 
-        const [xAxisResolution, setXAxisResolution] = useState(X_AXIS_RESOLUTION.SIX_MONTH); // Bereich der X-Achse
+    return preparedData;
+}
+
+const CandleStickChartDialog =
+    observer((props: CandleStickChartAnalyzeProps) => {
+
+        const [xAxisResolution, setXAxisResolution] = useState(X_AXIS_RESOLUTION.FIVE_YEARS); // Bereich der X-Achse
         const [isDragging, setIsDragging] = useState(false); // Bereich der X-Achse
         const [lastMouseX, setLastMouseX] = useState(0); // Bereich der X-Achse
         const [startIndex, setStartIndex] = useState(0); // Bereich der X-Achse
+        const [tickCount, setTickCount] = useState(0); // Bereich der X-Achse
+        const [startDate, setStartDate] = useState(""); // Bereich der X-Achse
 
-        const data = prepareData(props.generatedData);
+        const preparedData = prepareData(props.generatedData);
+
+        const data = randomlyAssignTradeToAnyData(preparedData, props.randomTrades);
+
+        const trades = props.randomTrades;
+
         const sevenDayData = transformToSevenDayData(data);
         const [visibleData, setVisibleData] = useState<{
             ts: string,
@@ -244,9 +292,12 @@ const CandleStickChartDialog =
             close: number,
             lowHigh: [number, number],
             openClose: [number, number],
+            trade: Trade | null,
         } []>(sevenDayData); // Bereich der X-Achse
 
         const asset = props.asset;
+
+
 
         const CustomTooltipCursor = ({x, y, height}: { x: string, y: string, height: string }) => (
             <path
@@ -284,7 +335,9 @@ const CandleStickChartDialog =
                 case X_AXIS_RESOLUTION.THREE_MONTH:
                     startIndex = data.length - numberOfLastDaysToShow;
                     setStartIndex(startIndex);
-                    setVisibleData(data.slice(startIndex, startIndex + numberOfLastDaysToShow));
+                    setTickCount(data.length);
+                    const slicedData = data.slice(startIndex, startIndex + numberOfLastDaysToShow);
+                    setVisibleData(slicedData);
                     break;
 
                 case X_AXIS_RESOLUTION.SIX_MONTH:
@@ -292,14 +345,13 @@ const CandleStickChartDialog =
                 case X_AXIS_RESOLUTION.FIVE_YEARS:
                     startIndex = sevenDayData.length - numberOfLastDaysToShow;
                     setStartIndex(startIndex);
+                    setTickCount(sevenDayData.length);
                     setVisibleData(sevenDayData.slice(startIndex, startIndex + numberOfLastDaysToShow));
                     console.log('visibleData', visibleData);
                     break;
                 default:
                     console.error('invalid x axis resolution');
-
             }
-
         }
 
         const handleMouseDown = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -337,6 +389,45 @@ const CandleStickChartDialog =
 
         return (
             <div>
+                <div className="flex-1">
+                    <Label htmlFor="startDate">Start Date</Label>
+                    <Input
+                        id="startDate"
+                        type="date"
+                        value={startDate}
+                        onChange={(e) => {
+                            setStartDate(e.target.value)
+                                    let startIndex;
+                            switch (xAxisResolution) {
+                                case X_AXIS_RESOLUTION.ONE_DAY:
+                                case X_AXIS_RESOLUTION.FIVE_DAYS:
+                                case X_AXIS_RESOLUTION.ONE_MONTH:
+                                case X_AXIS_RESOLUTION.THREE_MONTH:
+                                    startIndex = data.findIndex((d) => d.ts.split(',')[0].trim() === e.target.value);
+                                    console.log(e.target.value);
+                                    setStartIndex(startIndex);
+                                    setTickCount(data.length);
+                                    setVisibleData(data.slice(startIndex, startIndex + xAxisResolution));
+                                    console.log('data.slice(startIndex, startIndex + xAxisResolution)',data.slice(startIndex, startIndex + xAxisResolution));
+                                    break;
+
+                                case X_AXIS_RESOLUTION.SIX_MONTH:
+                                case X_AXIS_RESOLUTION.ONE_YEAR:
+                                case X_AXIS_RESOLUTION.FIVE_YEARS:
+                                    startIndex = sevenDayData.findIndex((d) => d.ts.split(',')[0].trim() === e.target.value);
+                                    console.log(e.target.value);
+                                    setStartIndex(startIndex);
+                                    setTickCount(sevenDayData.length);
+                                    setVisibleData(sevenDayData.slice(startIndex, startIndex + xAxisResolution));
+                                    break;
+                                default:
+                                    console.error('invalid x axis resolution');
+                            }
+                        }}
+                        max={new Date().toISOString().split('T')[0]}
+                    />
+                </div>
+
                 <p> {asset} </p>
                 <ChartContainer config={{
                     value: {
@@ -361,7 +452,7 @@ const CandleStickChartDialog =
                             data={visibleData}
                             margin={{top: 20, right: 30, left: 20, bottom: 20}}
                         >
-                            <XAxis dataKey="ts" tickCount={data.length} tick={CustomizedTick} padding={{'left': 5}}/>
+                            <XAxis dataKey="ts" tickCount={tickCount} tick={CustomizedTick} padding={{'left': 5}}/>
                             <YAxis yAxisId="1" dataKey="lowHigh" domain={['auto', 'auto']} allowDecimals={true}/>
                             <CartesianGrid strokeDasharray="3 3"/>
                             <Bar
@@ -370,13 +461,20 @@ const CandleStickChartDialog =
                                 fill="#8884d8"
                                 shape={<Candlestick/>}
                                 isAnimationActive={false}
-                            >
-                            </Bar>
+                            />
 
                             {/*// eslint-disable-next-line @typescript-eslint/ban-ts-comment*/}
                             {/*// @ts-expect-error take care later*/}
                             <Tooltip cursor={<CustomTooltipCursor/>} content={customTooltipContent}
                                      position={{x: 100, y: -25}} offset={20}/>
+
+                            {trades.map((trade, index) => {
+                                    return (
+                                        <ReferenceArea key={index} yAxisId="1" x1={trade.ts} x2={trades[index].ts}
+                                                       fill={trade.kind == 'long' ? "green" : "red"}
+                                                       fillOpacity={0.1}/>
+                                    )
+                            })}
                         </BarChart>
                     </ResponsiveContainer>
                 </ChartContainer>

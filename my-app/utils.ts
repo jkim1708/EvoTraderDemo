@@ -30,7 +30,7 @@ export const generateData = (startDate: Date, endDate: Date, asset: string, gran
     return data
 }
 
-function addMinutesToDate(objDate: Date, intMinutes: number) {
+export function addMinutesToDate(objDate: Date, intMinutes: number) {
     const addMlSeconds = intMinutes * 60 * 1000;
     return new Date(objDate.getTime() + addMlSeconds);
 }
