@@ -369,8 +369,8 @@ const EnhancedTradingAssetViewer = observer(() => {
         return (
             <Card className="w-full max-w-full">
                 <CardHeader>
-                    <CardTitle>Trading Strategy Creator</CardTitle>
-                    <CardDescription>Select asset, date range, and manage trades</CardDescription>
+                    <CardTitle className="text-2xl">Trading Strategy Creator (TSC)</CardTitle>
+                    <p className="text-muted-foreground">Select asset, date range, and manage trades</p>
                 </CardHeader>
                 <CardContent>
                     <form className="space-y-4 mb-6">

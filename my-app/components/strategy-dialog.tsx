@@ -5,6 +5,7 @@ import CandleStickChartDialog, {Trade} from "@/components/ui/candleStickChartDia
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {TradingRule} from "@/store/TradingRuleStore";
 import {addMinutesToDate, convertToCustomDate} from "@/utils";
+import React from "react";
 
 function generateRandomDateFromLast5Years() {
     const start = new Date();
@@ -58,19 +59,27 @@ export default function StrategyDialog({strategy, onClose}) {
     console.log('recentTrades' + recentTrades);
 
     return (
-        <Card className="w-11/12 mx-auto" >
-        <CardHeader>
-            <div className="flex items-center justify-between">
-                <CardTitle className="text-xl">
-                    {strategy.name} Analysis ({strategy.status})
-                </CardTitle>
-                <Button variant="ghost" size="icon" onClick={onClose}>
-                    <X className="h-4 w-4"/>
-                </Button>
-            </div>
+        <Card className="w-11/12 mx-auto">
+            <CardHeader>
+                <div className="flex items-center justify-between">
+                    <CardTitle className="text-xl">
+                        {strategy.name} - Trading Strategy Analyzer (TSA)
+                        {strategy.active == 'active' ?
+                            <div
+                                className="text-2xl font-bold text-orange-500"> {strategy.status}
+                            </div> : <div
+                                className="text-2xl font-bold text-grey-500"> {strategy.status}
+                            </div>}
+
+                    </CardTitle>
+                    <Button variant="ghost" size="icon" onClick={onClose}>
+                        <X className="h-4 w-4"/>
+                    </Button>
+                </div>
             <p className="text-sm text-muted-foreground">
                 {strategy.asset} - {strategy.indicators.join(', ')}
             </p>
+
         </CardHeader>
     <CardContent>
         <div className="space-y-6">
@@ -128,4 +137,4 @@ export default function StrategyDialog({strategy, onClose}) {
     </CardContent>
         </Card>
     )
-}
+};

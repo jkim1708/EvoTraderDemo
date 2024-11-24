@@ -71,7 +71,7 @@ const StrategyManagement = observer(() => {
         <div className="space-y-2">
         <Card className="w-11/12 mx-auto ">
             <CardHeader>
-                <CardTitle className="text-2xl">Trading Strategy Management</CardTitle>
+                <CardTitle className="text-2xl">Trading Strategy Manager (TSM)</CardTitle>
                 <p className="text-muted-foreground">Manage and monitor your trading algorithms</p>
             </CardHeader>
             <CardContent>
