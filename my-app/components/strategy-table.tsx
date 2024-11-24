@@ -18,7 +18,7 @@ const StrategyTable = observer(({onAnalyze}: { onAnalyze: (strategy: TradingStra
     } = useStores();
 
     const [count, setCount] = useState(0);
-    const [countSharpe, setCountSharpe] = useState(0);
+    const [countSharpe] = useState(0);
 
     const getRandomBetween20And80 = () => {
         return (Math.random() * (80 - 40) + 40).toFixed(1) + "%";
