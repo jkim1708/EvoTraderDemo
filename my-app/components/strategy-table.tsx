@@ -27,12 +27,18 @@ const StrategyTable = observer(({onAnalyze}: { onAnalyze: (strategy: TradingStra
         return (Math.random() * (1.8 - 0.5) + 0.5).toFixed(2);
     };
 
+    function getRandomProfitFactor() {
+
+        //1,1 1,9
+        return (Math.random() * (1.90 - 1.10) + 1.10).toFixed(2);
+    }
+
     useEffect(() => {
         const updateWinRate = () => {
             tradingStrategies.forEach(strategy => {
                 if (strategy.status === "inactive") return;
                 strategy.winRate = getRandomBetween20And80();
-                strategy.profitFactor = getRandomBetween20And80();
+                strategy.profitFactor = getRandomProfitFactor();
                 strategy.sharpeRatio = getRandomSharpeRatio();
             });
         };

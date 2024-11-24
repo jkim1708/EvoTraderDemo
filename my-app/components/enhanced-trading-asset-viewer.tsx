@@ -260,7 +260,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                 name,
                 indicators: getRandomIndicators(),
                 winRate: '62.5%',
-                profitFactor: '62,5%',
+                profitFactor: '1,2',
                 sharpeRatio: '2',
                 status: 'active',
                 tradingRules: rules,
