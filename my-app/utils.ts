@@ -1,4 +1,5 @@
-import {ReferencedArea} from "@/components/ui/candleStickChart";
+import CandleStickChart, {ReferencedArea} from "@/components/ui/candleStickChart";
+import {X_AXIS_RESOLUTION} from "@/components/ui/candleStickChartDialog";
 
 export type SampleAssetData = {
     date: Date
@@ -70,9 +71,12 @@ function extractDateTime(date: Date, frequency: CANDLESTICK_FREQUENCY): string {
 
 }
 
-export function transformToCandleStickSeries(tickData: { date: Date, value: number }[], frequency: CANDLESTICK_FREQUENCY) {
+export function transformToCandleStickSeries(tickData: {
+    date: Date,
+    value: number
+}[], frequency: CANDLESTICK_FREQUENCY) {
 
-    if (tickData === undefined || tickData === null ) return;
+    if (tickData === undefined || tickData === null) return;
 
     const groupedData = tickData.reduce((acc, tick) => {
         const dateTime = extractDateTime(tick.date, frequency);
@@ -130,7 +134,66 @@ export function isValidDate(dateString: string): boolean {
     return !isNaN(date.getTime());
 }
 
-export const isInExistingInReferenceArea = (referencedArea: ReferencedArea[], currentCursor: string ) => {
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
+export function findTsInDifferentFrequency(dateTs: string, tsSeries, xAxisResolution: X_AXIS_RESOLUTION, xKind: 'x1' | 'x2') {
+console.log("dateTs", dateTs);
+console.log("tsSeries", tsSeries);
+    //x1 outside of the view
+    const date = new Date(dateTs);
+    const firstDateInView = new Date(tsSeries[0].ts);
+    const lastDateInView = new Date(tsSeries[tsSeries.length - 1].ts);
+    if (xKind === 'x1') {
+        if (date < firstDateInView) return firstDateInView;
+        if  (date > lastDateInView) return lastDateInView;
+    }
+
+    //x2 outside of the view
+    if (xKind === 'x2') {
+        if (date > lastDateInView) return lastDateInView;
+        if (date < firstDateInView) return firstDateInView;
+    }
+
+    //x1 or x2 inside the view
+    switch (xAxisResolution) {
+        case X_AXIS_RESOLUTION.ONE_DAY:
+        case X_AXIS_RESOLUTION.FIVE_DAYS:
+        case X_AXIS_RESOLUTION.ONE_MONTH:
+        case X_AXIS_RESOLUTION.THREE_MONTH:
+        case X_AXIS_RESOLUTION.SIX_MONTH:
+
+            for(let i = 0; i < tsSeries.length; i++) {
+                //x1 and x2 inside the view
+                const isDateSame = tsSeries[i].ts.split(',')[0] === dateTs;
+                if (isDateSame) {
+                    return tsSeries[i].ts;
+                }
+            }
+
+            return dateTs;
+
+        case X_AXIS_RESOLUTION.ONE_YEAR:
+        case X_AXIS_RESOLUTION.FIVE_YEARS:
+            for (let i = 0; i < tsSeries.length-1; i++) {
+
+                const isDateBetweenTwoDates = date >= convertToDate(tsSeries[i].ts) && date <= convertToDate(tsSeries[i + 1].ts);
+                if (isDateBetweenTwoDates) {
+                    return tsSeries[i].ts;
+                }
+
+            }
+            console.error("Could not find the ts in the series");
+            break;
+
+        default:
+            console.error("No valid resolution found");
+
+    }
+
+
+}
+
+export const isInExistingInReferenceArea = (referencedArea: ReferencedArea[], currentCursor: string) => {
     if (referencedArea.length === 0) {
         return false;
     }

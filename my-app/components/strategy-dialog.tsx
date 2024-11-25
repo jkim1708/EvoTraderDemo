@@ -55,9 +55,6 @@ export default function StrategyDialog({strategy, onClose}) {
 
     addTradesToRecentTrades(recentTrades, randomTrades);
 
-
-    console.log('recentTrades' + recentTrades);
-
     return (
         <Card className="w-11/12 mx-auto">
             <CardHeader>
@@ -99,6 +96,7 @@ export default function StrategyDialog({strategy, onClose}) {
                         <CandleStickChartDialog
                             generatedData={strategy.underline}
                             randomTrades={recentTrades}
+                            strategy={strategy}
                             asset="EURUSD"/>
                     </div>
 

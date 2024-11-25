@@ -220,8 +220,6 @@ const EnhancedTradingAssetViewer = observer(() => {
 
         useEffect(() => {
             resetSelectedTrades();
-            console.log(data);
-            console.log(fourHourData);
         }, [startDate, endDate, asset, frequency]);
 
         const removeTrade = (startTime: string) => {
@@ -314,6 +312,10 @@ const EnhancedTradingAssetViewer = observer(() => {
                 const isBacktestingOffSampleValid = isValidDate(startBacktestingOffSample) && isValidDate(endBacktestingOffSample)
                 setIsStrategyParamValid((isNameValid && isBacktestingOffSampleValid));
 
+                if(!(isNameValid && isBacktestingOffSampleValid)){
+                    return;
+                }
+
                 if (!isNameValid) {
                     return;
                 }
@@ -332,13 +334,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                 frequency: frequency
             });
 
-            console.log('tradingStrategy', tradingStrategy);
-            console.log('tradingStrategy', JSON.stringify(tradingStrategy.tradingRules[0]));
-
             saveTradingStrategy(tradingStrategy);
-
-            console.log('tradingStrategies', tradingStrategies);
-            console.log('trading rules', JSON.stringify(tradingRules[0]));
 
             appRouterInstance.push('/strategy-management');
         }

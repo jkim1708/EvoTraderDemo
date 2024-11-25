@@ -9,7 +9,7 @@ import {
 } from 'recharts';
 import {
     convertToCustomDate,
-    convertToDate,
+    convertToDate, findTsInDifferentFrequency,
 } from "@/utils";
 import {observer} from "mobx-react-lite";
 import {Label} from "@/components/ui/label";
@@ -17,6 +17,7 @@ import {Button} from "@/components/ui/button";
 import {ChartContainer} from "@/components/ui/chart";
 import CandleStickChart from "@/components/ui/candleStickChart";
 import {Input} from "@/components/ui/input";
+import {TradingStrategy} from "@/store/RootStore";
 
 
 
@@ -111,6 +112,7 @@ interface CandleStickChartAnalyze {
 export type CandleStickChartAnalyzeProps = {
     generatedData: CandleStickChartAnalyze[],
     randomTrades: Trade[],
+    strategy: TradingStrategy,
     asset: string,
 }
 
@@ -239,7 +241,7 @@ function CustomizedTick(props: CustomizedTickProps) {
         ;
 }
 
-enum X_AXIS_RESOLUTION {
+export enum X_AXIS_RESOLUTION {
     ONE_DAY = 24,
     FIVE_DAYS = 5 * 24,
     ONE_MONTH = 30 * 24,
@@ -347,7 +349,6 @@ const CandleStickChartDialog =
                     setStartIndex(startIndex);
                     setTickCount(sevenDayData.length);
                     setVisibleData(sevenDayData.slice(startIndex, startIndex + numberOfLastDaysToShow));
-                    console.log('visibleData', visibleData);
                     break;
                 default:
                     console.error('invalid x axis resolution');
@@ -404,18 +405,15 @@ const CandleStickChartDialog =
                                 case X_AXIS_RESOLUTION.ONE_MONTH:
                                 case X_AXIS_RESOLUTION.THREE_MONTH:
                                     startIndex = data.findIndex((d) => d.ts.split(',')[0].trim() === e.target.value);
-                                    console.log(e.target.value);
                                     setStartIndex(startIndex);
                                     setTickCount(data.length);
                                     setVisibleData(data.slice(startIndex, startIndex + xAxisResolution));
-                                    console.log('data.slice(startIndex, startIndex + xAxisResolution)',data.slice(startIndex, startIndex + xAxisResolution));
                                     break;
 
                                 case X_AXIS_RESOLUTION.SIX_MONTH:
                                 case X_AXIS_RESOLUTION.ONE_YEAR:
                                 case X_AXIS_RESOLUTION.FIVE_YEARS:
                                     startIndex = sevenDayData.findIndex((d) => d.ts.split(',')[0].trim() === e.target.value);
-                                    console.log(e.target.value);
                                     setStartIndex(startIndex);
                                     setTickCount(sevenDayData.length);
                                     setVisibleData(sevenDayData.slice(startIndex, startIndex + xAxisResolution));
@@ -475,6 +473,11 @@ const CandleStickChartDialog =
                                                        fillOpacity={0.1}/>
                                     )
                             })}
+
+                            {/*<ReferenceArea yAxisId="1" x1={findTsInDifferentFrequency(props.strategy.backtestingOffSample.startDate, visibleData, xAxisResolution, 'x1')} x2={findTsInDifferentFrequency(props.strategy.backtestingOffSample.startDate, visibleData, xAxisResolution, 'x2')}*/}
+                            <ReferenceArea yAxisId="1" x1={findTsInDifferentFrequency(props.strategy.backtestingOffSample.startDate, visibleData, xAxisResolution, 'x1')} x2={visibleData[visibleData.length - 1].ts}
+                                            fill={"green"}
+                                            fillOpacity={0.1}/>
                         </BarChart>
                     </ResponsiveContainer>
                 </ChartContainer>
