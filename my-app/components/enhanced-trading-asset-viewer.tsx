@@ -402,7 +402,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                                 </Select>
                             </div>
                             <div className="flex-1">
-                                <Label htmlFor="startDate">Start Date</Label>
+                                <Label htmlFor="startDate">Date Select</Label>
                                 <Input
                                     id="startDate"
                                     type="date"
@@ -413,18 +413,18 @@ const EnhancedTradingAssetViewer = observer(() => {
                                     max={endDate}
                                 />
                             </div>
-                            <div className="flex-1">
-                                <Label htmlFor="endDate">End Date</Label>
-                                <Input
-                                    id="endDate"
-                                    type="date"
-                                    value={endDate}
-                                    onChange={(e) => {
-                                        setEndDate(e.target.value)
-                                    }}
-                                    max={new Date().toJSON().split('T')[0]}
-                                />
-                            </div>
+                            {/*<div className="flex-1">*/}
+                            {/*    <Label htmlFor="endDate">End Date</Label>*/}
+                            {/*    <Input*/}
+                            {/*        id="endDate"*/}
+                            {/*        type="date"*/}
+                            {/*        value={endDate}*/}
+                            {/*        onChange={(e) => {*/}
+                            {/*            setEndDate(e.target.value)*/}
+                            {/*        }}*/}
+                            {/*        max={new Date().toJSON().split('T')[0]}*/}
+                            {/*    />*/}
+                            {/*</div>*/}
                             <div className="flex-1">
                                 <Label htmlFor="frequency">Frequency</Label>
                                 <Select defaultValue={'hourly'}
