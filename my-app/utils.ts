@@ -125,6 +125,11 @@ export function convertToDate(date: string): Date {
     return new Date(`${dateParts[0]}-${month}-${day}T${hourStr}:00:00`);
 }
 
+export function isValidDate(dateString: string): boolean {
+    const date = new Date(dateString);
+    return !isNaN(date.getTime());
+}
+
 export const isInExistingInReferenceArea = (referencedArea: ReferencedArea[], currentCursor: string ) => {
     if (referencedArea.length === 0) {
         return false;

@@ -21,7 +21,7 @@ import {
 import {
     CANDLESTICK_FREQUENCY, convertToCustomDate,
     convertToDate,
-    generateData,
+    generateData, isValidDate,
     SampleAssetData,
     transformToCandleStickSeries
 } from "@/utils";
@@ -42,7 +42,7 @@ import {useRouter, useSearchParams} from "next/navigation";
 //     return pnl.toFixed(4)
 // }
 
-const assets= ['EURUSD', 'GBPUSD', 'EURCHF', 'EURNOK']
+const assets = ['EURUSD', 'GBPUSD', 'EURCHF', 'EURNOK']
 
 const EnhancedTradingAssetViewer = observer(() => {
         const {
@@ -77,10 +77,10 @@ const EnhancedTradingAssetViewer = observer(() => {
                 setDefinedRefArea(strategy.tradingRules.map(trade => (
 
                     {
-                    referencedAreaLeft: trade.startTime,
-                    referencedAreaRight: trade.endTime,
-                    tradeKind: trade.kind
-                })));
+                        referencedAreaLeft: trade.startTime,
+                        referencedAreaRight: trade.endTime,
+                        tradeKind: trade.kind
+                    })));
                 initialAsset = strategy.tradingRules[0].asset;
             });
         }
@@ -100,7 +100,10 @@ const EnhancedTradingAssetViewer = observer(() => {
         // const [selectedRange, setSelectedRange] = useState<[number, number] | null>(null)
         // const [tradeType, setTradeType] = useState<'long' | 'short'>('long')
         const [editingTrade, setEditingTrade] = useState<TradingRule | null>(null)
-        const [isStrategyNameValid, setIsStrategyNameValid] = useState(true);
+        const [isStrategyNameValid, setIsStrategyParamValid] = useState(true);
+
+        const [startBacktestingOffSample, setStartBacktestingOffSample] = useState('');
+        const [endBacktestingOffSample, setEndBacktestingOffSample] = useState('');
 
         const resetSelectedTrades = () => {
             setTradingRule([]);
@@ -135,12 +138,12 @@ const EnhancedTradingAssetViewer = observer(() => {
             }
         }, [pathStrategyName]);
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    function transformToFourHourData(candleStickSeries){
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        function transformToFourHourData(candleStickSeries) {
 
             // Initialize result array
-            const aggregatedData:  {
+            const aggregatedData: {
                 high: string,
                 low: string,
                 open: string,
@@ -162,9 +165,9 @@ const EnhancedTradingAssetViewer = observer(() => {
             }[] = [];
             let currentStartTime: Date | null = null;
 
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-expect-error
-        candleStickSeries.forEach((candle) => {
+            candleStickSeries.forEach((candle) => {
                 const candleTime = convertToDate(candle.ts);
 
                 // If we haven't started a group or this timestamp is within the same 4-hour interval, add it
@@ -202,7 +205,7 @@ const EnhancedTradingAssetViewer = observer(() => {
         }
 
         useEffect(() => {
-            const tickSeries: SampleAssetData = generateData(new Date(startDate), new Date(endDate), asset,5);
+            const tickSeries: SampleAssetData = generateData(new Date(startDate), new Date(endDate), asset, 5);
             const candleStickSeries: CandleStickChart[] = transformToCandleStickSeries(tickSeries, frequency) ?? [];
 
             setData(candleStickSeries);
@@ -213,12 +216,11 @@ const EnhancedTradingAssetViewer = observer(() => {
         }, [startDate, endDate, asset]);
 
 
-
-    useEffect(() => {
+        useEffect(() => {
             resetSelectedTrades();
-        console.log(data);
-        console.log(fourHourData);
-    }, [startDate, endDate, asset, frequency]);
+            console.log(data);
+            console.log(fourHourData);
+        }, [startDate, endDate, asset, frequency]);
 
         const removeTrade = (startTime: string) => {
             setTradingRule(tradingRules.filter(trade => trade.startTime !== startTime))
@@ -267,6 +269,14 @@ const EnhancedTradingAssetViewer = observer(() => {
                 selectedStartDate: param.selectedStartDate,
                 selectedEndDate: param.selectedEndDate,
                 frequency: param.frequency,
+                backtestingOffSample: {
+                    startDate: new Date('2019-01-01').toISOString(),
+                    endDate: new Date('2019-01-02').toISOString()
+                },
+                backtestingOnSample: {
+                    startDate: param.selectedStartDate,
+                    endDate: param.selectedEndDate
+                },
                 underline: data,
                 tradeOnSample,
                 tradeOffSample
@@ -299,7 +309,8 @@ const EnhancedTradingAssetViewer = observer(() => {
             if (viewMode === VIEW_MODE.CREATE) {
 
                 const isNameValid = !isNameExistent(currentTradingStrategyName);
-                setIsStrategyNameValid(isNameValid);
+                const isBacktestingOffSampleValid = isValidDate(startBacktestingOffSample) && isValidDate(endBacktestingOffSample)
+                setIsStrategyParamValid((isNameValid && isBacktestingOffSampleValid));
 
                 if (!isNameValid) {
                     return;
@@ -359,7 +370,7 @@ const EnhancedTradingAssetViewer = observer(() => {
         }
 
         function handleFrequencySelect(value: string) {
-            if(value == 'four_hourly'){
+            if (value == 'four_hourly') {
                 setFrequency(CANDLESTICK_FREQUENCY.FOUR_HOURLY)
             } else {
                 setFrequency(CANDLESTICK_FREQUENCY.HOURLY)
@@ -415,7 +426,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                             <div className="flex-1">
                                 <Label htmlFor="frequency">Frequency</Label>
                                 <Select defaultValue={'hourly'}
-                                    onValueChange={(value) => handleFrequencySelect(value)}
+                                        onValueChange={(value) => handleFrequencySelect(value)}
                                 >
                                     <SelectTrigger id="frequency">
                                         <SelectValue/>
@@ -453,8 +464,46 @@ const EnhancedTradingAssetViewer = observer(() => {
                     </div>
 
 
-                    <CandleStickChart data={frequency == CANDLESTICK_FREQUENCY.HOURLY ? data : fourHourData} asset={asset}/>
+                    <CandleStickChart data={frequency == CANDLESTICK_FREQUENCY.HOURLY ? data : fourHourData}
+                                      asset={asset}/>
 
+                    <Label htmlFor="start-date-backtesting-off-sample" className="text-right">
+                        Start Date
+                    </Label>
+                    <Input
+                        id="start-date-backtesting-off-sample"
+                        type="date"
+                        value={
+                            startBacktestingOffSample
+                        }
+                        onChange={(e) => {
+                            setStartBacktestingOffSample(
+                                e.target.value
+                            )
+
+                        }}
+                        className="flex-1"
+                        max={endDate}
+                    />
+
+                    <Label htmlFor="end-date-backtesting-off-sample" className="text-right">
+                        End Date
+                    </Label>
+                    <Input
+                        id="end-date-backtesting-off-sample"
+                        type="date"
+                        value={
+                            endBacktestingOffSample
+                        }
+                        onChange={(e) => {
+                            setEndBacktestingOffSample(
+                                e.target.value
+                            )
+
+                        }}
+                        className="flex-1"
+                        max={endDate}
+                    />
 
                     <div className="mt-6">
                         <h3 className="text-lg font-semibold mb-2">Selected Trades</h3>
