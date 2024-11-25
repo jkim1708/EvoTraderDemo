@@ -4,6 +4,16 @@ import {CANDLESTICK_FREQUENCY, convertToCustomDate} from "@/utils";
 import CandleStickChart from "@/components/ui/candleStickChart";
 
 
+export interface BacktestingOffSample {
+    startDate: string,
+    endDate: string,
+}
+
+export interface BacktestingOnSample {
+    startDate: string,
+    endDate: string,
+}
+
 export interface TradingStrategy {
     id: string,
     name: string,
@@ -16,6 +26,9 @@ export interface TradingStrategy {
     selectedStartDate: string,
     selectedEndDate: string,
     frequency: CANDLESTICK_FREQUENCY,
+
+    backtestingOffSample: BacktestingOffSample;
+    backtestingOnSample: BacktestingOnSample;
 
     //user configured
     tradingRules: TradingRule[],
