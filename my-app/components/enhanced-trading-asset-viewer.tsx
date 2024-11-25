@@ -467,43 +467,49 @@ const EnhancedTradingAssetViewer = observer(() => {
                     <CandleStickChart data={frequency == CANDLESTICK_FREQUENCY.HOURLY ? data : fourHourData}
                                       asset={asset}/>
 
-                    <Label htmlFor="start-date-backtesting-off-sample" className="text-right">
-                        Start Date
-                    </Label>
-                    <Input
-                        id="start-date-backtesting-off-sample"
-                        type="date"
-                        value={
-                            startBacktestingOffSample
-                        }
-                        onChange={(e) => {
-                            setStartBacktestingOffSample(
-                                e.target.value
-                            )
+                    <p> Backtesting Time Range </p>
+                    <div className="flex space-x-4 mb-4">
+                        <div>
+                            <Label htmlFor="start-date-backtesting-off-sample" className="text-right">
+                                Start Date
+                            </Label>
+                            <Input
+                                id="start-date-backtesting-off-sample"
+                                type="date"
+                                value={
+                                    startBacktestingOffSample
+                                }
+                                onChange={(e) => {
+                                    setStartBacktestingOffSample(
+                                        e.target.value
+                                    )
 
-                        }}
-                        className="flex-1"
-                        max={endDate}
-                    />
+                                }}
+                                className="flex-1"
+                                max={endDate}
+                            />
+                        </div>
+                        <div>
+                            <Label htmlFor="end-date-backtesting-off-sample" className="text-right">
+                                End Date
+                            </Label>
+                            <Input
+                                id="end-date-backtesting-off-sample"
+                                type="date"
+                                value={
+                                    endBacktestingOffSample
+                                }
+                                onChange={(e) => {
+                                    setEndBacktestingOffSample(
+                                        e.target.value
+                                    )
 
-                    <Label htmlFor="end-date-backtesting-off-sample" className="text-right">
-                        End Date
-                    </Label>
-                    <Input
-                        id="end-date-backtesting-off-sample"
-                        type="date"
-                        value={
-                            endBacktestingOffSample
-                        }
-                        onChange={(e) => {
-                            setEndBacktestingOffSample(
-                                e.target.value
-                            )
-
-                        }}
-                        className="flex-1"
-                        max={endDate}
-                    />
+                                }}
+                                className="flex-1"
+                                max={endDate}
+                            />
+                        </div>
+                    </div>
 
                     <div className="mt-6">
                         <h3 className="text-lg font-semibold mb-2">Selected Trades</h3>
