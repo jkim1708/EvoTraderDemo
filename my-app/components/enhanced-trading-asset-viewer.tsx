@@ -117,6 +117,8 @@ const EnhancedTradingAssetViewer = observer(() => {
         useEffect(() => {
             if (pathStrategyName) {
                 setViewMode(VIEW_MODE.EDIT);
+                setStartBacktestingOffSample(tradingStrategies.find(strategy => strategy.name === pathStrategyName)?.backtestingOffSample.startDate ?? '');
+                setEndBacktestingOffSample(tradingStrategies.find(strategy => strategy.name === pathStrategyName)?.backtestingOffSample.endDate ?? '');
             }
         }, []);
 
@@ -270,8 +272,8 @@ const EnhancedTradingAssetViewer = observer(() => {
                 selectedEndDate: param.selectedEndDate,
                 frequency: param.frequency,
                 backtestingOffSample: {
-                    startDate: new Date('2019-01-01').toISOString(),
-                    endDate: new Date('2019-01-02').toISOString()
+                    startDate: startBacktestingOffSample,
+                    endDate: endBacktestingOffSample,
                 },
                 backtestingOnSample: {
                     startDate: param.selectedStartDate,
