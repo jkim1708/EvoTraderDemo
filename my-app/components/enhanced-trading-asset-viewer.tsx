@@ -469,7 +469,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                     <CandleStickChart data={frequency == CANDLESTICK_FREQUENCY.HOURLY ? data : fourHourData}
                                       asset={asset}/>
 
-                    <p> Backtesting Time Range </p>
+                    <p> Backtesting Offsample Time Range </p>
                     <div className="flex space-x-4 mb-4">
                         <div>
                             <Label htmlFor="start-date-backtesting-off-sample" className="text-right">
