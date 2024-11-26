@@ -58,21 +58,18 @@ const EnhancedTradingAssetViewer = observer(() => {
             tradingStrategyStore: {setTradingStrategy, tradingStrategies, tradeOnSample, tradeOffSample},
         } = useStores();
 
-        const today = new Date()
         const twoDaysAgo = new Date('2019-01-01')
 
         const searchParams = useSearchParams();
         const pathStrategyName = searchParams.get('strategyName')
 
         let initialStartDate;
-        let initialEndDate;
         let initialAsset;
 
         if (pathStrategyName) {
             setCurrentTradingStrategyName(pathStrategyName as string);
             tradingStrategies.filter(strategy => strategy.name === pathStrategyName).forEach(strategy => {
                 initialStartDate = strategy.selectedStartDate;
-                initialEndDate = strategy.selectedEndDate;
                 setTradingRule(strategy.tradingRules);
                 setDefinedRefArea(strategy.tradingRules.map(trade => (
 
@@ -86,7 +83,6 @@ const EnhancedTradingAssetViewer = observer(() => {
         }
 
         const [startDate, setStartDate] = useState(initialStartDate ?? twoDaysAgo.toISOString().split('T')[0])
-        const [endDate, setEndDate] = useState(initialEndDate ?? today.toISOString().split('T')[0])
         const [frequency, setFrequency] = useState(CANDLESTICK_FREQUENCY.HOURLY)
         const [asset, setAsset] = useState(initialAsset ?? "EURUSD")
         const [data, setData] = useState([] as CandleStickChart[])
@@ -128,7 +124,6 @@ const EnhancedTradingAssetViewer = observer(() => {
                 setCurrentTradingStrategyName(pathStrategyName as string);
                 tradingStrategies.filter(strategy => strategy.name === pathStrategyName).forEach(strategy => {
                     setStartDate(strategy.selectedStartDate);
-                    setEndDate(strategy.selectedEndDate);
                     setTradingRule(strategy.tradingRules);
                     setDefinedRefArea(strategy.tradingRules.map(trade => ({
                         referencedAreaLeft: trade.startTime,
@@ -208,7 +203,7 @@ const EnhancedTradingAssetViewer = observer(() => {
         }
 
         useEffect(() => {
-            const tickSeries: SampleAssetData = generateData(new Date(startDate), new Date(endDate), asset, 5);
+            const tickSeries: SampleAssetData = generateData(new Date(startDate), new Date(), asset, 5);
             const candleStickSeries: CandleStickChart[] = transformToCandleStickSeries(tickSeries, frequency) ?? [];
 
             setData(candleStickSeries);
@@ -216,12 +211,12 @@ const EnhancedTradingAssetViewer = observer(() => {
             const transformedData = transformToFourHourData(candleStickSeries);
             setFourHourData(transformedData);
 
-        }, [startDate, endDate, asset]);
+        }, [startDate, asset]);
 
 
         useEffect(() => {
             resetSelectedTrades();
-        }, [startDate, endDate, asset, frequency]);
+        }, [startDate, asset, frequency]);
 
         const removeTrade = (startTime: string) => {
             setTradingRule(tradingRules.filter(trade => trade.startTime !== startTime))
@@ -331,7 +326,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                 name: currentTradingStrategyName,
                 rules: tradingRules,
                 selectedStartDate: startDate,
-                selectedEndDate: endDate,
+                selectedEndDate: "",
                 frequency: frequency
             });
 
@@ -407,7 +402,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                                     onChange={(e) => {
                                         setStartDate(e.target.value)
                                     }}
-                                    max={endDate}
+                                    max={new Date().toJSON().split('T')[0]}
                                 />
                             </div>
                             {/*<div className="flex-1">*/}
@@ -485,7 +480,7 @@ const EnhancedTradingAssetViewer = observer(() => {
 
                                 }}
                                 className="flex-1"
-                                max={endDate}
+                                max={new Date().toJSON().split('T')[0]}
                             />
                         </div>
                         <div>
@@ -505,7 +500,6 @@ const EnhancedTradingAssetViewer = observer(() => {
 
                                 }}
                                 className="flex-1"
-                                max={endDate}
                             />
                         </div>
                     </div>
