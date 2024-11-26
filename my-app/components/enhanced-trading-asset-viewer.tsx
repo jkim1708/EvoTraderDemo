@@ -86,6 +86,8 @@ const EnhancedTradingAssetViewer = observer(() => {
         const [frequency, setFrequency] = useState(CANDLESTICK_FREQUENCY.HOURLY)
         const [asset, setAsset] = useState(initialAsset ?? "EURUSD")
         const [data, setData] = useState([] as CandleStickChart[])
+        const [fullTimeRangeData, setFullTimeRangeData] = useState([] as CandleStickChart[])
+        const [fullTimeRangeFourHourData, setFullTimeRangeMasterFourHourData] = useState([] as CandleStickChart[])
         const [fourHourData, setFourHourData] = useState([] as CandleStickChart[])
 
         enum VIEW_MODE {
@@ -206,13 +208,27 @@ const EnhancedTradingAssetViewer = observer(() => {
             const tickSeries: SampleAssetData = generateData(new Date(startDate), new Date(), asset, 5);
             const candleStickSeries: CandleStickChart[] = transformToCandleStickSeries(tickSeries, frequency) ?? [];
 
+            setFullTimeRangeData(candleStickSeries);
             setData(candleStickSeries);
 
             const transformedData = transformToFourHourData(candleStickSeries);
+            setFullTimeRangeMasterFourHourData(transformedData);
             setFourHourData(transformedData);
 
-        }, [startDate, asset]);
+        }, [asset]);
 
+        function setNewStartDateVisibleDate(startDate: string, fullTimeRangeData: CandleStickChart[], fullTimeRangeFourHourData: CandleStickChart[]) {
+            fullTimeRangeData.forEach((d, i) => {
+                if (d.ts.split(',')[0] === startDate) setData(fullTimeRangeData.slice(i));
+            });
+            fullTimeRangeFourHourData.forEach((d, i) => {
+                if (d.ts.split(',')[0] === startDate) setFourHourData(fullTimeRangeFourHourData.slice(i));
+            });
+        }
+
+        useEffect(() => {
+                setNewStartDateVisibleDate(startDate, fullTimeRangeData, fullTimeRangeFourHourData);
+        }, [startDate]);
 
         useEffect(() => {
             resetSelectedTrades();
@@ -308,7 +324,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                 const isBacktestingOffSampleValid = isValidDate(startBacktestingOffSample) && isValidDate(endBacktestingOffSample)
                 setIsStrategyParamValid((isNameValid && isBacktestingOffSampleValid));
 
-                if(!(isNameValid && isBacktestingOffSampleValid)){
+                if (!(isNameValid && isBacktestingOffSampleValid)) {
                     return;
                 }
 
