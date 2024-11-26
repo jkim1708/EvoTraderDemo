@@ -97,6 +97,7 @@ const EnhancedTradingAssetViewer = observer(() => {
             EDIT
         };
         const [viewMode, setViewMode] = useState(VIEW_MODE.CREATE)
+
         // const [selectedRange, setSelectedRange] = useState<[number, number] | null>(null)
         // const [tradeType, setTradeType] = useState<'long' | 'short'>('long')
         const [editingTrade, setEditingTrade] = useState<TradingRule | null>(null)

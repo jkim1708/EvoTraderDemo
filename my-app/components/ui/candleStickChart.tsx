@@ -1,23 +1,15 @@
 "use client"
 
 import React, {useCallback, useState} from 'react';
-import {
-    BarChart,
-    Bar,
-    XAxis,
-    YAxis,
-    CartesianGrid, Tooltip, ReferenceArea, ResponsiveContainer,
-} from 'recharts';
-import {
-    convertToDate,
-    isInExistingInReferenceArea,
-} from "@/utils";
+import {Bar, BarChart, CartesianGrid, ReferenceArea, ResponsiveContainer, Tooltip, XAxis, YAxis,} from 'recharts';
+import {convertToDate, isInExistingInReferenceArea,} from "@/utils";
 import {observer} from "mobx-react-lite";
 import {useStores} from "@/store/Provider";
 import {Button} from "@/components/ui/button";
 import {ChartContainer} from "@/components/ui/chart";
 import {CategoricalChartState} from "recharts/types/chart/types";
 import {Label} from "@/components/ui/label";
+import {X_AXIS_RESOLUTION} from "@/components/ui/candleStickChartDialog";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
@@ -256,9 +248,19 @@ const CandleStickChart =
             resetRefAreaSelection();
         }
 
-        function handleDButton(numberOfLastDaysToShow: number): void {
-            setStartIndex(data.length - numberOfLastDaysToShow * 24);
-            setXAxisResolution(numberOfLastDaysToShow * 24);
+        function handleDButton(numberOfLastDaysToShow: X_AXIS_RESOLUTION): void {
+
+            switch (numberOfLastDaysToShow) {
+                case X_AXIS_RESOLUTION.ONE_DAY:
+                case X_AXIS_RESOLUTION.FIVE_DAYS:
+                case X_AXIS_RESOLUTION.ONE_MONTH:
+                case X_AXIS_RESOLUTION.THREE_MONTH:
+                case X_AXIS_RESOLUTION.THREE_MONTH:
+                    setStartIndex(data.length - numberOfLastDaysToShow);
+                    setXAxisResolution(numberOfLastDaysToShow * 24);
+
+
+            }
         }
 
         //
@@ -371,27 +373,27 @@ const CandleStickChart =
                 <Label> Range </Label>
                 <div className="flex space-x-4 mb-4 tradeKindButton">
                     < Button
-                        onClick={() => handleDButton(1)}
+                        onClick={() => handleDButton(X_AXIS_RESOLUTION.ONE_DAY)}
                     >
                         1D
                     </Button>
                     < Button
-                        onClick={() => handleDButton(5)}
+                        onClick={() => handleDButton(X_AXIS_RESOLUTION.FIVE_DAYS)}
                     >
                         5D
                     </Button>
                     < Button
-                        onClick={() => handleDButton(30)}
+                        onClick={() => handleDButton(X_AXIS_RESOLUTION.ONE_MONTH)}
                     >
                         1M
                     </Button>
                     < Button
-                        onClick={() => handleDButton(90)}
+                        onClick={() => handleDButton(X_AXIS_RESOLUTION.THREE_MONTH)}
                     >
                         3M
                     </Button>
                     < Button
-                        onClick={() => handleDButton(180)}
+                        onClick={() => handleDButton(X_AXIS_RESOLUTION.SIX_MONTH)}
                     >
                         6M
                     </Button>

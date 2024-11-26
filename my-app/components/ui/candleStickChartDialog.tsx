@@ -89,6 +89,14 @@ const Candlestick = props => {
           `}
                 />
             )}
+
+            <path  d={`
+          M ${x},${y}
+          L ${x},${y + height}
+          L ${x + width},${y + height}
+          L ${x + width},${y}
+          L ${x},${y}
+        `}/>
         </g>
     );
 };
@@ -246,7 +254,7 @@ export enum X_AXIS_RESOLUTION {
     FIVE_DAYS = 5 * 24,
     ONE_MONTH = 30 * 24,
     THREE_MONTH = 3 * 30 * 24,
-    SIX_MONTH = 26, //weeks
+    SIX_MONTH = 6 * 30 * 24,
     ONE_YEAR = 52, //weeks
     FIVE_YEARS = 5 * 52 //weeks
 }
@@ -372,7 +380,7 @@ const CandleStickChartDialog =
                     return newIndex;
                 });
                 setLastMouseX(event.clientX);
-                if (xAxisResolution == X_AXIS_RESOLUTION.ONE_YEAR || xAxisResolution == X_AXIS_RESOLUTION.FIVE_YEARS || xAxisResolution == X_AXIS_RESOLUTION.SIX_MONTH) {
+                if (xAxisResolution == X_AXIS_RESOLUTION.ONE_YEAR || xAxisResolution == X_AXIS_RESOLUTION.FIVE_YEARS) {
                     setVisibleData(sevenDayData.slice(startIndex, startIndex + xAxisResolution));
                 } else {
                     setVisibleData(data.slice(startIndex, startIndex + xAxisResolution));
@@ -404,13 +412,13 @@ const CandleStickChartDialog =
                                 case X_AXIS_RESOLUTION.FIVE_DAYS:
                                 case X_AXIS_RESOLUTION.ONE_MONTH:
                                 case X_AXIS_RESOLUTION.THREE_MONTH:
+                                case X_AXIS_RESOLUTION.SIX_MONTH:
                                     startIndex = data.findIndex((d) => d.ts.split(',')[0].trim() === e.target.value);
                                     setStartIndex(startIndex);
                                     setTickCount(data.length);
                                     setVisibleData(data.slice(startIndex, startIndex + xAxisResolution));
                                     break;
 
-                                case X_AXIS_RESOLUTION.SIX_MONTH:
                                 case X_AXIS_RESOLUTION.ONE_YEAR:
                                 case X_AXIS_RESOLUTION.FIVE_YEARS:
                                     startIndex = sevenDayData.findIndex((d) => d.ts.split(',')[0].trim() === e.target.value);
