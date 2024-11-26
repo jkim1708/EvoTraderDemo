@@ -255,10 +255,9 @@ const CandleStickChart =
                 case X_AXIS_RESOLUTION.FIVE_DAYS:
                 case X_AXIS_RESOLUTION.ONE_MONTH:
                 case X_AXIS_RESOLUTION.THREE_MONTH:
-                case X_AXIS_RESOLUTION.THREE_MONTH:
-                    setStartIndex(data.length - numberOfLastDaysToShow);
-                    setXAxisResolution(numberOfLastDaysToShow * 24);
-
+                case X_AXIS_RESOLUTION.SIX_MONTH:
+                    setStartIndex(0);
+                    setXAxisResolution(numberOfLastDaysToShow);
 
             }
         }
