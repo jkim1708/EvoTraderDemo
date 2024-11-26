@@ -380,11 +380,8 @@ const CandleStickChartDialog =
                     return newIndex;
                 });
                 setLastMouseX(event.clientX);
-                if (xAxisResolution == X_AXIS_RESOLUTION.ONE_YEAR || xAxisResolution == X_AXIS_RESOLUTION.FIVE_YEARS) {
                     setVisibleData(sevenDayData.slice(startIndex, startIndex + xAxisResolution));
-                } else {
                     setVisibleData(data.slice(startIndex, startIndex + xAxisResolution));
-                }
             }
         }, [isDragging, lastMouseX, xAxisResolution, data.length]);
 
