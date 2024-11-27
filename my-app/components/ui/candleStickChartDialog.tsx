@@ -1,6 +1,6 @@
 "use client"
 
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {
     Bar,
     XAxis,
@@ -289,7 +289,6 @@ const CandleStickChartDialog =
         const preparedData = prepareData(props.generatedData);
 
         const fullTimeRangeData = randomlyAssignTradeToAnyData(preparedData, props.randomTrades);
-        const data = fullTimeRangeData;
 
         const sevenDayData = transformToSevenDayData(fullTimeRangeData);
         const fullTimeRangeSevenDayData = transformToSevenDayData(fullTimeRangeData);
