@@ -294,8 +294,6 @@ const CandleStickChartDialog =
         const sevenDayData = transformToSevenDayData(fullTimeRangeData);
         const fullTimeRangeSevenDayData = transformToSevenDayData(sevenDayData);
 
-        const trades = props.randomTrades;
-
         const [visibleData, setVisibleData] = useState<{
             ts: string,
             low: string,

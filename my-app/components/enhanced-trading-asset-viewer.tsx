@@ -62,8 +62,6 @@ const EnhancedTradingAssetViewer = observer(() => {
             tradingStrategyStore: {setTradingStrategy, tradingStrategies, tradeOnSample, tradeOffSample},
         } = useStores();
 
-        const twoDaysAgo = new Date('2019-01-01')
-
         const searchParams = useSearchParams();
         const isEditMode = searchParams.get('strategyName')
 
@@ -88,7 +86,7 @@ const EnhancedTradingAssetViewer = observer(() => {
             });
         }
 
-        const [startDate, setStartDate] = useState(initialStartDate ?? twoDaysAgo.toISOString().split('T')[0])
+        const [startDate, setStartDate] = useState(initialStartDate ?? new Date('2020-02-01').toISOString().split('T')[0])
         const [frequency, setFrequency] = useState(CANDLESTICK_FREQUENCY.HOURLY)
         const [asset, setAsset] = useState(initialAsset ?? "EURUSD")
         const [data, setData] = useState([] as CandleStickChart[])
