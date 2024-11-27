@@ -6,27 +6,36 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {TradingRule} from "@/store/TradingRuleStore";
 import {addMinutesToDate, convertToCustomDate} from "@/utils";
 import React from "react";
+import {TradingStrategy} from "@/store/RootStore";
 
-function generateRandomDateFromLast5Years() {
-    const start = new Date();
-    start.setFullYear(start.getFullYear() - 5);
-    return new Date(start.getTime() + Math.random() * (new Date().getTime() - start.getTime()));
+//generate 10 random trades which have 1 day duration
+function generateRandomDateRange(offSampleTestStartDate: Date, offSampleTestEndDate: Date): {
+    startDate: Date,
+    endDate: Date
+}[] {
+    const randomDateRange: { startDate: Date, endDate: Date }[] = [] as { startDate: Date, endDate: Date }[];
+    for (let i = 0; i < 10; i++) {
+        const startDate = new Date(offSampleTestStartDate.getTime() + Math.random() * (offSampleTestEndDate.getTime() - offSampleTestStartDate.getTime()));
+        const endDate = new Date(addMinutesToDate(startDate, 60 * 24));
+
+        randomDateRange.push({startDate, endDate});
+    }
+    return randomDateRange;
 }
 
-function generateRandomTrades(): Trade[] {
+function generateRandomTrades(strategy: TradingStrategy): Trade[] {
     const randomTrades: Trade[] = [] as Trade[];
-    for (let i = 0; i < 10; i++) {
-        const date = generateRandomDateFromLast5Years();
-        const nextDay = convertToCustomDate(addMinutesToDate(date, 60 * 24)); //one day
-        const ts = convertToCustomDate(date);
-        randomTrades.push({
+    // const date = generateRandomDateFromLast5Years();
+    const offSampleTestStartDate = new Date(strategy.backtestingOffSample.startDate);
+    const offSampleTestEndDate = new Date(strategy.backtestingOffSample.endDate);
+    const randomDateRange = generateRandomDateRange(offSampleTestStartDate, offSampleTestEndDate);
+    randomDateRange.forEach(dateRange => randomTrades.push({
             kind: 'short',
-            ts,
-            tsEnd: nextDay,
+            ts: convertToCustomDate(dateRange.startDate),
+            tsEnd: convertToCustomDate(dateRange.endDate),
             entryPrice: 1,
         })
-
-    }
+    )
     return randomTrades;
 }
 
@@ -51,7 +60,7 @@ export default function StrategyDialog({strategy, onClose}) {
 
     const recentTrades = strategy.tradingRules;
 
-    const randomTrades = generateRandomTrades();
+    const randomTrades = generateRandomTrades(strategy);
 
     addTradesToRecentTrades(recentTrades, randomTrades);
 
@@ -61,9 +70,9 @@ export default function StrategyDialog({strategy, onClose}) {
                 <div className="flex items-center justify-between">
                     <CardTitle className="text-xl">
                         {strategy.name} - Trading Strategy Analyzer (TSA) {strategy.status == 'active' ?
-                            <div className="text-2xl font-bold text-orange-500"> {strategy.status}</div> : <div
-                                className="text-2xl font-bold text-grey-500"> {strategy.status}
-                            </div>}
+                        <div className="text-2xl font-bold text-orange-500"> {strategy.status}</div> : <div
+                            className="text-2xl font-bold text-grey-500"> {strategy.status}
+                        </div>}
 
                     </CardTitle>
                     <Button variant="ghost" size="icon" onClick={onClose}>
