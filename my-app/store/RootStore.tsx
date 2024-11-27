@@ -7,6 +7,7 @@ import CandleStickChart from "@/components/ui/candleStickChart";
 export interface BacktestingOffSample {
     startDate: string,
     endDate: string,
+    trades: TradingRule[],
 }
 
 export interface BacktestingOnSample {

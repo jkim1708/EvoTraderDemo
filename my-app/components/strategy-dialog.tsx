@@ -58,11 +58,15 @@ function addTradesToRecentTrades(recentTrades: TradingRule[], randomTrades: Trad
 // @ts-expect-error
 export default function StrategyDialog({strategy, onClose}) {
 
-    const recentTrades = strategy.tradingRules;
+    const recentTrades = [...strategy.tradingRules];
 
-    const randomTrades = generateRandomTrades(strategy);
+    let backtestingOffSampleTrades: Trade[] = strategy.backtestingOffSample.trades ?? [];
 
-    addTradesToRecentTrades(recentTrades, randomTrades);
+    if (backtestingOffSampleTrades.length == 0) {
+        backtestingOffSampleTrades = generateRandomTrades(strategy);
+        addTradesToRecentTrades(recentTrades, backtestingOffSampleTrades);
+    }
+
 
     return (
         <Card className="w-11/12 mx-auto">
