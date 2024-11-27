@@ -24,6 +24,8 @@ class TradingRuleStore {
 
     currentSelectedTradeKind: 'short' | 'long';
 
+    currentTradingStrategyOnSampleRange: number = 180;
+
     constructor() {
         this.tradingRules = [];
         this.currentSelectedTradeKind = 'long';
@@ -40,6 +42,10 @@ class TradingRuleStore {
     setTradingRule = (tradingRules: TradingRule[]) => {
         this.tradingRules = tradingRules
     };
+
+    setCurrentTradingStrategyOnSampleRange = (range: number) => {
+        this.currentTradingStrategyOnSampleRange = range;
+    }
 
     setDefinedRefArea = (definedRefArea: { referencedAreaLeft: string, referencedAreaRight: string, tradeKind: 'long' | 'short' }[]) => {
         this.definedRefArea = definedRefArea;

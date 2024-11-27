@@ -135,7 +135,8 @@ const CandleStickChart =
                 setTradingRule,
                 currentSelectedAsset,
                 definedRefArea,
-                currentSelectedTradeKind
+                currentSelectedTradeKind,
+                setCurrentTradingStrategyOnSampleRange
             },
         } = useStores();
 
@@ -281,6 +282,8 @@ const CandleStickChart =
                 });
                 setLastMouseX(event.clientX);
             }
+
+            setCurrentTradingStrategyOnSampleRange(xAxisResolution);
         }, [isDragging, lastMouseX, xAxisResolution, data.length]);
 
         const handleMouseUp = useCallback(() => {

@@ -19,9 +19,11 @@ import {
     DialogTrigger
 } from "@/components/ui/dialog"
 import {
-    CANDLESTICK_FREQUENCY, convertToCustomDate,
+    CANDLESTICK_FREQUENCY,
+    convertToCustomDate,
     convertToDate,
-    generateData, isValidDate,
+    generateData,
+    isValidDate,
     SampleAssetData,
     transformToCandleStickSeries
 } from "@/utils";
@@ -54,6 +56,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                 setCurrentSelectedTradeKind,
                 setCurrentTradingStrategyName,
                 currentTradingStrategyName,
+                currentTradingStrategyOnSampleRange,
             },
             tradingStrategyStore: {setTradingStrategy, tradingStrategies, tradeOnSample, tradeOffSample},
         } = useStores();
@@ -286,8 +289,8 @@ const EnhancedTradingAssetViewer = observer(() => {
                     endDate: endBacktestingOffSample,
                 },
                 backtestingOnSample: {
-                    startDate: param.selectedStartDate,
-                    endDate: param.selectedEndDate
+                    startDate: data[0].ts.split(',')[0],
+                    endDate: data[currentTradingStrategyOnSampleRange].ts.split(',')[0]
                 },
                 underline: data,
                 tradeOnSample,
@@ -475,7 +478,8 @@ const EnhancedTradingAssetViewer = observer(() => {
 
 
                     <CandleStickChart data={frequency == CANDLESTICK_FREQUENCY.HOURLY ? data : fourHourData}
-                                      asset={asset}/>
+                                      asset={asset}
+                    />
 
                     <p> Backtesting Offsample Time Range </p>
                     <div className="flex space-x-4 mb-4">
