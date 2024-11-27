@@ -46,7 +46,7 @@ function addTradesToRecentTrades(recentTrades: TradingRule[], randomTrades: Trad
         recentTrades.push({
             kind: trade.kind,
             startTime: trade.ts,
-            endTime: trade.ts,
+            endTime: trade.tsEnd,
             asset: 'EURUSD',
             profitNLoss: parseFloat((Math.random() * (0.009 - 0.001) + 0.001).toFixed(8)),
         })
