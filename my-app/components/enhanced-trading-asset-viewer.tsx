@@ -57,6 +57,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                 setCurrentTradingStrategyName,
                 currentTradingStrategyName,
                 currentTradingStrategyOnSampleRange,
+                setCurrentTradingStrategyOnSampleRange,
             },
             tradingStrategyStore: {setTradingStrategy, tradingStrategies, tradeOnSample, tradeOffSample},
         } = useStores();
@@ -64,14 +65,15 @@ const EnhancedTradingAssetViewer = observer(() => {
         const twoDaysAgo = new Date('2019-01-01')
 
         const searchParams = useSearchParams();
-        const pathStrategyName = searchParams.get('strategyName')
+        const isEditMode = searchParams.get('strategyName')
 
         let initialStartDate;
         let initialAsset;
 
-        if (pathStrategyName) {
-            setCurrentTradingStrategyName(pathStrategyName as string);
-            tradingStrategies.filter(strategy => strategy.name === pathStrategyName).forEach(strategy => {
+        //initialize edit Page
+        if (isEditMode) {
+            setCurrentTradingStrategyName(isEditMode as string);
+            tradingStrategies.filter(strategy => strategy.name === isEditMode).forEach(strategy => {
                 initialStartDate = strategy.selectedStartDate;
                 setTradingRule(strategy.tradingRules);
                 setDefinedRefArea(strategy.tradingRules.map(trade => (
@@ -82,6 +84,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                         tradeKind: trade.kind
                     })));
                 initialAsset = strategy.tradingRules[0].asset;
+                setCurrentTradingStrategyOnSampleRange(parseInt(strategy.backtestingOnSample.endDate));
             });
         }
 
@@ -117,17 +120,17 @@ const EnhancedTradingAssetViewer = observer(() => {
 
 
         useEffect(() => {
-            if (pathStrategyName) {
+            if (isEditMode) {
                 setViewMode(VIEW_MODE.EDIT);
-                setStartBacktestingOffSample(tradingStrategies.find(strategy => strategy.name === pathStrategyName)?.backtestingOffSample.startDate ?? '');
-                setEndBacktestingOffSample(tradingStrategies.find(strategy => strategy.name === pathStrategyName)?.backtestingOffSample.endDate ?? '');
+                setStartBacktestingOffSample(tradingStrategies.find(strategy => strategy.name === isEditMode)?.backtestingOffSample.startDate ?? '');
+                setEndBacktestingOffSample(tradingStrategies.find(strategy => strategy.name === isEditMode)?.backtestingOffSample.endDate ?? '');
             }
         }, []);
 
         useEffect(() => {
-            if (pathStrategyName) {
-                setCurrentTradingStrategyName(pathStrategyName as string);
-                tradingStrategies.filter(strategy => strategy.name === pathStrategyName).forEach(strategy => {
+            if (isEditMode) {
+                setCurrentTradingStrategyName(isEditMode as string);
+                tradingStrategies.filter(strategy => strategy.name === isEditMode).forEach(strategy => {
                     setStartDate(strategy.selectedStartDate);
                     setTradingRule(strategy.tradingRules);
                     setDefinedRefArea(strategy.tradingRules.map(trade => ({
@@ -139,7 +142,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                 });
 
             }
-        }, [pathStrategyName]);
+        }, [isEditMode]);
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
@@ -230,7 +233,7 @@ const EnhancedTradingAssetViewer = observer(() => {
         }
 
         useEffect(() => {
-                setNewStartDateVisibleDate(startDate, fullTimeRangeData, fullTimeRangeFourHourData);
+            setNewStartDateVisibleDate(startDate, fullTimeRangeData, fullTimeRangeFourHourData);
         }, [startDate]);
 
         useEffect(() => {
