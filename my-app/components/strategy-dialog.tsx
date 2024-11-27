@@ -49,7 +49,7 @@ function addTradesToRecentTrades(recentTrades: TradingRule[], randomTrades: Trad
             endTime: trade.tsEnd,
             asset: 'EURUSD',
             profitNLoss: parseFloat((Math.random() * (0.009 - 0.001) + 0.001).toFixed(8)),
-        })
+        } as TradingRule)
     })
 
 }

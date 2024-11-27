@@ -18,6 +18,7 @@ import {ChartContainer} from "@/components/ui/chart";
 import CandleStickChart from "@/components/ui/candleStickChart";
 import {Input} from "@/components/ui/input";
 import {TradingStrategy} from "@/store/RootStore";
+import {TradingRule} from "@/store/TradingRuleStore";
 
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -118,7 +119,7 @@ interface CandleStickChartAnalyze {
 
 export type CandleStickChartAnalyzeProps = {
     generatedData: CandleStickChartAnalyze[],
-    randomTrades: Trade[],
+    randomTrades: TradingRule[],
     strategy: TradingStrategy,
     asset: string,
 }
@@ -288,10 +289,10 @@ const CandleStickChartDialog =
 
         const preparedData = prepareData(props.generatedData);
 
-        const fullTimeRangeData = randomlyAssignTradeToAnyData(preparedData, props.randomTrades);
+        const fullTimeRangeData = randomlyAssignTradeToAnyData(preparedData, []);
 
         const sevenDayData = transformToSevenDayData(fullTimeRangeData);
-        const fullTimeRangeSevenDayData = transformToSevenDayData(fullTimeRangeData);
+        const fullTimeRangeSevenDayData = transformToSevenDayData(sevenDayData);
 
         const trades = props.randomTrades;
 
@@ -415,6 +416,9 @@ const CandleStickChartDialog =
             event.preventDefault();
         }, []);
 
+        console.log('props.strategy.backtestingOnSample.startDate', props.strategy.backtestingOnSample.startDate);
+        console.log('props.randomTrades[1]', props.randomTrades[1]);
+
         return (
             <div>
                 <div className="flex-1">
@@ -491,27 +495,38 @@ const CandleStickChartDialog =
                             <Tooltip cursor={<CustomTooltipCursor/>} content={customTooltipContent}
                                      position={{x: 100, y: -25}} offset={20}/>
 
-                            {trades.map((trade, index) => {
-                                return (
-                                    <ReferenceArea key={index} yAxisId="1" x1={trade.ts} x2={trades[index].ts}
-                                                   fill={trade.kind == 'long' ? "green" : "red"}
-                                                   fillOpacity={0.1}/>
-                                )
-                            })}
+                            {/*{trades.map((trade, index) => {*/}
+                            {/*    return (*/}
+                            {/*        <ReferenceArea key={index} yAxisId="1" x1={findTsInDifferentFrequency(trade.ts, visibleData, xAxisResolution, 'x1')} x2={findTsInDifferentFrequency(trade.tsEnd, visibleData, xAxisResolution, 'x2')}*/}
+                            {/*                       fill={trade.kind == 'long' ? "blue" : "red"}*/}
+                            {/*                       fillOpacity={0.1}/>*/}
+                            {/*    )*/}
+                            {/*})}*/}
+
+                            {/*return (*/}
+
+                            {/*)*/}
 
                             {/*off sample backtesting area*/}
                             <ReferenceArea yAxisId="1"
                                            x1={findTsInDifferentFrequency(props.strategy.backtestingOffSample.startDate, visibleData, xAxisResolution, 'x1')}
                                            x2={findTsInDifferentFrequency(props.strategy.backtestingOffSample.endDate, visibleData, xAxisResolution, 'x2')}
                                            fill={"grey"}
-                                           fillOpacity={0.1}/>
+                                           fillOpacity={0.3}/>
 
                             {/*on sample backtesting area*/}
                             <ReferenceArea yAxisId="1"
                                            x1={findTsInDifferentFrequency(props.strategy.backtestingOnSample.startDate, visibleData, xAxisResolution, 'x1')}
                                            x2={findTsInDifferentFrequency(props.strategy.backtestingOnSample.endDate, visibleData, xAxisResolution, 'x2')}
                                            fill={"orange"}
-                                           fillOpacity={0.1}/>
+                                           fillOpacity={0.3}/>
+
+
+                            {props.randomTrades.map((trade, index) => (<ReferenceArea yAxisId="1" key={index}
+                                                                                      x1={findTsInDifferentFrequency(trade.startTime.split(',')[0], visibleData, xAxisResolution, 'x1')}
+                                                                                      x2={findTsInDifferentFrequency(trade.endTime.split(',')[0], visibleData, xAxisResolution, 'x2')}
+                                                                                      fill={trade.kind == 'long' ? "blue" : "red"}
+                                                                                      fillOpacity={0.3}/>))}
                         </BarChart>
                     </ResponsiveContainer>
                 </ChartContainer>
