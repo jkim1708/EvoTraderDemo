@@ -20,7 +20,6 @@ import {Input} from "@/components/ui/input";
 import {TradingStrategy} from "@/store/RootStore";
 
 
-
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
 const Candlestick = props => {
@@ -90,7 +89,7 @@ const Candlestick = props => {
                 />
             )}
 
-            <path  d={`
+            <path d={`
           M ${x},${y}
           L ${x},${y + height}
           L ${x + width},${y + height}
@@ -284,6 +283,7 @@ const CandleStickChartDialog =
         const [isDragging, setIsDragging] = useState(false); // Bereich der X-Achse
         const [lastMouseX, setLastMouseX] = useState(0); // Bereich der X-Achse
         const [tickCount, setTickCount] = useState(0); // Bereich der X-Achse
+        const [startIndex, setStartIndex] = useState(0); // Bereich der X-Achse
         const [startDate, setStartDate] = useState(""); // Bereich der X-Achse
 
         const preparedData = prepareData(props.generatedData);
@@ -359,6 +359,7 @@ const CandleStickChartDialog =
                     console.error('invalid x axis resolution');
             }
 
+            setStartIndex(startIndex ?? 0);
             console.log("visibleData", visibleData[0]);
             console.log("visibleData", visibleData[1]);
         }
@@ -375,15 +376,40 @@ const CandleStickChartDialog =
             if (isDragging) {
                 const deltaX = event.clientX - lastMouseX;
                 const scrollAmount = Math.round(deltaX / 5); // Adjust sensitivity here
-                // setStartIndex(prevIndex => {
-                //     const newIndex = Math.max(0, Math.min(data.length - xAxisResolution, prevIndex - scrollAmount));
-                //     return newIndex;
-                // });
-                // setLastMouseX(event.clientX);
-                //     setVisibleData(fullTimeRangeSevenDayData.slice(startIndex, startIndex + xAxisResolution));
-                //     setVisibleData(fullTimeRangeData.slice(startIndex, startIndex + xAxisResolution));
+                console.log('scrollAmount', scrollAmount);
+                console.log('startIndex', startIndex);
+                let newStartIndex = 0;
+                if (startIndex) {
+                    newStartIndex = Math.max(0, startIndex - scrollAmount);
+                console.log('startIndex - scrollAmount', startIndex - scrollAmount);
+                }
+                console.log('newStartIndex', newStartIndex);
+
+                setLastMouseX(event.clientX);
+                switch (xAxisResolution) {
+                    case X_AXIS_RESOLUTION.ONE_DAY:
+                    case X_AXIS_RESOLUTION.FIVE_DAYS:
+                    case X_AXIS_RESOLUTION.ONE_MONTH:
+                    case X_AXIS_RESOLUTION.THREE_MONTH:
+                    case X_AXIS_RESOLUTION.SIX_MONTH:
+                        const slice = fullTimeRangeData.slice(newStartIndex, newStartIndex + xAxisResolution);
+                        setVisibleData(slice);
+                        console.log('slice', slice);
+                        break;
+
+                    case X_AXIS_RESOLUTION.ONE_YEAR:
+                    case X_AXIS_RESOLUTION.FIVE_YEARS:
+                        const slice1 = fullTimeRangeSevenDayData.slice(newStartIndex, newStartIndex + xAxisResolution);
+                        console.log('slice1', slice1);
+                        setVisibleData(slice1);
+                        break;
+                    default:
+                }
+
+                setStartIndex(newStartIndex ?? 0);
+
             }
-        }, [isDragging, lastMouseX, xAxisResolution, data.length]);
+        }, [isDragging, lastMouseX]);
 
         const handleMouseUp = useCallback(() => {
             setIsDragging(false);
@@ -403,7 +429,7 @@ const CandleStickChartDialog =
                         value={startDate}
                         onChange={(e) => {
                             setStartDate(e.target.value)
-                                    let startIndex;
+                            let startIndex;
                             switch (xAxisResolution) {
                                 case X_AXIS_RESOLUTION.ONE_DAY:
                                 case X_AXIS_RESOLUTION.FIVE_DAYS:
@@ -470,16 +496,18 @@ const CandleStickChartDialog =
                                      position={{x: 100, y: -25}} offset={20}/>
 
                             {trades.map((trade, index) => {
-                                    return (
-                                        <ReferenceArea key={index} yAxisId="1" x1={trade.ts} x2={trades[index].ts}
-                                                       fill={trade.kind == 'long' ? "green" : "red"}
-                                                       fillOpacity={0.1}/>
-                                    )
+                                return (
+                                    <ReferenceArea key={index} yAxisId="1" x1={trade.ts} x2={trades[index].ts}
+                                                   fill={trade.kind == 'long' ? "green" : "red"}
+                                                   fillOpacity={0.1}/>
+                                )
                             })}
 
-                            <ReferenceArea yAxisId="1" x1={findTsInDifferentFrequency(props.strategy.backtestingOffSample.startDate, visibleData, xAxisResolution, 'x1')} x2={visibleData[visibleData.length - 1].ts}
-                                            fill={"green"}
-                                            fillOpacity={0.1}/>
+                            <ReferenceArea yAxisId="1"
+                                           x1={findTsInDifferentFrequency(props.strategy.backtestingOffSample.startDate, visibleData, xAxisResolution, 'x1')}
+                                           x2={visibleData[visibleData.length - 1].ts}
+                                           fill={"green"}
+                                           fillOpacity={0.1}/>
                         </BarChart>
                     </ResponsiveContainer>
                 </ChartContainer>
