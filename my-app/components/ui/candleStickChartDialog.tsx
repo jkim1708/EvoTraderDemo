@@ -342,11 +342,11 @@ const CandleStickChartDialog =
                 case X_AXIS_RESOLUTION.FIVE_DAYS:
                 case X_AXIS_RESOLUTION.ONE_MONTH:
                 case X_AXIS_RESOLUTION.THREE_MONTH:
+                case X_AXIS_RESOLUTION.SIX_MONTH:
                     startIndex = fullTimeRangeData.length - numberOfLastDaysToShow;
                     setVisibleData(fullTimeRangeData.slice(startIndex));
                     break;
 
-                case X_AXIS_RESOLUTION.SIX_MONTH:
                 case X_AXIS_RESOLUTION.ONE_YEAR:
                 case X_AXIS_RESOLUTION.FIVE_YEARS:
                     startIndex = fullTimeRangeSevenDayData.length - numberOfLastDaysToShow;
