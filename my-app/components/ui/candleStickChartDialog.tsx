@@ -1,6 +1,6 @@
 "use client"
 
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
     Bar,
     XAxis,
@@ -283,17 +283,19 @@ const CandleStickChartDialog =
         const [xAxisResolution, setXAxisResolution] = useState(X_AXIS_RESOLUTION.FIVE_YEARS); // Bereich der X-Achse
         const [isDragging, setIsDragging] = useState(false); // Bereich der X-Achse
         const [lastMouseX, setLastMouseX] = useState(0); // Bereich der X-Achse
-        const [startIndex, setStartIndex] = useState(0); // Bereich der X-Achse
         const [tickCount, setTickCount] = useState(0); // Bereich der X-Achse
         const [startDate, setStartDate] = useState(""); // Bereich der X-Achse
 
         const preparedData = prepareData(props.generatedData);
 
-        const data = randomlyAssignTradeToAnyData(preparedData, props.randomTrades);
+        const fullTimeRangeData = randomlyAssignTradeToAnyData(preparedData, props.randomTrades);
+        const data = fullTimeRangeData;
+
+        const sevenDayData = transformToSevenDayData(fullTimeRangeData);
+        const fullTimeRangeSevenDayData = transformToSevenDayData(fullTimeRangeData);
 
         const trades = props.randomTrades;
 
-        const sevenDayData = transformToSevenDayData(data);
         const [visibleData, setVisibleData] = useState<{
             ts: string,
             low: string,
@@ -306,8 +308,6 @@ const CandleStickChartDialog =
         } []>(sevenDayData); // Bereich der X-Achse
 
         const asset = props.asset;
-
-
 
         const CustomTooltipCursor = ({x, y, height}: { x: string, y: string, height: string }) => (
             <path
@@ -338,29 +338,29 @@ const CandleStickChartDialog =
 
             let startIndex;
 
-            switch (xAxisResolution) {
+            switch (numberOfLastDaysToShow) {
                 case X_AXIS_RESOLUTION.ONE_DAY:
                 case X_AXIS_RESOLUTION.FIVE_DAYS:
                 case X_AXIS_RESOLUTION.ONE_MONTH:
                 case X_AXIS_RESOLUTION.THREE_MONTH:
-                    startIndex = data.length - numberOfLastDaysToShow;
-                    setStartIndex(startIndex);
-                    setTickCount(data.length);
-                    const slicedData = data.slice(startIndex, startIndex + numberOfLastDaysToShow);
-                    setVisibleData(slicedData);
+                    startIndex = fullTimeRangeData.length - numberOfLastDaysToShow;
+                    setTickCount(numberOfLastDaysToShow);
+                    setVisibleData(fullTimeRangeData.slice(startIndex));
                     break;
 
                 case X_AXIS_RESOLUTION.SIX_MONTH:
                 case X_AXIS_RESOLUTION.ONE_YEAR:
                 case X_AXIS_RESOLUTION.FIVE_YEARS:
-                    startIndex = sevenDayData.length - numberOfLastDaysToShow;
-                    setStartIndex(startIndex);
-                    setTickCount(sevenDayData.length);
-                    setVisibleData(sevenDayData.slice(startIndex, startIndex + numberOfLastDaysToShow));
+                    startIndex = fullTimeRangeSevenDayData.length - numberOfLastDaysToShow;
+                    setTickCount(numberOfLastDaysToShow);
+                    setVisibleData(fullTimeRangeSevenDayData.slice(startIndex));
                     break;
                 default:
                     console.error('invalid x axis resolution');
             }
+
+            console.log("visibleData", visibleData[0]);
+            console.log("visibleData", visibleData[1]);
         }
 
         const handleMouseDown = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -375,13 +375,13 @@ const CandleStickChartDialog =
             if (isDragging) {
                 const deltaX = event.clientX - lastMouseX;
                 const scrollAmount = Math.round(deltaX / 5); // Adjust sensitivity here
-                setStartIndex(prevIndex => {
-                    const newIndex = Math.max(0, Math.min(data.length - xAxisResolution, prevIndex - scrollAmount));
-                    return newIndex;
-                });
-                setLastMouseX(event.clientX);
-                    setVisibleData(sevenDayData.slice(startIndex, startIndex + xAxisResolution));
-                    setVisibleData(data.slice(startIndex, startIndex + xAxisResolution));
+                // setStartIndex(prevIndex => {
+                //     const newIndex = Math.max(0, Math.min(data.length - xAxisResolution, prevIndex - scrollAmount));
+                //     return newIndex;
+                // });
+                // setLastMouseX(event.clientX);
+                //     setVisibleData(fullTimeRangeSevenDayData.slice(startIndex, startIndex + xAxisResolution));
+                //     setVisibleData(fullTimeRangeData.slice(startIndex, startIndex + xAxisResolution));
             }
         }, [isDragging, lastMouseX, xAxisResolution, data.length]);
 
@@ -410,18 +410,16 @@ const CandleStickChartDialog =
                                 case X_AXIS_RESOLUTION.ONE_MONTH:
                                 case X_AXIS_RESOLUTION.THREE_MONTH:
                                 case X_AXIS_RESOLUTION.SIX_MONTH:
-                                    startIndex = data.findIndex((d) => d.ts.split(',')[0].trim() === e.target.value);
-                                    setStartIndex(startIndex);
-                                    setTickCount(data.length);
-                                    setVisibleData(data.slice(startIndex, startIndex + xAxisResolution));
+                                    startIndex = fullTimeRangeData.findIndex((d) => d.ts.split(',')[0].trim() === e.target.value);
+                                    setTickCount(fullTimeRangeData.length);
+                                    setVisibleData(fullTimeRangeData.slice(startIndex, startIndex + xAxisResolution));
                                     break;
 
                                 case X_AXIS_RESOLUTION.ONE_YEAR:
                                 case X_AXIS_RESOLUTION.FIVE_YEARS:
-                                    startIndex = sevenDayData.findIndex((d) => d.ts.split(',')[0].trim() === e.target.value);
-                                    setStartIndex(startIndex);
-                                    setTickCount(sevenDayData.length);
-                                    setVisibleData(sevenDayData.slice(startIndex, startIndex + xAxisResolution));
+                                    startIndex = fullTimeRangeSevenDayData.findIndex((d) => d.ts.split(',')[0].trim() === e.target.value);
+                                    setTickCount(fullTimeRangeSevenDayData.length);
+                                    setVisibleData(fullTimeRangeSevenDayData.slice(startIndex, startIndex + xAxisResolution));
                                     break;
                                 default:
                                     console.error('invalid x axis resolution');
@@ -479,7 +477,6 @@ const CandleStickChartDialog =
                                     )
                             })}
 
-                            {/*<ReferenceArea yAxisId="1" x1={findTsInDifferentFrequency(props.strategy.backtestingOffSample.startDate, visibleData, xAxisResolution, 'x1')} x2={findTsInDifferentFrequency(props.strategy.backtestingOffSample.startDate, visibleData, xAxisResolution, 'x2')}*/}
                             <ReferenceArea yAxisId="1" x1={findTsInDifferentFrequency(props.strategy.backtestingOffSample.startDate, visibleData, xAxisResolution, 'x1')} x2={visibleData[visibleData.length - 1].ts}
                                             fill={"green"}
                                             fillOpacity={0.1}/>
