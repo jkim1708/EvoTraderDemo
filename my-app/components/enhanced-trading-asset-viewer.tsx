@@ -290,6 +290,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                 backtestingOffSample: {
                     startDate: startBacktestingOffSample,
                     endDate: endBacktestingOffSample,
+                    trades: []
                 },
                 backtestingOnSample: {
                     startDate: data[0].ts.split(',')[0],

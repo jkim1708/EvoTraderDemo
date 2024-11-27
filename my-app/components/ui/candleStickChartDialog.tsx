@@ -334,6 +334,7 @@ const CandleStickChartDialog =
         function handleDButton(numberOfLastDaysToShow: X_AXIS_RESOLUTION): void {
 
             setXAxisResolution(numberOfLastDaysToShow);
+            setTickCount(numberOfLastDaysToShow);
 
             let startIndex;
 
@@ -343,7 +344,6 @@ const CandleStickChartDialog =
                 case X_AXIS_RESOLUTION.ONE_MONTH:
                 case X_AXIS_RESOLUTION.THREE_MONTH:
                     startIndex = fullTimeRangeData.length - numberOfLastDaysToShow;
-                    setTickCount(numberOfLastDaysToShow);
                     setVisibleData(fullTimeRangeData.slice(startIndex));
                     break;
 
@@ -351,7 +351,6 @@ const CandleStickChartDialog =
                 case X_AXIS_RESOLUTION.ONE_YEAR:
                 case X_AXIS_RESOLUTION.FIVE_YEARS:
                     startIndex = fullTimeRangeSevenDayData.length - numberOfLastDaysToShow;
-                    setTickCount(numberOfLastDaysToShow);
                     setVisibleData(fullTimeRangeSevenDayData.slice(startIndex));
                     break;
                 default:
@@ -359,8 +358,6 @@ const CandleStickChartDialog =
             }
 
             setStartIndex(startIndex ?? 0);
-            console.log("visibleData", visibleData[0]);
-            console.log("visibleData", visibleData[1]);
         }
 
         const handleMouseDown = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -380,7 +377,7 @@ const CandleStickChartDialog =
                 let newStartIndex = 0;
                 if (startIndex) {
                     newStartIndex = Math.max(0, startIndex - scrollAmount);
-                console.log('startIndex - scrollAmount', startIndex - scrollAmount);
+                    console.log('startIndex - scrollAmount', startIndex - scrollAmount);
                 }
                 console.log('newStartIndex', newStartIndex);
 

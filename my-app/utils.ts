@@ -137,8 +137,6 @@ export function isValidDate(dateString: string): boolean {
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
 export function findTsInDifferentFrequency(dateTs: string, tsSeries, xAxisResolution: X_AXIS_RESOLUTION, xKind: 'x1' | 'x2') {
-console.log("dateTs", dateTs);
-console.log("tsSeries", tsSeries);
     //x1 outside of the view
     const date = new Date(dateTs);
     const firstDateInView = new Date(tsSeries[0].ts);
