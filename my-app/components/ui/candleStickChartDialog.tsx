@@ -503,10 +503,18 @@ const CandleStickChartDialog =
                                 )
                             })}
 
+                            {/*off sample backtesting area*/}
                             <ReferenceArea yAxisId="1"
                                            x1={findTsInDifferentFrequency(props.strategy.backtestingOffSample.startDate, visibleData, xAxisResolution, 'x1')}
-                                           x2={visibleData[visibleData.length - 1].ts}
-                                           fill={"green"}
+                                           x2={findTsInDifferentFrequency(props.strategy.backtestingOffSample.endDate, visibleData, xAxisResolution, 'x2')}
+                                           fill={"grey"}
+                                           fillOpacity={0.1}/>
+
+                            {/*on sample backtesting area*/}
+                            <ReferenceArea yAxisId="1"
+                                           x1={findTsInDifferentFrequency(props.strategy.backtestingOnSample.startDate, visibleData, xAxisResolution, 'x1')}
+                                           x2={findTsInDifferentFrequency(props.strategy.backtestingOnSample.endDate, visibleData, xAxisResolution, 'x2')}
+                                           fill={"orange"}
                                            fillOpacity={0.1}/>
                         </BarChart>
                     </ResponsiveContainer>
