@@ -209,7 +209,7 @@ const EnhancedTradingAssetViewer = observer(() => {
         }
 
         useEffect(() => {
-            const tickSeries: SampleAssetData = generateData(new Date(startDate), new Date(), asset, 5);
+            const tickSeries: SampleAssetData = generateData(new Date('2019-10-01'), new Date(), asset, 5);
             const candleStickSeries: CandleStickChart[] = transformToCandleStickSeries(tickSeries, frequency) ?? [];
 
             setFullTimeRangeData(candleStickSeries);
