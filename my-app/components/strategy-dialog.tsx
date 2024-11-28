@@ -19,7 +19,7 @@ function addTradesToRecentTrades(recentTrades: TradingRule[], randomTrades: Trad
             startTime: trade.startTime,
             endTime: trade.endTime,
             asset: trade.asset,
-            profitNLoss: parseFloat((Math.random() * (0.009 - 0.001) + 0.001).toFixed(8)),
+            profitNLoss: trade.profitNLoss,
         } as TradingRule)
     })
 
