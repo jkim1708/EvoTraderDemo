@@ -10,6 +10,15 @@ import {TradingStrategy} from "@/store/RootStore";
 import {Switch} from "@/components/ui/switch";
 import {observer} from "mobx-react-lite";
 
+function isStartDateExistentAlready(randomDateRange: { startDate: Date; endDate: Date }[], startDate: Date) {
+    const foundDate = randomDateRange.find(date => {
+        return (date.startDate.toISOString().split('T')[0] === startDate.toISOString().split('T')[0]);
+    })
+
+    if (foundDate) return true;
+    return false;
+}
+
 //generate 10 random trades which have 1 day duration
 function generateRandomDateRange(offSampleTestStartDate: Date, offSampleTestEndDate: Date): {
     startDate: Date,
@@ -18,6 +27,9 @@ function generateRandomDateRange(offSampleTestStartDate: Date, offSampleTestEndD
     const randomDateRange: { startDate: Date, endDate: Date }[] = [] as { startDate: Date, endDate: Date }[];
     for (let i = 0; i < 10; i++) {
         const startDate = new Date(offSampleTestStartDate.getTime() + Math.random() * (offSampleTestEndDate.getTime() - offSampleTestStartDate.getTime()));
+        if(isStartDateExistentAlready(randomDateRange, startDate)) {
+         break;
+        }
         const endDate = new Date(addMinutesToDate(startDate, 60 * 24));
 
         randomDateRange.push({startDate, endDate});
@@ -32,7 +44,7 @@ function generateRandomTrades(strategy: TradingStrategy): TradingRule[] {
     const offSampleTestEndDate = new Date(strategy.backtestingOffSample.endDate);
     const randomDateRange = generateRandomDateRange(offSampleTestStartDate, offSampleTestEndDate);
     randomDateRange.forEach(dateRange => randomTrades.push({
-            kind: Math.floor(Math.random()*2.0) === 0 ? 'long' : 'short',
+            kind: Math.floor(Math.random() * 2.0) === 0 ? 'long' : 'short',
             startTime: convertToCustomDate(dateRange.startDate),
             endTime: convertToCustomDate(dateRange.endDate),
             asset: strategy.tradingRules[0].asset,
