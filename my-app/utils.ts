@@ -1,4 +1,4 @@
-import CandleStickChart, {ReferencedArea} from "@/components/ui/candleStickChart";
+import {ReferencedArea} from "@/components/ui/candleStickChart";
 import {X_AXIS_RESOLUTION} from "@/components/ui/candleStickChartDialog";
 
 export type SampleAssetData = {
@@ -58,8 +58,6 @@ export enum CANDLESTICK_FREQUENCY {
 }
 
 function extractDateTime(date: Date, frequency: CANDLESTICK_FREQUENCY): string {
-
-    const aggregateForEveryFourHour = frequency === CANDLESTICK_FREQUENCY.FOUR_HOURLY;
 
     const day = date.getDate();
     const dayStr = day < 10 ? "0" + day : day;
@@ -189,6 +187,34 @@ export function findTsInDifferentFrequency(dateTs: string, tsSeries, xAxisResolu
     }
 
 
+}
+
+export function isStartDateExistentAlready(randomDateRange: { startDate: Date; endDate: Date }[], startDate: Date) {
+    const foundDate = randomDateRange.find(date => {
+        return (date.startDate.toISOString().split('T')[0] === startDate.toISOString().split('T')[0]);
+    })
+
+    if (foundDate) return true;
+    return false;
+}
+
+
+//generate 10 random trades which have 1 day duration
+export function generateRandomDateRange(offSampleTestStartDate: Date, offSampleTestEndDate: Date): {
+    startDate: Date,
+    endDate: Date
+}[] {
+    const randomDateRange: { startDate: Date, endDate: Date }[] = [] as { startDate: Date, endDate: Date }[];
+    for (let i = 0; i < 10; i++) {
+        const startDate = new Date(offSampleTestStartDate.getTime() + Math.random() * (offSampleTestEndDate.getTime() - offSampleTestStartDate.getTime()));
+        if(isStartDateExistentAlready(randomDateRange, startDate)) {
+            break;
+        }
+        const endDate = new Date(addMinutesToDate(startDate, 60 * 24));
+
+        randomDateRange.push({startDate, endDate});
+    }
+    return randomDateRange;
 }
 
 export const isInExistingInReferenceArea = (referencedArea: ReferencedArea[], currentCursor: string) => {

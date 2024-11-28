@@ -22,7 +22,7 @@ import {
     CANDLESTICK_FREQUENCY,
     convertToCustomDate,
     convertToDate,
-    generateData,
+    generateData, generateRandomDateRange,
     isValidDate,
     SampleAssetData,
     transformToCandleStickSeries
@@ -264,7 +264,29 @@ const EnhancedTradingAssetViewer = observer(() => {
             setEditingTrade(null)
         }
 
-        function createTradingStrategy(param: {
+        function generateRandomTrades(startBacktestingOffSample: string,endBacktestingOffSample: string , asset: "EURUSD" | "USDJPY" | "GBPUSD" | "EURCHF" | "EURNOK"): TradingRule[] {
+            const randomTrades: TradingRule[] = [] as TradingRule[];
+            // const date = generateRandomDateFromLast5Years();
+            const offSampleTestStartDate = new Date(startBacktestingOffSample);
+            const offSampleTestEndDate = new Date(endBacktestingOffSample);
+            const randomDateRange = generateRandomDateRange(offSampleTestStartDate, offSampleTestEndDate);
+            randomDateRange.forEach(dateRange => randomTrades.push({
+                    kind: Math.floor(Math.random() * 2.0) === 0 ? 'long' : 'short',
+                    startTime: convertToCustomDate(dateRange.startDate),
+                    endTime: convertToCustomDate(dateRange.endDate),
+                    asset: asset,
+                    profitNLoss: parseFloat((Math.random() * (0.009 - 0.001) + 0.001).toFixed(8)),
+                })
+            )
+
+            if(randomTrades.length === 0) {
+                console.error("Could not generate random trades");
+            }
+            console.log('randomDateRange',randomDateRange);
+            return randomTrades;
+        }
+
+    function createTradingStrategy(param: {
             name: string;
             rules: TradingRule[],
             selectedStartDate: string;
@@ -288,7 +310,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                 backtestingOffSample: {
                     startDate: startBacktestingOffSample,
                     endDate: endBacktestingOffSample,
-                    trades: []
+                    trades: generateRandomTrades(startBacktestingOffSample,endBacktestingOffSample, asset as "EURUSD" | "USDJPY" | "GBPUSD" | "EURCHF" | "EURNOK"),
                 },
                 backtestingOnSample: {
                     startDate: data[0].ts.split(',')[0],

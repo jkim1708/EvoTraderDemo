@@ -4,55 +4,11 @@ import {X} from "lucide-react"
 import CandleStickChartDialog from "@/components/ui/candleStickChartDialog";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {TradingRule} from "@/store/TradingRuleStore";
-import {addMinutesToDate, convertToCustomDate} from "@/utils";
 import React from "react";
 import {TradingStrategy} from "@/store/RootStore";
 import {Switch} from "@/components/ui/switch";
 import {observer} from "mobx-react-lite";
 
-function isStartDateExistentAlready(randomDateRange: { startDate: Date; endDate: Date }[], startDate: Date) {
-    const foundDate = randomDateRange.find(date => {
-        return (date.startDate.toISOString().split('T')[0] === startDate.toISOString().split('T')[0]);
-    })
-
-    if (foundDate) return true;
-    return false;
-}
-
-//generate 10 random trades which have 1 day duration
-function generateRandomDateRange(offSampleTestStartDate: Date, offSampleTestEndDate: Date): {
-    startDate: Date,
-    endDate: Date
-}[] {
-    const randomDateRange: { startDate: Date, endDate: Date }[] = [] as { startDate: Date, endDate: Date }[];
-    for (let i = 0; i < 10; i++) {
-        const startDate = new Date(offSampleTestStartDate.getTime() + Math.random() * (offSampleTestEndDate.getTime() - offSampleTestStartDate.getTime()));
-        if(isStartDateExistentAlready(randomDateRange, startDate)) {
-         break;
-        }
-        const endDate = new Date(addMinutesToDate(startDate, 60 * 24));
-
-        randomDateRange.push({startDate, endDate});
-    }
-    return randomDateRange;
-}
-
-function generateRandomTrades(strategy: TradingStrategy): TradingRule[] {
-    const randomTrades: TradingRule[] = [] as TradingRule[];
-    // const date = generateRandomDateFromLast5Years();
-    const offSampleTestStartDate = new Date(strategy.backtestingOffSample.startDate);
-    const offSampleTestEndDate = new Date(strategy.backtestingOffSample.endDate);
-    const randomDateRange = generateRandomDateRange(offSampleTestStartDate, offSampleTestEndDate);
-    randomDateRange.forEach(dateRange => randomTrades.push({
-            kind: Math.floor(Math.random() * 2.0) === 0 ? 'long' : 'short',
-            startTime: convertToCustomDate(dateRange.startDate),
-            endTime: convertToCustomDate(dateRange.endDate),
-            asset: strategy.tradingRules[0].asset,
-            profitNLoss: parseFloat((Math.random() * (0.009 - 0.001) + 0.001).toFixed(8)),
-        })
-    )
-    return randomTrades;
-}
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 function addTradesToRecentTrades(recentTrades: TradingRule[], randomTrades: TradingRule[]) {
@@ -62,7 +18,7 @@ function addTradesToRecentTrades(recentTrades: TradingRule[], randomTrades: Trad
             kind: trade.kind,
             startTime: trade.startTime,
             endTime: trade.endTime,
-            asset: 'EURUSD',
+            asset: trade.asset,
             profitNLoss: parseFloat((Math.random() * (0.009 - 0.001) + 0.001).toFixed(8)),
         } as TradingRule)
     })
@@ -78,14 +34,11 @@ const StrategyDialog = observer((props: StrategyDialogProps) => {
 
     const {strategy, onClose} = props;
 
-    let backtestingOffSampleTrades: TradingRule[];
-
     const recentTrades = [...strategy.tradingRules];
 
-    backtestingOffSampleTrades = strategy.backtestingOffSample.trades ?? [];
+    const backtestingOffSampleTrades: TradingRule[] = strategy.backtestingOffSample.trades;
 
-    if (backtestingOffSampleTrades.length == 0) {
-        backtestingOffSampleTrades = generateRandomTrades(strategy);
+    if (backtestingOffSampleTrades.length != 0) {
         addTradesToRecentTrades(recentTrades, backtestingOffSampleTrades);
     }
 
