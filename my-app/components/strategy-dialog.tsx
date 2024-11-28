@@ -5,7 +5,7 @@ import CandleStickChartDialog from "@/components/ui/candleStickChartDialog";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {TradingRule} from "@/store/TradingRuleStore";
 import {addMinutesToDate, convertToCustomDate} from "@/utils";
-import React from "react";
+import React, {useEffect} from "react";
 import {TradingStrategy} from "@/store/RootStore";
 import {Switch} from "@/components/ui/switch";
 import {observer} from "mobx-react-lite";
@@ -66,14 +66,20 @@ const StrategyDialog = observer((props: StrategyDialogProps) => {
 
     const {strategy, onClose} = props;
 
-    const recentTrades = [...strategy.tradingRules];
+    let recentTrades;
 
-    let backtestingOffSampleTrades: TradingRule[] = strategy.backtestingOffSample.trades ?? [];
+    let backtestingOffSampleTrades: TradingRule[];
 
-    if (backtestingOffSampleTrades.length == 0) {
-        backtestingOffSampleTrades = generateRandomTrades(strategy);
-        addTradesToRecentTrades(recentTrades, backtestingOffSampleTrades);
-    }
+    useEffect(() => {
+        recentTrades = [...strategy.tradingRules];
+
+        backtestingOffSampleTrades = strategy.backtestingOffSample.trades ?? [];
+
+        if (backtestingOffSampleTrades.length == 0) {
+            backtestingOffSampleTrades = generateRandomTrades(strategy);
+            addTradesToRecentTrades(recentTrades, backtestingOffSampleTrades);
+        }
+    }, []);
 
 
     return (
@@ -128,7 +134,7 @@ const StrategyDialog = observer((props: StrategyDialogProps) => {
                             generatedData={strategy.underline}
                             randomTrades={recentTrades}
                             strategy={strategy}
-                            />
+                        />
                     </div>
 
                     <div className="space-y-4">
