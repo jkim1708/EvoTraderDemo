@@ -1,5 +1,4 @@
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table"
-import {Switch} from "@/components/ui/switch"
 import {Button} from "@/components/ui/button"
 import {useStores} from "@/store/Provider";
 import {TradingStrategy} from "@/store/RootStore";

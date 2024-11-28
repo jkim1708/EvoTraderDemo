@@ -92,6 +92,7 @@ const StrategyManagement = observer(() => {
             {selectedStrategy && (
                 <StrategyDialog
                     strategy={selectedStrategy}
+
                     onClose={() => setSelectedStrategy(null)}
                 />
             )}

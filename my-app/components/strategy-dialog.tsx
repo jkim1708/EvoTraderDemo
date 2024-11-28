@@ -5,7 +5,7 @@ import CandleStickChartDialog from "@/components/ui/candleStickChartDialog";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {TradingRule} from "@/store/TradingRuleStore";
 import {addMinutesToDate, convertToCustomDate} from "@/utils";
-import React, {useEffect} from "react";
+import React from "react";
 import {TradingStrategy} from "@/store/RootStore";
 import {Switch} from "@/components/ui/switch";
 import {observer} from "mobx-react-lite";
@@ -32,7 +32,7 @@ function generateRandomTrades(strategy: TradingStrategy): TradingRule[] {
     const offSampleTestEndDate = new Date(strategy.backtestingOffSample.endDate);
     const randomDateRange = generateRandomDateRange(offSampleTestStartDate, offSampleTestEndDate);
     randomDateRange.forEach(dateRange => randomTrades.push({
-            kind: 'short',
+            kind: Math.floor(Math.random()*2.0) === 0 ? 'long' : 'short',
             startTime: convertToCustomDate(dateRange.startDate),
             endTime: convertToCustomDate(dateRange.endDate),
             asset: strategy.tradingRules[0].asset,
@@ -66,18 +66,16 @@ const StrategyDialog = observer((props: StrategyDialogProps) => {
 
     const {strategy, onClose} = props;
 
-    let recentTrades;
-
     let backtestingOffSampleTrades: TradingRule[];
 
-        recentTrades = [...strategy.tradingRules];
+    const recentTrades = [...strategy.tradingRules];
 
-        backtestingOffSampleTrades = strategy.backtestingOffSample.trades ?? [];
+    backtestingOffSampleTrades = strategy.backtestingOffSample.trades ?? [];
 
-        if (backtestingOffSampleTrades.length == 0) {
-            backtestingOffSampleTrades = generateRandomTrades(strategy);
-            addTradesToRecentTrades(recentTrades, backtestingOffSampleTrades);
-        }
+    if (backtestingOffSampleTrades.length == 0) {
+        backtestingOffSampleTrades = generateRandomTrades(strategy);
+        addTradesToRecentTrades(recentTrades, backtestingOffSampleTrades);
+    }
 
 
     return (
