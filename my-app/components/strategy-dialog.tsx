@@ -70,7 +70,6 @@ const StrategyDialog = observer((props: StrategyDialogProps) => {
 
     let backtestingOffSampleTrades: TradingRule[];
 
-    useEffect(() => {
         recentTrades = [...strategy.tradingRules];
 
         backtestingOffSampleTrades = strategy.backtestingOffSample.trades ?? [];
@@ -79,7 +78,6 @@ const StrategyDialog = observer((props: StrategyDialogProps) => {
             backtestingOffSampleTrades = generateRandomTrades(strategy);
             addTradesToRecentTrades(recentTrades, backtestingOffSampleTrades);
         }
-    }, [strategy.name]);
 
 
     return (
