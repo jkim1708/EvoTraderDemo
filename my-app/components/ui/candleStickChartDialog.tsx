@@ -530,36 +530,43 @@ const CandleStickChartDialog =
                 <div className="flex space-x-4 mb-4 tradeKindButton">
                     < Button
                         onClick={() => handleDButton(X_AXIS_RESOLUTION.ONE_DAY)}
+                        {...xAxisResolution==X_AXIS_RESOLUTION.ONE_DAY ? {}: {variant : "outline"}}
                     >
                         1D
                     </Button>
                     < Button
                         onClick={() => handleDButton(X_AXIS_RESOLUTION.FIVE_DAYS)}
+                        {...xAxisResolution==X_AXIS_RESOLUTION.FIVE_DAYS ? {}: {variant : "outline"}}
                     >
                         5D
                     </Button>
                     < Button
                         onClick={() => handleDButton(X_AXIS_RESOLUTION.ONE_MONTH)}
+                        {...xAxisResolution==X_AXIS_RESOLUTION.ONE_MONTH ? {}: {variant : "outline"}}
                     >
                         1M
                     </Button>
                     < Button
                         onClick={() => handleDButton(X_AXIS_RESOLUTION.THREE_MONTH)}
+                        {...xAxisResolution==X_AXIS_RESOLUTION.THREE_MONTH ? {}: {variant : "outline"}}
                     >
                         3M
                     </Button>
                     < Button
                         onClick={() => handleDButton(X_AXIS_RESOLUTION.SIX_MONTH)}
+                        {...xAxisResolution==X_AXIS_RESOLUTION.SIX_MONTH ? {}: {variant : "outline"}}
                     >
                         6M
                     </Button>
                     < Button
                         onClick={() => handleDButton(X_AXIS_RESOLUTION.ONE_YEAR)}
+                        {...xAxisResolution==X_AXIS_RESOLUTION.ONE_YEAR ? {}: {variant : "outline"}}
                     >
                         1Y
                     </Button>
                     < Button
                         onClick={() => handleDButton(X_AXIS_RESOLUTION.FIVE_YEARS)}
+                        {...xAxisResolution==X_AXIS_RESOLUTION.FIVE_YEARS? {}: {variant : "outline"}}
                     >
                         5Y
                     </Button>

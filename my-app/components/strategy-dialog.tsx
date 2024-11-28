@@ -79,7 +79,7 @@ const StrategyDialog = observer((props: StrategyDialogProps) => {
             backtestingOffSampleTrades = generateRandomTrades(strategy);
             addTradesToRecentTrades(recentTrades, backtestingOffSampleTrades);
         }
-    }, []);
+    }, [strategy.name]);
 
 
     return (
