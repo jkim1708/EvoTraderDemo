@@ -114,14 +114,12 @@ interface CandleStickChartAnalyze {
     open: string,
     close: string,
     ts: string,
-    trade: Trade,
 }
 
-export type CandleStickChartAnalyzeProps = {
+export type CandleStickChartProps = {
     generatedData: CandleStickChartAnalyze[],
     randomTrades: TradingRule[],
     strategy: TradingStrategy,
-    asset: string,
 }
 
 type CustomizedTickProps = {
@@ -278,7 +276,7 @@ function randomlyAssignTradeToAnyData(preparedData: {
 }
 
 const CandleStickChartDialog =
-    observer((props: CandleStickChartAnalyzeProps) => {
+    observer((props: CandleStickChartProps) => {
 
         const [xAxisResolution, setXAxisResolution] = useState(X_AXIS_RESOLUTION.FIVE_YEARS); // Bereich der X-Achse
         const [isDragging, setIsDragging] = useState(false); // Bereich der X-Achse
@@ -305,7 +303,7 @@ const CandleStickChartDialog =
             trade: Trade | null,
         } []>(sevenDayData); // Bereich der X-Achse
 
-        const asset = props.asset;
+        const asset = props.strategy.tradingRules[0].asset;
 
         const CustomTooltipCursor = ({x, y, height}: { x: string, y: string, height: string }) => (
             <path

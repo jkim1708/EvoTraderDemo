@@ -1,7 +1,7 @@
 import {Button} from "@/components/ui/button"
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table"
 import {X} from "lucide-react"
-import CandleStickChartDialog, {Trade} from "@/components/ui/candleStickChartDialog";
+import CandleStickChartDialog from "@/components/ui/candleStickChartDialog";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {TradingRule} from "@/store/TradingRuleStore";
 import {addMinutesToDate, convertToCustomDate} from "@/utils";
@@ -25,30 +25,31 @@ function generateRandomDateRange(offSampleTestStartDate: Date, offSampleTestEndD
     return randomDateRange;
 }
 
-function generateRandomTrades(strategy: TradingStrategy): Trade[] {
-    const randomTrades: Trade[] = [] as Trade[];
+function generateRandomTrades(strategy: TradingStrategy): TradingRule[] {
+    const randomTrades: TradingRule[] = [] as TradingRule[];
     // const date = generateRandomDateFromLast5Years();
     const offSampleTestStartDate = new Date(strategy.backtestingOffSample.startDate);
     const offSampleTestEndDate = new Date(strategy.backtestingOffSample.endDate);
     const randomDateRange = generateRandomDateRange(offSampleTestStartDate, offSampleTestEndDate);
     randomDateRange.forEach(dateRange => randomTrades.push({
             kind: 'short',
-            ts: convertToCustomDate(dateRange.startDate),
-            tsEnd: convertToCustomDate(dateRange.endDate),
-            entryPrice: 1,
+            startTime: convertToCustomDate(dateRange.startDate),
+            endTime: convertToCustomDate(dateRange.endDate),
+            asset: strategy.tradingRules[0].asset,
+            profitNLoss: parseFloat((Math.random() * (0.009 - 0.001) + 0.001).toFixed(8)),
         })
     )
     return randomTrades;
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-function addTradesToRecentTrades(recentTrades: TradingRule[], randomTrades: Trade[]) {
+function addTradesToRecentTrades(recentTrades: TradingRule[], randomTrades: TradingRule[]) {
     randomTrades.slice(0, 1);
-    randomTrades.forEach((trade: Trade) => {
+    randomTrades.forEach((trade: TradingRule) => {
         recentTrades.push({
             kind: trade.kind,
-            startTime: trade.ts,
-            endTime: trade.tsEnd,
+            startTime: trade.startTime,
+            endTime: trade.endTime,
             asset: 'EURUSD',
             profitNLoss: parseFloat((Math.random() * (0.009 - 0.001) + 0.001).toFixed(8)),
         } as TradingRule)
@@ -56,13 +57,18 @@ function addTradesToRecentTrades(recentTrades: TradingRule[], randomTrades: Trad
 
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
-const StrategyDialog = observer(({strategy, onClose}) => {
+export type StrategyDialogProps = {
+    strategy: TradingStrategy,
+    onClose: () => void,
+}
+
+const StrategyDialog = observer((props: StrategyDialogProps) => {
+
+    const {strategy, onClose} = props;
 
     const recentTrades = [...strategy.tradingRules];
 
-    let backtestingOffSampleTrades: Trade[] = strategy.backtestingOffSample.trades ?? [];
+    let backtestingOffSampleTrades: TradingRule[] = strategy.backtestingOffSample.trades ?? [];
 
     if (backtestingOffSampleTrades.length == 0) {
         backtestingOffSampleTrades = generateRandomTrades(strategy);
@@ -96,7 +102,7 @@ const StrategyDialog = observer(({strategy, onClose}) => {
                     </Button>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                    {strategy.asset} - {strategy.indicators.join(', ')}
+                    {strategy.tradingRules[0].asset} - {strategy.indicators.join(', ')}
                 </p>
 
             </CardHeader>
@@ -122,7 +128,7 @@ const StrategyDialog = observer(({strategy, onClose}) => {
                             generatedData={strategy.underline}
                             randomTrades={recentTrades}
                             strategy={strategy}
-                            asset="EURUSD"/>
+                            />
                     </div>
 
                     <div className="space-y-4">
