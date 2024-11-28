@@ -22,7 +22,6 @@ function addTradesToRecentTrades(recentTrades: TradingRule[], randomTrades: Trad
             profitNLoss: trade.profitNLoss,
         } as TradingRule)
     })
-
 }
 
 export type StrategyDialogProps = {

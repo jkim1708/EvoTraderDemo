@@ -412,9 +412,70 @@ const CandleStickChartDialog =
             event.preventDefault();
         }, []);
 
-        console.log('props.strategy.backtestingOnSample.startDate', props.strategy.backtestingOnSample.startDate);
-        console.log('props.randomTrades[1]', props.randomTrades[1]);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        function isOutsideOfRange(fullTimeRangeData, startIndex, xAxisResolution: X_AXIS_RESOLUTION.ONE_DAY | X_AXIS_RESOLUTION.FIVE_DAYS | X_AXIS_RESOLUTION.ONE_MONTH | X_AXIS_RESOLUTION.THREE_MONTH | X_AXIS_RESOLUTION.SIX_MONTH | X_AXIS_RESOLUTION.ONE_YEAR | X_AXIS_RESOLUTION.FIVE_YEARS) {
+            return ((startIndex + xAxisResolution) > fullTimeRangeData.length)
+        }
 
+
+
+        function findClosestDateIndex(fullTimeRangeSevenDayData: {
+            ts: string;
+            low: string;
+            high: string;
+            open: number;
+            close: number;
+            lowHigh: [number, number];
+            openClose: [number, number];
+            trade: Trade | null
+        }[], value: Date) {
+            let resultIndex;
+            fullTimeRangeSevenDayData.forEach((data, index) => {
+                if ((new Date(data.ts.split(',')[0]).getTime() < value.getTime()) && (value.getTime() < new Date(fullTimeRangeSevenDayData[index+1].ts.split(',')[0]).getTime())) {
+                    resultIndex =  index;
+                }
+            });
+
+            return resultIndex;
+        }
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        const handleStartDateChange = (e) => {
+            setStartDate(e.target.value)
+            let end;
+            let startIndex;
+            switch (xAxisResolution) {
+                case X_AXIS_RESOLUTION.ONE_DAY:
+                case X_AXIS_RESOLUTION.FIVE_DAYS:
+                case X_AXIS_RESOLUTION.ONE_MONTH:
+                case X_AXIS_RESOLUTION.THREE_MONTH:
+                case X_AXIS_RESOLUTION.SIX_MONTH:
+                    startIndex = fullTimeRangeData.findIndex((d) => d.ts.split(',')[0].trim() === e.target.value);
+                    end = isOutsideOfRange(fullTimeRangeData, startIndex, xAxisResolution) ? (fullTimeRangeData.length - 1) : (startIndex + xAxisResolution);
+                    setVisibleData(fullTimeRangeData.slice(startIndex, end));
+                    break;
+
+                case X_AXIS_RESOLUTION.ONE_YEAR:
+                case X_AXIS_RESOLUTION.FIVE_YEARS:
+                    //needed because dates from calendar might not be in the chart since in years range view we have a ffrequency of 7 days
+                    startIndex = findClosestDateIndex(fullTimeRangeSevenDayData, new Date(e.target.value));
+                    end = isOutsideOfRange(fullTimeRangeSevenDayData, startIndex, xAxisResolution) ? (fullTimeRangeSevenDayData.length - 1) : (startIndex + xAxisResolution);
+                    setVisibleData(fullTimeRangeSevenDayData.slice(startIndex, end));
+                    break;
+                default:
+                    console.error('invalid x axis resolution');
+            }
+
+            setTickCount(visibleData.length);
+            setStartIndex(startIndex ?? 0);
+
+            console.log('end',end);
+            console.log('startIndex',startIndex);
+            console.log('fullTimeRangeSevenDayData.slice(startIndex, end)', fullTimeRangeSevenDayData.slice(startIndex, end));
+
+        };
         return (
             <div>
                 <div className="flex-1">
@@ -423,30 +484,7 @@ const CandleStickChartDialog =
                         id="startDate"
                         type="date"
                         value={startDate}
-                        onChange={(e) => {
-                            setStartDate(e.target.value)
-                            let startIndex;
-                            switch (xAxisResolution) {
-                                case X_AXIS_RESOLUTION.ONE_DAY:
-                                case X_AXIS_RESOLUTION.FIVE_DAYS:
-                                case X_AXIS_RESOLUTION.ONE_MONTH:
-                                case X_AXIS_RESOLUTION.THREE_MONTH:
-                                case X_AXIS_RESOLUTION.SIX_MONTH:
-                                    startIndex = fullTimeRangeData.findIndex((d) => d.ts.split(',')[0].trim() === e.target.value);
-                                    setTickCount(fullTimeRangeData.length);
-                                    setVisibleData(fullTimeRangeData.slice(startIndex, startIndex + xAxisResolution));
-                                    break;
-
-                                case X_AXIS_RESOLUTION.ONE_YEAR:
-                                case X_AXIS_RESOLUTION.FIVE_YEARS:
-                                    startIndex = fullTimeRangeSevenDayData.findIndex((d) => d.ts.split(',')[0].trim() === e.target.value);
-                                    setTickCount(fullTimeRangeSevenDayData.length);
-                                    setVisibleData(fullTimeRangeSevenDayData.slice(startIndex, startIndex + xAxisResolution));
-                                    break;
-                                default:
-                                    console.error('invalid x axis resolution');
-                            }
-                        }}
+                        onChange={handleStartDateChange}
                         max={new Date().toISOString().split('T')[0]}
                     />
                 </div>
@@ -530,43 +568,43 @@ const CandleStickChartDialog =
                 <div className="flex space-x-4 mb-4 tradeKindButton">
                     < Button
                         onClick={() => handleDButton(X_AXIS_RESOLUTION.ONE_DAY)}
-                        {...xAxisResolution==X_AXIS_RESOLUTION.ONE_DAY ? {}: {variant : "outline"}}
+                        {...xAxisResolution == X_AXIS_RESOLUTION.ONE_DAY ? {} : {variant: "outline"}}
                     >
                         1D
                     </Button>
                     < Button
                         onClick={() => handleDButton(X_AXIS_RESOLUTION.FIVE_DAYS)}
-                        {...xAxisResolution==X_AXIS_RESOLUTION.FIVE_DAYS ? {}: {variant : "outline"}}
+                        {...xAxisResolution == X_AXIS_RESOLUTION.FIVE_DAYS ? {} : {variant: "outline"}}
                     >
                         5D
                     </Button>
                     < Button
                         onClick={() => handleDButton(X_AXIS_RESOLUTION.ONE_MONTH)}
-                        {...xAxisResolution==X_AXIS_RESOLUTION.ONE_MONTH ? {}: {variant : "outline"}}
+                        {...xAxisResolution == X_AXIS_RESOLUTION.ONE_MONTH ? {} : {variant: "outline"}}
                     >
                         1M
                     </Button>
                     < Button
                         onClick={() => handleDButton(X_AXIS_RESOLUTION.THREE_MONTH)}
-                        {...xAxisResolution==X_AXIS_RESOLUTION.THREE_MONTH ? {}: {variant : "outline"}}
+                        {...xAxisResolution == X_AXIS_RESOLUTION.THREE_MONTH ? {} : {variant: "outline"}}
                     >
                         3M
                     </Button>
                     < Button
                         onClick={() => handleDButton(X_AXIS_RESOLUTION.SIX_MONTH)}
-                        {...xAxisResolution==X_AXIS_RESOLUTION.SIX_MONTH ? {}: {variant : "outline"}}
+                        {...xAxisResolution == X_AXIS_RESOLUTION.SIX_MONTH ? {} : {variant: "outline"}}
                     >
                         6M
                     </Button>
                     < Button
                         onClick={() => handleDButton(X_AXIS_RESOLUTION.ONE_YEAR)}
-                        {...xAxisResolution==X_AXIS_RESOLUTION.ONE_YEAR ? {}: {variant : "outline"}}
+                        {...xAxisResolution == X_AXIS_RESOLUTION.ONE_YEAR ? {} : {variant: "outline"}}
                     >
                         1Y
                     </Button>
                     < Button
                         onClick={() => handleDButton(X_AXIS_RESOLUTION.FIVE_YEARS)}
-                        {...xAxisResolution==X_AXIS_RESOLUTION.FIVE_YEARS? {}: {variant : "outline"}}
+                        {...xAxisResolution == X_AXIS_RESOLUTION.FIVE_YEARS ? {} : {variant: "outline"}}
                     >
                         5Y
                     </Button>
