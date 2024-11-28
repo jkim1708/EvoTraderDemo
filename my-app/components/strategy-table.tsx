@@ -103,7 +103,6 @@ const StrategyTable = observer(({onAnalyze}: { onAnalyze: (strategy: TradingStra
                 <TableHead>Profit Factor</TableHead>
                 <TableHead>Sharpe Ratio</TableHead>
                 <TableHead>Broker</TableHead>
-                <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
             </TableRow>
         </TableHeader>
@@ -125,13 +124,6 @@ const StrategyTable = observer(({onAnalyze}: { onAnalyze: (strategy: TradingStra
                 <TableCell>{strategy.profitFactor}</TableCell>
                 <TableCell>{strategy.sharpeRatio}</TableCell>
                 <TableCell>Lemon Markets</TableCell>
-                <TableCell>
-                    <Switch checked={(strategy.status === "active")}
-                            onClick={() => {
-                                strategy.status = (strategy.status === "inactive") ? "active" : "inactive"
-                            }}
-                    />
-                </TableCell>
                 <TableCell>
                     <div className="space-x-2">
                         <Button variant="outline" onClick={() => onAnalyze(strategy)}>

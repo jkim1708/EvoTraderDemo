@@ -7,6 +7,8 @@ import {TradingRule} from "@/store/TradingRuleStore";
 import {addMinutesToDate, convertToCustomDate} from "@/utils";
 import React from "react";
 import {TradingStrategy} from "@/store/RootStore";
+import {Switch} from "@/components/ui/switch";
+import {observer} from "mobx-react-lite";
 
 //generate 10 random trades which have 1 day duration
 function generateRandomDateRange(offSampleTestStartDate: Date, offSampleTestEndDate: Date): {
@@ -56,7 +58,7 @@ function addTradesToRecentTrades(recentTrades: TradingRule[], randomTrades: Trad
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
-export default function StrategyDialog({strategy, onClose}) {
+const StrategyDialog = observer(({strategy, onClose}) => {
 
     const recentTrades = [...strategy.tradingRules];
 
@@ -79,6 +81,16 @@ export default function StrategyDialog({strategy, onClose}) {
                         </div>}
 
                     </CardTitle>
+                    <div className="space-x-6">
+                        <p>
+                            Live Trading
+                        </p>
+                        <Switch checked={(strategy.status === "active")}
+                                onClick={() => {
+                                    strategy.status = (strategy.status === "inactive") ? "active" : "inactive"
+                                }}
+                        />
+                    </div>
                     <Button variant="ghost" size="icon" onClick={onClose}>
                         <X className="h-4 w-4"/>
                     </Button>
@@ -145,4 +157,6 @@ export default function StrategyDialog({strategy, onClose}) {
             </CardContent>
         </Card>
     )
-};
+});
+
+export default StrategyDialog;
