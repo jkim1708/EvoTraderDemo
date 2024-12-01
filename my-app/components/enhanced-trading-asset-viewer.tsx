@@ -209,7 +209,7 @@ const EnhancedTradingAssetViewer = observer(() => {
         }
 
         useEffect(() => {
-            const tickSeries: SampleAssetData = generateData(new Date('2019-10-01'), new Date(), asset, 5);
+            const tickSeries: SampleAssetData = generateData(new Date('2019-10-01'), new Date(), asset, 15);
             const candleStickSeries: CandleStickChart[] = transformToCandleStickSeries(tickSeries, frequency) ?? [];
 
             setFullTimeRangeData(candleStickSeries);
@@ -282,7 +282,6 @@ const EnhancedTradingAssetViewer = observer(() => {
             if(randomTrades.length === 0) {
                 console.error("Could not generate random trades");
             }
-            console.log('randomDateRange',randomDateRange);
             return randomTrades;
         }
 

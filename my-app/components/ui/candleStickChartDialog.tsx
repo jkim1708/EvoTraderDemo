@@ -328,33 +328,40 @@ const CandleStickChartDialog =
         }
 
 
-        function handleDButton(numberOfLastDaysToShow: X_AXIS_RESOLUTION): void {
-
-            setXAxisResolution(numberOfLastDaysToShow);
-            setTickCount(numberOfLastDaysToShow);
-
+        function handleDButton(numberOfLastDaysToShow: X_AXIS_RESOLUTION) {
             let startIndex;
 
-            switch (numberOfLastDaysToShow) {
-                case X_AXIS_RESOLUTION.ONE_DAY:
-                case X_AXIS_RESOLUTION.FIVE_DAYS:
-                case X_AXIS_RESOLUTION.ONE_MONTH:
-                case X_AXIS_RESOLUTION.THREE_MONTH:
-                case X_AXIS_RESOLUTION.SIX_MONTH:
-                    startIndex = fullTimeRangeData.length - numberOfLastDaysToShow;
-                    setVisibleData(fullTimeRangeData.slice(startIndex));
-                    break;
+            const runAsync =     () => {
+                switch (numberOfLastDaysToShow) {
+                    case X_AXIS_RESOLUTION.ONE_DAY:
+                    case X_AXIS_RESOLUTION.FIVE_DAYS:
+                    case X_AXIS_RESOLUTION.ONE_MONTH:
+                    case X_AXIS_RESOLUTION.THREE_MONTH:
+                        startIndex = fullTimeRangeData.length - numberOfLastDaysToShow;
+                        setVisibleData(fullTimeRangeData.slice(startIndex));
+                        break;
+                    case X_AXIS_RESOLUTION.SIX_MONTH:
+                        startIndex = fullTimeRangeData.length - numberOfLastDaysToShow;
+                        //set visible range and take out every 3rd element
+                        const thirdRangeData = fullTimeRangeData.slice(startIndex).filter((_, i) => {return i % 3 === 0});
+                        setVisibleData(thirdRangeData);
+                        break;
 
-                case X_AXIS_RESOLUTION.ONE_YEAR:
-                case X_AXIS_RESOLUTION.FIVE_YEARS:
-                    startIndex = fullTimeRangeSevenDayData.length - numberOfLastDaysToShow;
-                    setVisibleData(fullTimeRangeSevenDayData.slice(startIndex));
-                    break;
-                default:
-                    console.error('invalid x axis resolution');
+                    case X_AXIS_RESOLUTION.ONE_YEAR:
+                    case X_AXIS_RESOLUTION.FIVE_YEARS:
+                        startIndex = fullTimeRangeSevenDayData.length - numberOfLastDaysToShow;
+                        setVisibleData(fullTimeRangeSevenDayData.slice(startIndex));
+                        break;
+                    default:
+                        console.error('invalid x axis resolution');
+                }
             }
 
-            setStartIndex(startIndex ?? 0);
+            runAsync();
+            setXAxisResolution(numberOfLastDaysToShow);
+            setTickCount(numberOfLastDaysToShow);
+            if(startIndex) setStartIndex(startIndex);
+
         }
 
         const handleMouseDown = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -365,18 +372,14 @@ const CandleStickChartDialog =
             }
         }, []);
 
-        const handleMouseMove = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        const handleMouseMove = useCallback(async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
             if (isDragging) {
                 const deltaX = event.clientX - lastMouseX;
                 const scrollAmount = Math.round(deltaX / 5); // Adjust sensitivity here
-                console.log('scrollAmount', scrollAmount);
-                console.log('startIndex', startIndex);
                 let newStartIndex = 0;
                 if (startIndex) {
                     newStartIndex = Math.max(0, startIndex - scrollAmount);
-                    console.log('startIndex - scrollAmount', startIndex - scrollAmount);
                 }
-                console.log('newStartIndex', newStartIndex);
 
                 setLastMouseX(event.clientX);
                 switch (xAxisResolution) {
@@ -387,13 +390,11 @@ const CandleStickChartDialog =
                     case X_AXIS_RESOLUTION.SIX_MONTH:
                         const slice = fullTimeRangeData.slice(newStartIndex, newStartIndex + xAxisResolution);
                         setVisibleData(slice);
-                        console.log('slice', slice);
                         break;
 
                     case X_AXIS_RESOLUTION.ONE_YEAR:
                     case X_AXIS_RESOLUTION.FIVE_YEARS:
                         const slice1 = fullTimeRangeSevenDayData.slice(newStartIndex, newStartIndex + xAxisResolution);
-                        console.log('slice1', slice1);
                         setVisibleData(slice1);
                         break;
                     default:
@@ -471,10 +472,6 @@ const CandleStickChartDialog =
             setTickCount(visibleData.length);
             setStartIndex(startIndex ?? 0);
 
-            console.log('end',end);
-            console.log('startIndex',startIndex);
-            console.log('fullTimeRangeSevenDayData.slice(startIndex, end)', fullTimeRangeSevenDayData.slice(startIndex, end));
-
         };
         return (
             <div>
@@ -513,7 +510,9 @@ const CandleStickChartDialog =
                             data={visibleData}
                             margin={{top: 20, right: 30, left: 20, bottom: 20}}
                         >
-                            <XAxis dataKey="ts" tickCount={tickCount} tick={CustomizedTick} padding={{'left': 5}}/>
+                            <XAxis dataKey="ts" tickCount={tickCount}
+                                   tick={CustomizedTick}
+                                   padding={{'left': 5}}/>
                             <YAxis yAxisId="1" dataKey="lowHigh" domain={['auto', 'auto']} allowDecimals={true}/>
                             <CartesianGrid strokeDasharray="3 3"/>
                             <Bar
@@ -526,20 +525,8 @@ const CandleStickChartDialog =
 
                             {/*// eslint-disable-next-line @typescript-eslint/ban-ts-comment*/}
                             {/*// @ts-expect-error take care later*/}
-                            <Tooltip content={customTooltipContent}
+                            <Tooltip content={customTooltipContent} cursor={<CustomTooltipCursor/>}
                                      position={{x: 100, y: -25}} offset={20}/>
-
-                            {/*{trades.map((trade, index) => {*/}
-                            {/*    return (*/}
-                            {/*        <ReferenceArea key={index} yAxisId="1" x1={findTsInDifferentFrequency(trade.ts, visibleData, xAxisResolution, 'x1')} x2={findTsInDifferentFrequency(trade.tsEnd, visibleData, xAxisResolution, 'x2')}*/}
-                            {/*                       fill={trade.kind == 'long' ? "blue" : "red"}*/}
-                            {/*                       fillOpacity={0.1}/>*/}
-                            {/*    )*/}
-                            {/*})}*/}
-
-                            {/*return (*/}
-
-                            {/*)*/}
 
                             {/*off sample backtesting area*/}
                             <ReferenceArea yAxisId="1"
