@@ -526,7 +526,7 @@ const CandleStickChartDialog =
 
                             {/*// eslint-disable-next-line @typescript-eslint/ban-ts-comment*/}
                             {/*// @ts-expect-error take care later*/}
-                            <Tooltip cursor={<CustomTooltipCursor/>} content={customTooltipContent}
+                            <Tooltip content={customTooltipContent}
                                      position={{x: 100, y: -25}} offset={20}/>
 
                             {/*{trades.map((trade, index) => {*/}
