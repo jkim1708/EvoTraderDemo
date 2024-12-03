@@ -111,7 +111,7 @@ const StrategyDialog = observer((props: StrategyDialogProps) => {
                             <TableBody>
                                 {recentTrades.map((trade: TradingRule, index: number) => (
                                     <TableRow key={index}>
-                                        <TableCell>{trade.kind}</TableCell>
+                                        <TableCell className={trade.kind=="short" ? "text-red-500":"text-green-500"}>{trade.kind}</TableCell>
                                         <TableCell>{trade.startTime}</TableCell>
                                         <TableCell>{""}</TableCell>
                                         <TableCell>{trade.endTime}</TableCell>
