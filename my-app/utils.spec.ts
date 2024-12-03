@@ -1,5 +1,5 @@
 import {describe} from "@jest/globals";
-import {isStartDateExistentAlready} from "@/utils";
+import {generateRandomDateRange, isStartDateExistentAlready} from "@/utils";
 
 describe('utils', () => {
     describe('isStartDateExistentAlready', () => {
@@ -23,5 +23,17 @@ describe('utils', () => {
                     endDate: new Date('2022-01-05')
                 }], new Date('2022-01-01'))).toBe(false);
         })
+    });
+
+    describe('generateRandomTrade', () => {
+
+        it('should return random trades with no duplicate start dates', () => {
+            const randomDateRange = generateRandomDateRange(new Date('2022-01-01'), new Date('2022-1-03'));
+            console.log(randomDateRange[0].startDate.toISOString().split('T')[0]);
+            const startDates = randomDateRange.map(dateRange => dateRange.startDate.toISOString().split('T')[0]);
+            const isDuplicate = startDates.some((startDate, index) => startDates.indexOf(startDate) !== index);
+            expect(isDuplicate).toBe(false);
+        });
+
     });
 });
