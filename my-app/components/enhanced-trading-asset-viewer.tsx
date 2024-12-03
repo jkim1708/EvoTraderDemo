@@ -103,9 +103,8 @@ const EnhancedTradingAssetViewer = observer(() => {
         // const [selectedRange, setSelectedRange] = useState<[number, number] | null>(null)
         // const [tradeType, setTradeType] = useState<'long' | 'short'>('long')
         const [editingTrade, setEditingTrade] = useState<TradingRule | null>(null)
-        const [errors, setErrors] = useState<["duplicate_trading_name" | "no_trading_rule" | "no_backtesting_range"] | []>([])
+        const [errors, setErrors] = useState([])
         const [showErrorDialog, setShowErrorDialog] = useState<boolean>(false)
-        const [isStrategyNameValid, setIsStrategyParamValid] = useState(true);
 
         const [startBacktestingOffSample, setStartBacktestingOffSample] = useState('');
         const [endBacktestingOffSample, setEndBacktestingOffSample] = useState('');
@@ -346,7 +345,7 @@ const EnhancedTradingAssetViewer = observer(() => {
 
         function handleCreateStrategy() {
 
-            const error: ["duplicate_trading_name" | "no_trading_rule" | "no_backtesting_range"] | [] = [];
+            const error = [];
             if (viewMode === VIEW_MODE.CREATE) {
 
                 const isNameValid = !isNameExistent(currentTradingStrategyName);
@@ -354,27 +353,27 @@ const EnhancedTradingAssetViewer = observer(() => {
                 // setIsStrategyParamValid((isNameValid && isBacktestingOffSampleValid));
 
                 if (!(isNameValid && isBacktestingOffSampleValid)) {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    if (isNameValid) { // @ts-expect-error
+                    if (!isNameValid) {
                         error.push("duplicate_trading_name");
                     }
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    if (isBacktestingOffSampleValid) { // @ts-expect-error
+                    if (!isBacktestingOffSampleValid) {
                         error.push("no_backtesting_range");
                     }
-                    // setErrors(error)
+
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-expect-error
+                    setErrors(error);
                     setShowErrorDialog(true);
                     return
                 }
             }
 
             if (tradingRules.length === 0) {
+                error.push("no_trading_rule");
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                if (tradingRules.length > 0) { // @ts-expect-error
-                    error.push("no_trading_rule");
-                    // setErrors(error)
-                    setShowErrorDialog(true);
-                }
+                // @ts-expect-error
+                setErrors(error);
+                setShowErrorDialog(true);
                 return
             }
 
@@ -427,7 +426,7 @@ const EnhancedTradingAssetViewer = observer(() => {
             }
         }
 
-    return (
+        return (
             <Card className="w-full max-w-full">
                 <CardHeader>
                     <CardTitle className="text-2xl">Trading Strategy Creator (TSC)</CardTitle>
@@ -494,8 +493,8 @@ const EnhancedTradingAssetViewer = observer(() => {
                             <Label htmlFor="asset">Trading Rule Name</Label>
                             <Input
                                 // className={isStrategyNameValid ? "" : "border-red-500"}
-                                   id={"tading-rule-name"}
-                                   defaultValue={"My Trading Rule"} onChange={e => {
+                                id={"tading-rule-name"}
+                                defaultValue={"My Trading Rule"} onChange={e => {
                                 setCurrentTradingStrategyName(e.target.value)
                             }} disabled={viewMode === VIEW_MODE.EDIT}/>
                         </div>
@@ -655,7 +654,6 @@ const EnhancedTradingAssetViewer = observer(() => {
                                         </div>
 
 
-
                                     </li>
                                 ))}
                             </ul>
@@ -689,17 +687,21 @@ const EnhancedTradingAssetViewer = observer(() => {
                                                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                                                 // @ts-expect-error
                                                 errors.includes("duplicate_trading_name") ?
-                                                "Trading name already exists" : ""}
+                                                    "Trading name already exists" : ""}
+                                        </p>
+                                        <p>
                                             {
                                                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                                                 // @ts-expect-error
                                                 errors.includes("no_trading_rule") ?
-                                                "No trading rule selected" : ""}
+                                                    "No trading rule selected" : ""}
+                                        </p>
+                                        <p>
                                             {
                                                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                                                 // @ts-expect-error
                                                 errors.includes("no_backtesting_range") ?
-                                                "No backtesting range selected" : ""}
+                                                    "No backtesting range selected" : ""}
 
                                         </p>
                                     </div>
@@ -717,7 +719,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                     </div>
                 </CardContent>
             </Card>
-    )
+        )
     }
 );
 export default EnhancedTradingAssetViewer;
