@@ -103,6 +103,8 @@ const EnhancedTradingAssetViewer = observer(() => {
         // const [selectedRange, setSelectedRange] = useState<[number, number] | null>(null)
         // const [tradeType, setTradeType] = useState<'long' | 'short'>('long')
         const [editingTrade, setEditingTrade] = useState<TradingRule | null>(null)
+        const [errors, setErrors] = useState<["duplicate_trading_name" | "no_trading_rule" | "no_backtesting_range"] | []>([])
+        const [showErrorDialog, setShowErrorDialog] = useState<boolean>(false)
         const [isStrategyNameValid, setIsStrategyParamValid] = useState(true);
 
         const [startBacktestingOffSample, setStartBacktestingOffSample] = useState('');
@@ -264,7 +266,7 @@ const EnhancedTradingAssetViewer = observer(() => {
             setEditingTrade(null)
         }
 
-        function generateRandomTrades(startBacktestingOffSample: string,endBacktestingOffSample: string , asset: "EURUSD" | "USDJPY" | "GBPUSD" | "EURCHF" | "EURNOK"): TradingRule[] {
+        function generateRandomTrades(startBacktestingOffSample: string, endBacktestingOffSample: string, asset: "EURUSD" | "USDJPY" | "GBPUSD" | "EURCHF" | "EURNOK"): TradingRule[] {
             const randomTrades: TradingRule[] = [] as TradingRule[];
             // const date = generateRandomDateFromLast5Years();
             const offSampleTestStartDate = new Date(startBacktestingOffSample);
@@ -279,13 +281,13 @@ const EnhancedTradingAssetViewer = observer(() => {
                 })
             )
 
-            if(randomTrades.length === 0) {
+            if (randomTrades.length === 0) {
                 console.error("Could not generate random trades");
             }
             return randomTrades;
         }
 
-    function createTradingStrategy(param: {
+        function createTradingStrategy(param: {
             name: string;
             rules: TradingRule[],
             selectedStartDate: string;
@@ -309,7 +311,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                 backtestingOffSample: {
                     startDate: startBacktestingOffSample,
                     endDate: endBacktestingOffSample,
-                    trades: generateRandomTrades(startBacktestingOffSample,endBacktestingOffSample, asset as "EURUSD" | "USDJPY" | "GBPUSD" | "EURCHF" | "EURNOK"),
+                    trades: generateRandomTrades(startBacktestingOffSample, endBacktestingOffSample, asset as "EURUSD" | "USDJPY" | "GBPUSD" | "EURCHF" | "EURNOK"),
                 },
                 backtestingOnSample: {
                     startDate: data[0].ts.split(',')[0],
@@ -344,24 +346,36 @@ const EnhancedTradingAssetViewer = observer(() => {
 
         function handleCreateStrategy() {
 
+            const error: ["duplicate_trading_name" | "no_trading_rule" | "no_backtesting_range"] | [] = [];
             if (viewMode === VIEW_MODE.CREATE) {
 
                 const isNameValid = !isNameExistent(currentTradingStrategyName);
                 const isBacktestingOffSampleValid = isValidDate(startBacktestingOffSample) && isValidDate(endBacktestingOffSample)
-                setIsStrategyParamValid((isNameValid && isBacktestingOffSampleValid));
+                // setIsStrategyParamValid((isNameValid && isBacktestingOffSampleValid));
 
                 if (!(isNameValid && isBacktestingOffSampleValid)) {
-                    return;
-                }
-
-                if (!isNameValid) {
-                    return;
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    if (isNameValid) { // @ts-expect-error
+                        error.push("duplicate_trading_name");
+                    }
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    if (isBacktestingOffSampleValid) { // @ts-expect-error
+                        error.push("no_backtesting_range");
+                    }
+                    // setErrors(error)
+                    setShowErrorDialog(true);
+                    return
                 }
             }
 
             if (tradingRules.length === 0) {
-
-                return;
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                if (tradingRules.length > 0) { // @ts-expect-error
+                    error.push("no_trading_rule");
+                    // setErrors(error)
+                    setShowErrorDialog(true);
+                }
+                return
             }
 
             const tradingStrategy = createTradingStrategy({
@@ -413,7 +427,7 @@ const EnhancedTradingAssetViewer = observer(() => {
             }
         }
 
-        return (
+    return (
             <Card className="w-full max-w-full">
                 <CardHeader>
                     <CardTitle className="text-2xl">Trading Strategy Creator (TSC)</CardTitle>
@@ -478,7 +492,9 @@ const EnhancedTradingAssetViewer = observer(() => {
                     <div className="flex space-x-4 mb-4">
                         <div className="flex-4">
                             <Label htmlFor="asset">Trading Rule Name</Label>
-                            <Input className={isStrategyNameValid ? "" : "border-red-500"} id={"tading-rule-name"}
+                            <Input
+                                // className={isStrategyNameValid ? "" : "border-red-500"}
+                                   id={"tading-rule-name"}
                                    defaultValue={"My Trading Rule"} onChange={e => {
                                 setCurrentTradingStrategyName(e.target.value)
                             }} disabled={viewMode === VIEW_MODE.EDIT}/>
@@ -637,6 +653,9 @@ const EnhancedTradingAssetViewer = observer(() => {
                                                 <Trash2 className="h-4 w-4"/>
                                             </Button>
                                         </div>
+
+
+
                                     </li>
                                 ))}
                             </ul>
@@ -655,10 +674,50 @@ const EnhancedTradingAssetViewer = observer(() => {
                             {/*<Trash2 className="h-4 w-4"/>*/}
                             Create
                         </Button>
+
+                        <div>
+                            <Dialog open={showErrorDialog}>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle>Error Input Value</DialogTitle>
+                                        <DialogDescription>Please insert or change input
+                                            values</DialogDescription>
+                                    </DialogHeader>
+                                    <div className="grid gap-4 py-4">
+                                        <p>
+                                            {
+                                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                                // @ts-expect-error
+                                                errors.includes("duplicate_trading_name") ?
+                                                "Trading name already exists" : ""}
+                                            {
+                                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                                // @ts-expect-error
+                                                errors.includes("no_trading_rule") ?
+                                                "No trading rule selected" : ""}
+                                            {
+                                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                                // @ts-expect-error
+                                                errors.includes("no_backtesting_range") ?
+                                                "No backtesting range selected" : ""}
+
+                                        </p>
+                                    </div>
+                                    <DialogFooter>
+                                        <DialogClose>
+                                            <Button
+                                                onClick={() => setShowErrorDialog(false)}>Ok</Button>
+                                        </DialogClose>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+                        </div>
+
+
                     </div>
                 </CardContent>
             </Card>
-        )
+    )
     }
 );
 export default EnhancedTradingAssetViewer;
