@@ -33,13 +33,11 @@ const StrategyDialog = observer((props: StrategyDialogProps) => {
 
     const {strategy, onClose} = props;
 
-    const recentTrades = [...strategy.tradingRules];
+    const recentTrades: TradingRule[] = [];
 
     const backtestingOffSampleTrades: TradingRule[] = strategy.backtestingOffSample.trades;
 
-    if (backtestingOffSampleTrades.length != 0) {
         addTradesToRecentTrades(recentTrades, backtestingOffSampleTrades);
-    }
 
 
     return (
