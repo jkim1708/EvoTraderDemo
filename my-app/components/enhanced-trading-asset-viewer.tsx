@@ -276,7 +276,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                     startTime: convertToCustomDate(dateRange.startDate),
                     endTime: convertToCustomDate(dateRange.endDate),
                     asset: asset,
-                    profitNLoss: parseFloat((Math.random() * (0.009 - 0.001) + 0.001).toFixed(8)),
+                    profitNLoss: ((Math.random()<0.3) ? -1: 1) *  parseFloat((Math.random() * (0.009 - 0.001) + 0.001).toFixed(8)),
                 })
             )
 

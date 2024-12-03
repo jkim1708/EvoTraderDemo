@@ -105,7 +105,7 @@ const StrategyDialog = observer((props: StrategyDialogProps) => {
                                     <TableHead>Entry Price</TableHead>
                                     <TableHead>Exit Date</TableHead>
                                     <TableHead>Exit Price</TableHead>
-                                    <TableHead>Profit</TableHead>
+                                    <TableHead>ProfitNLoss</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
