@@ -116,7 +116,7 @@ const StrategyDialog = observer((props: StrategyDialogProps) => {
                                         <TableCell>{""}</TableCell>
                                         <TableCell>{trade.endTime}</TableCell>
                                         <TableCell>{""}</TableCell>
-                                        <TableCell className="text-green-500">{trade.profitNLoss}</TableCell>
+                                        <TableCell className={trade.profitNLoss<0 ? "text-red-500":"text-green-500"}>{trade.profitNLoss}</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
