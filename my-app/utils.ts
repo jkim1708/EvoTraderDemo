@@ -1,5 +1,19 @@
-import {ReferencedArea} from "@/components/ui/candleStickChart";
-import {X_AXIS_RESOLUTION} from "@/components/ui/candleStickChartDialog";
+
+export type ReferencedArea = {
+    referencedAreaLeft: string,
+    referencedAreaRight: string,
+}
+
+
+export enum X_AXIS_RESOLUTION {
+    ONE_DAY = 24,
+    FIVE_DAYS = 5 * 24,
+    ONE_MONTH = 30 * 24,
+    THREE_MONTH = 3 * 30 * 24,
+    SIX_MONTH = 6 * 30 * 24,
+    ONE_YEAR = 52, //weeks
+    FIVE_YEARS = 5 * 52 //weeks
+}
 
 export type SampleAssetData = {
     date: Date

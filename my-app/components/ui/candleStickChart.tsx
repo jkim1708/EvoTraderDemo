@@ -2,14 +2,13 @@
 
 import React, {Suspense, useCallback, useState} from 'react';
 import {Bar, BarChart, CartesianGrid, ReferenceArea, ResponsiveContainer, Tooltip, XAxis, YAxis,} from 'recharts';
-import {convertToDate, isInExistingInReferenceArea,} from "@/utils";
+import {convertToDate, isInExistingInReferenceArea, X_AXIS_RESOLUTION,} from "@/utils";
 import {observer} from "mobx-react-lite";
 import {useStores} from "@/store/Provider";
 import {Button} from "@/components/ui/button";
 import {ChartContainer} from "@/components/ui/chart";
 import {CategoricalChartState} from "recharts/types/chart/types";
 import {Label} from "@/components/ui/label";
-import {X_AXIS_RESOLUTION} from "@/components/ui/candleStickChartDialog";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
@@ -96,6 +95,7 @@ export type CandleStickChartProps = {
     data: CandleStickChart[],
     asset: string,
 }
+
 
 export type ReferencedArea = {
     referencedAreaLeft: string,

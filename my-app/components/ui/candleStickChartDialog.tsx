@@ -9,7 +9,7 @@ import {
 } from 'recharts';
 import {
     convertToCustomDate,
-    convertToDate, findTsInDifferentFrequency,
+    convertToDate, findTsInDifferentFrequency, X_AXIS_RESOLUTION,
 } from "@/utils";
 import {observer} from "mobx-react-lite";
 import {Label} from "@/components/ui/label";
@@ -245,16 +245,6 @@ function CustomizedTick(props: CustomizedTickProps) {
         </g>
     )
         ;
-}
-
-export enum X_AXIS_RESOLUTION {
-    ONE_DAY = 24,
-    FIVE_DAYS = 5 * 24,
-    ONE_MONTH = 30 * 24,
-    THREE_MONTH = 3 * 30 * 24,
-    SIX_MONTH = 6 * 30 * 24,
-    ONE_YEAR = 52, //weeks
-    FIVE_YEARS = 5 * 52 //weeks
 }
 
 function randomlyAssignTradeToAnyData(preparedData: {
