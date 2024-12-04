@@ -506,11 +506,13 @@ const CandleStickChartDialog =
             if (chartContainer) {
                 const handleWheel = (e: WheelEvent) => {
                     e.preventDefault();
-                    console.log('e.deltaY', e.deltaY);
-                    const scrollAmount = Math.round(e.deltaY / 100); // Adjust sensitivity here
+                    console.log(e.deltaY);
+                    const scrollAmount = Math.round((e.deltaY)); // Adjust sensitivity here
+                    console.log('scrollAmount',scrollAmount);
                     let newStartIndex = 0;
-                    if (startIndex) {
+                    if (startIndex != null || startIndex != undefined) {
                         newStartIndex = Math.max(0, startIndex - scrollAmount);
+                        console.log('newStartIndex 1',newStartIndex);
                     }
 
                     switch (xAxisResolution) {
@@ -519,18 +521,22 @@ const CandleStickChartDialog =
                         case X_AXIS_RESOLUTION.ONE_MONTH:
                         case X_AXIS_RESOLUTION.THREE_MONTH:
                         case X_AXIS_RESOLUTION.SIX_MONTH:
+                            newStartIndex = Math.min(fullTimeRangeData.length-1, newStartIndex);
                             const slice = fullTimeRangeData.slice(newStartIndex);
                             setVisibleData(slice);
                             break;
 
                         case X_AXIS_RESOLUTION.ONE_YEAR:
                         case X_AXIS_RESOLUTION.FIVE_YEARS:
+                            newStartIndex = Math.min(fullTimeRangeSevenDayData.length-1, newStartIndex);
+                            console.log("newStartIndex",newStartIndex);
                             const slice1 = fullTimeRangeSevenDayData.slice(newStartIndex);
                             setVisibleData(slice1);
                             break;
                         default:
                     }
 
+                    setTickCount(visibleData.length);
                     setStartIndex(newStartIndex ?? 0);
                 };
 
@@ -540,7 +546,7 @@ const CandleStickChartDialog =
                     chartContainer.removeEventListener('wheel', handleWheel);
                 };
             }
-        }, [startIndex, xAxisResolution, fullTimeRangeData, fullTimeRangeSevenDayData]);
+        }, [startIndex]);
 
         return (
             <div>
@@ -598,11 +604,11 @@ const CandleStickChartDialog =
                             <Tooltip content={customTooltipContent} cursor={<CustomTooltipCursor/>}
                                      position={{x: 100, y: -25}} offset={20}/>
 
-                            {props.randomTrades.map((trade, index) => (<ReferenceArea yAxisId="1" key={index}
-                                                                                      x1={findTsInDifferentFrequency(trade.startTime.split(',')[0], visibleData, xAxisResolution, 'x1')}
-                                                                                      x2={findTsInDifferentFrequency(trade.endTime.split(',')[0], visibleData, xAxisResolution, 'x2')}
-                                                                                      fill={trade.kind == 'long' ? "blue" : "red"}
-                                                                                      fillOpacity={0.3}/>))}
+                            {/*{props.randomTrades.map((trade, index) => (<ReferenceArea yAxisId="1" key={index}*/}
+                            {/*                                                          x1={findTsInDifferentFrequency(trade.startTime.split(',')[0], visibleData, xAxisResolution, 'x1')}*/}
+                            {/*                                                          x2={findTsInDifferentFrequency(trade.endTime.split(',')[0], visibleData, xAxisResolution, 'x2')}*/}
+                            {/*                                                          fill={trade.kind == 'long' ? "blue" : "red"}*/}
+                            {/*                                                          fillOpacity={0.3}/>))}*/}
                         </BarChart>
                     </ResponsiveContainer>
                 </ChartContainer>
