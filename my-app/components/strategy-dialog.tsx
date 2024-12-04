@@ -39,7 +39,6 @@ const StrategyDialog = observer((props: StrategyDialogProps) => {
 
         addTradesToRecentTrades(recentTrades, backtestingOffSampleTrades);
 
-
     return (
         <Card className="w-11/12 mx-auto">
             <CardHeader>

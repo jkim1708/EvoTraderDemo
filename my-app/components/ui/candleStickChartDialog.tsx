@@ -265,6 +265,36 @@ function randomlyAssignTradeToAnyData(preparedData: {
     return preparedData;
 }
 
+function getIndexStartDate(preparedData: {
+    ts: string;
+    low: string;
+    high: string;
+    open: number;
+    close: number;
+    lowHigh: [number, number];
+    openClose: [number, number];
+    trade: Trade | null
+}[], props: CandleStickChartProps) {
+    return preparedData.findIndex((data) => {
+        return (data.ts.split(',')[0].trim() === props.strategy.backtestingOffSample.startDate)
+    });
+}
+
+function getIndexEndDate(preparedData: {
+    ts: string;
+    low: string;
+    high: string;
+    open: number;
+    close: number;
+    lowHigh: [number, number];
+    openClose: [number, number];
+    trade: Trade | null
+}[], props: CandleStickChartProps) {
+    return preparedData.findIndex((data) => {
+        return (data.ts.split(',')[0].trim() === props.strategy.backtestingOffSample.endDate)
+    });
+}
+
 const CandleStickChartDialog =
     observer((props: CandleStickChartProps) => {
 
@@ -277,10 +307,15 @@ const CandleStickChartDialog =
 
         const preparedData = prepareData(props.generatedData);
 
-        const fullTimeRangeData = randomlyAssignTradeToAnyData(preparedData, []);
+        const indexFoundStartDate = getIndexStartDate(preparedData, props);
+        const indexFoundEndDate = getIndexEndDate(preparedData, props);
+        const initialVisibleData = preparedData.slice(indexFoundStartDate, indexFoundEndDate);
+
+        const fullTimeRangeData = randomlyAssignTradeToAnyData(initialVisibleData, []);
 
         const sevenDayData = transformToSevenDayData(fullTimeRangeData);
         const fullTimeRangeSevenDayData = transformToSevenDayData(sevenDayData);
+
 
         const [visibleData, setVisibleData] = useState<{
             ts: string,
@@ -291,7 +326,7 @@ const CandleStickChartDialog =
             lowHigh: [number, number],
             openClose: [number, number],
             trade: Trade | null,
-        } []>(sevenDayData); // Bereich der X-Achse
+        } []>(initialVisibleData); // Bereich der X-Achse
 
         const asset = props.strategy.tradingRules[0].asset;
 
@@ -312,7 +347,6 @@ const CandleStickChartDialog =
             const low = payload[0] ? parseFloat(payload[0].payload.low).toFixed(4) : "";
 
             return (
-
                 <p> o {open} h {high} l {low} c {close} </p>
             )
         }
@@ -321,7 +355,7 @@ const CandleStickChartDialog =
         function handleDButton(numberOfLastDaysToShow: X_AXIS_RESOLUTION) {
             let startIndex;
 
-            const runAsync =     () => {
+            const runAsync = () => {
                 switch (numberOfLastDaysToShow) {
                     case X_AXIS_RESOLUTION.ONE_DAY:
                     case X_AXIS_RESOLUTION.FIVE_DAYS:
@@ -333,7 +367,9 @@ const CandleStickChartDialog =
                     case X_AXIS_RESOLUTION.SIX_MONTH:
                         startIndex = fullTimeRangeData.length - numberOfLastDaysToShow;
                         //set visible range and take out every 3rd element
-                        const thirdRangeData = fullTimeRangeData.slice(startIndex).filter((_, i) => {return i % 3 === 0});
+                        const thirdRangeData = fullTimeRangeData.slice(startIndex).filter((_, i) => {
+                            return i % 3 === 0
+                        });
                         setVisibleData(thirdRangeData);
                         break;
 
@@ -350,7 +386,7 @@ const CandleStickChartDialog =
             runAsync();
             setXAxisResolution(numberOfLastDaysToShow);
             setTickCount(numberOfLastDaysToShow);
-            if(startIndex) setStartIndex(startIndex);
+            if (startIndex) setStartIndex(startIndex);
 
         }
 
@@ -410,7 +446,6 @@ const CandleStickChartDialog =
         }
 
 
-
         function findClosestDateIndex(fullTimeRangeSevenDayData: {
             ts: string;
             low: string;
@@ -423,8 +458,8 @@ const CandleStickChartDialog =
         }[], value: Date) {
             let resultIndex;
             fullTimeRangeSevenDayData.forEach((data, index) => {
-                if ((new Date(data.ts.split(',')[0]).getTime() < value.getTime()) && (value.getTime() < new Date(fullTimeRangeSevenDayData[index+1].ts.split(',')[0]).getTime())) {
-                    resultIndex =  index;
+                if ((new Date(data.ts.split(',')[0]).getTime() < value.getTime()) && (value.getTime() < new Date(fullTimeRangeSevenDayData[index + 1].ts.split(',')[0]).getTime())) {
+                    resultIndex = index;
                 }
             });
 
@@ -517,21 +552,6 @@ const CandleStickChartDialog =
                             {/*// @ts-expect-error take care later*/}
                             <Tooltip content={customTooltipContent} cursor={<CustomTooltipCursor/>}
                                      position={{x: 100, y: -25}} offset={20}/>
-
-                            {/*off sample backtesting area*/}
-                            <ReferenceArea yAxisId="1"
-                                           x1={findTsInDifferentFrequency(props.strategy.backtestingOffSample.startDate, visibleData, xAxisResolution, 'x1')}
-                                           x2={findTsInDifferentFrequency(props.strategy.backtestingOffSample.endDate, visibleData, xAxisResolution, 'x2')}
-                                           fill={"grey"}
-                                           fillOpacity={0.2}/>
-
-                            {/*on sample backtesting area*/}
-                            <ReferenceArea yAxisId="1"
-                                           x1={findTsInDifferentFrequency(props.strategy.backtestingOnSample.startDate, visibleData, xAxisResolution, 'x1')}
-                                           x2={findTsInDifferentFrequency(props.strategy.backtestingOnSample.endDate, visibleData, xAxisResolution, 'x2')}
-                                           fill={"grey"}
-                                           fillOpacity={0.4}/>
-
 
                             {props.randomTrades.map((trade, index) => (<ReferenceArea yAxisId="1" key={index}
                                                                                       x1={findTsInDifferentFrequency(trade.startTime.split(',')[0], visibleData, xAxisResolution, 'x1')}
