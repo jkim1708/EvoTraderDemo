@@ -1,6 +1,6 @@
 "use client"
 
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
     Bar,
     XAxis,
@@ -316,6 +316,7 @@ const CandleStickChartDialog =
         const sevenDayData = transformToSevenDayData(fullTimeRangeData);
         const fullTimeRangeSevenDayData = transformToSevenDayData(sevenDayData);
 
+        const chartContainerRef = useRef<HTMLDivElement>(null);
 
         const [visibleData, setVisibleData] = useState<{
             ts: string,
@@ -498,6 +499,49 @@ const CandleStickChartDialog =
             setStartIndex(startIndex ?? 0);
 
         };
+
+
+        useEffect(() => {
+            const chartContainer = chartContainerRef.current;
+            if (chartContainer) {
+                const handleWheel = (e: WheelEvent) => {
+                    e.preventDefault();
+                    console.log('e.deltaY', e.deltaY);
+                    const scrollAmount = Math.round(e.deltaY / 100); // Adjust sensitivity here
+                    let newStartIndex = 0;
+                    if (startIndex) {
+                        newStartIndex = Math.max(0, startIndex - scrollAmount);
+                    }
+
+                    switch (xAxisResolution) {
+                        case X_AXIS_RESOLUTION.ONE_DAY:
+                        case X_AXIS_RESOLUTION.FIVE_DAYS:
+                        case X_AXIS_RESOLUTION.ONE_MONTH:
+                        case X_AXIS_RESOLUTION.THREE_MONTH:
+                        case X_AXIS_RESOLUTION.SIX_MONTH:
+                            const slice = fullTimeRangeData.slice(newStartIndex);
+                            setVisibleData(slice);
+                            break;
+
+                        case X_AXIS_RESOLUTION.ONE_YEAR:
+                        case X_AXIS_RESOLUTION.FIVE_YEARS:
+                            const slice1 = fullTimeRangeSevenDayData.slice(newStartIndex);
+                            setVisibleData(slice1);
+                            break;
+                        default:
+                    }
+
+                    setStartIndex(newStartIndex ?? 0);
+                };
+
+                chartContainer.addEventListener('wheel', handleWheel, { passive: false });
+
+                return () => {
+                    chartContainer.removeEventListener('wheel', handleWheel);
+                };
+            }
+        }, [startIndex, xAxisResolution, fullTimeRangeData, fullTimeRangeSevenDayData]);
+
         return (
             <div>
                 <div className="flex-1">
@@ -518,6 +562,7 @@ const CandleStickChartDialog =
                         color: "hsl(var(--chart-1))",
                     },
                 }}
+                ref={chartContainerRef}
                                 className="h-[400px]"
                                 onMouseDown={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleMouseDown(e)}
                                 onMouseMove={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleMouseMove(e)}
