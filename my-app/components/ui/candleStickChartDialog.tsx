@@ -5,11 +5,11 @@ import {
     Bar,
     XAxis,
     YAxis,
-    CartesianGrid, Tooltip, ResponsiveContainer, BarChart, ReferenceArea,
+    CartesianGrid, Tooltip, ResponsiveContainer, BarChart,
 } from 'recharts';
 import {
     convertToCustomDate,
-    convertToDate, findTsInDifferentFrequency, X_AXIS_RESOLUTION,
+    convertToDate, X_AXIS_RESOLUTION,
 } from "@/utils";
 import {observer} from "mobx-react-lite";
 import {Label} from "@/components/ui/label";

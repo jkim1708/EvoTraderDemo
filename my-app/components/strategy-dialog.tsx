@@ -20,6 +20,8 @@ function addTradesToRecentTrades(recentTrades: TradingRule[], randomTrades: Trad
             endTime: trade.endTime,
             asset: trade.asset,
             profitNLoss: trade.profitNLoss,
+            entryPrice: trade.entryPrice,
+            exitPrice: trade.exitPrice
         } as TradingRule)
     })
 }
@@ -112,9 +114,9 @@ const StrategyDialog = observer((props: StrategyDialogProps) => {
                                     <TableRow key={index}>
                                         <TableCell className={trade.kind=="short" ? "text-red-500":"text-green-500"}>{trade.kind}</TableCell>
                                         <TableCell>{trade.startTime}</TableCell>
-                                        <TableCell>{""}</TableCell>
+                                        <TableCell>{trade.entryPrice ?? ""}</TableCell>
                                         <TableCell>{trade.endTime}</TableCell>
-                                        <TableCell>{""}</TableCell>
+                                        <TableCell>{trade.exitPrice ?? ""}</TableCell>
                                         <TableCell className={trade.profitNLoss<0 ? "text-red-500":"text-green-500"}>{trade.profitNLoss}</TableCell>
                                     </TableRow>
                                 ))}

@@ -271,14 +271,24 @@ const EnhancedTradingAssetViewer = observer(() => {
             const offSampleTestStartDate = new Date(startBacktestingOffSample);
             const offSampleTestEndDate = new Date(endBacktestingOffSample);
             const randomDateRange = generateRandomDateRange(offSampleTestStartDate, offSampleTestEndDate);
-            randomDateRange.forEach(dateRange => randomTrades.push({
+
+
+
+            randomDateRange.forEach(dateRange => {
+                const pnl = ((Math.random()<0.3) ? -1: 1) *  parseFloat((Math.random() * (0.009 - 0.001) + 0.001).toFixed(8));
+                const entryPrice = parseFloat((Math.random() * (1.2 - 0.8) + 0.8).toFixed(4));
+                const exitPrice = pnl - entryPrice;
+
+                randomTrades.push({
                     kind: Math.floor(Math.random() * 2.0) === 0 ? 'long' : 'short',
                     startTime: convertToCustomDate(dateRange.startDate),
                     endTime: convertToCustomDate(dateRange.endDate),
                     asset: asset,
-                    profitNLoss: ((Math.random()<0.3) ? -1: 1) *  parseFloat((Math.random() * (0.009 - 0.001) + 0.001).toFixed(8)),
+                    profitNLoss: pnl,
+                    entryPrice: entryPrice,
+                    exitPrice: exitPrice,
                 })
-            )
+            }            )
 
             if (randomTrades.length === 0) {
                 console.error("Could not generate random trades");

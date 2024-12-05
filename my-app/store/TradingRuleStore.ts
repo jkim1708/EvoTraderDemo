@@ -6,7 +6,8 @@ export interface TradingRule {
     endTime: string,
     asset: 'EURUSD' | 'USDJPY' | 'GBPUSD' | 'EURCHF' | 'EURNOK',
     profitNLoss: number,
-
+    entryPrice?: number,
+    exitPrice?: number,
 }
 
 class TradingRuleStore {
