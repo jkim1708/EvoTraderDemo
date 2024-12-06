@@ -624,17 +624,6 @@ const CandleStickChartDialog =
 
         return (
             <div>
-                <div className="flex-1">
-                    <Label htmlFor="startDate">Start Date</Label>
-                    <Input
-                        id="startDate"
-                        type="date"
-                        value={startDate}
-                        onChange={handleStartDateChange}
-                        max={new Date().toISOString().split('T')[0]}
-                    />
-                </div>
-
                 <p> {asset} </p>
                 <ChartContainer config={{
                     value: {
