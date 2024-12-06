@@ -437,12 +437,14 @@ const CandleStickChartDialog =
         const handleMouseMove = useCallback(async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
             if (isDragging) {
                 const deltaX = event.clientX - lastMouseX;
-                const scrollAmount = Math.round(deltaX / 5); // Adjust sensitivity here
+                const scrollAmount = Math.round(deltaX); // Adjust sensitivity here
                 let newStartIndex = 0;
-                if (startIndex) {
+                if (startIndex != null || startIndex != undefined) {
                     newStartIndex = Math.max(0, startIndex - scrollAmount);
+                    console.log('startIndex - scrollAmount', startIndex - scrollAmount);
                 }
-
+                console.log('lastMouseX', lastMouseX);
+                console.log('event.clientX', event.clientX);
                 let lastIndex;
                 setLastMouseX(event.clientX);
                 switch (xAxisResolution) {
@@ -452,6 +454,7 @@ const CandleStickChartDialog =
                     case X_AXIS_RESOLUTION.THREE_MONTH:
                     case X_AXIS_RESOLUTION.SIX_MONTH:
                         lastIndex = Math.min(fullTimeRangeData.length - 1, newStartIndex + visibleData.length - 1);
+
                         console.log('startIndex', startIndex);
                         console.log('scrollAmount', scrollAmount);
                         console.log('newStartIndex', newStartIndex);
@@ -464,9 +467,6 @@ const CandleStickChartDialog =
                     case X_AXIS_RESOLUTION.ONE_YEAR:
                     case X_AXIS_RESOLUTION.FIVE_YEARS:
                         lastIndex = Math.min(fullTimeRangeSevenDayData.length - 1, newStartIndex + visibleData.length - 1)
-                        console.log('newStartIndex', newStartIndex);
-                        console.log('visibleData.length', visibleData.length);
-                        console.log('lastIndex', lastIndex);
                         const slice1 = fullTimeRangeSevenDayData.slice(newStartIndex, lastIndex);
                         setVisibleData(slice1);
                         break;
