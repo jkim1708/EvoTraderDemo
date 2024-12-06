@@ -299,6 +299,23 @@ function isTimeRangeGreaterThanOneYear(generatedData) {
     return diffDays > 365;
 }
 
+function isTimeRangeGreaterThanThreeMonths(offSampleBacktestTimeRangedData: {
+    ts: string;
+    low: string;
+    high: string;
+    open: number;
+    close: number;
+    lowHigh: [number, number];
+    openClose: [number, number];
+    trade: Trade | null
+}[]) {
+    const startDate = convertToDate(offSampleBacktestTimeRangedData[0].ts);
+    const endDate = convertToDate(offSampleBacktestTimeRangedData[offSampleBacktestTimeRangedData.length - 1].ts);
+    const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > 90;
+}
+
 const CandleStickChartDialog =
     observer((props: CandleStickChartProps) => {
 
@@ -318,10 +335,12 @@ const CandleStickChartDialog =
             console.log('isTimeRangeGreaterThanOneYear');
             initialXAxisResolution = X_AXIS_RESOLUTION.FIVE_YEARS;
             initialVisibleData = sevenDayData;
-        } else if (isTimeRangeGreaterThanSixMonths(offSampleBacktestTimeRangedData)) {
+        } else if (isTimeRangeGreaterThanThreeMonths(offSampleBacktestTimeRangedData)) {
             console.log('isTimeRangeGreaterThanSixMonths');
-            initialXAxisResolution = X_AXIS_RESOLUTION.ONE_YEAR;
-            initialVisibleData = sevenDayData;
+            initialXAxisResolution = X_AXIS_RESOLUTION.SIX_MONTH;
+            initialVisibleData = initialVisibleData.filter((_, i) => {
+                return i % 3 === 0
+            });
         }
 
         const [xAxisResolution, setXAxisResolution] = useState<X_AXIS_RESOLUTION>(initialXAxisResolution); // Bereich der X-Achse
@@ -380,6 +399,7 @@ const CandleStickChartDialog =
                     case X_AXIS_RESOLUTION.THREE_MONTH:
                         startIndex = fullTimeRangeData.length - numberOfLastDaysToShow;
                         setVisibleData(fullTimeRangeData.slice(startIndex));
+                        setLastIndex(fullTimeRangeData.slice(startIndex).length - 1);
                         break;
                     case X_AXIS_RESOLUTION.SIX_MONTH:
                         startIndex = fullTimeRangeData.length - numberOfLastDaysToShow;
@@ -388,12 +408,14 @@ const CandleStickChartDialog =
                             return i % 3 === 0
                         });
                         setVisibleData(thirdRangeData);
+                        setLastIndex(thirdRangeData.length - 1);
                         break;
 
                     case X_AXIS_RESOLUTION.ONE_YEAR:
                     case X_AXIS_RESOLUTION.FIVE_YEARS:
                         startIndex = fullTimeRangeSevenDayData.length - numberOfLastDaysToShow;
                         setVisibleData(fullTimeRangeSevenDayData.slice(startIndex));
+                        setLastIndex(fullTimeRangeSevenDayData.slice(startIndex).length - 1);
                         break;
                     default:
                         console.error('invalid x axis resolution');
@@ -483,7 +505,7 @@ const CandleStickChartDialog =
                 const handleWheel = (e: WheelEvent) => {
                     e.preventDefault();
                     console.log(e.deltaY);
-                    const scrollAmount = Math.round((e.deltaY/100)); // Adjust sensitivity here
+                    const scrollAmount = Math.round((e.deltaY*(visibleData.length/100))); // Adjust sensitivity here
                     console.log('scrollAmount', scrollAmount);
                     let newStartIndex = 0;
                     let newLastIndex = 0;
