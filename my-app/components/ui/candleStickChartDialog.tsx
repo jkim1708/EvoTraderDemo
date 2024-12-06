@@ -295,26 +295,61 @@ function getIndexEndDate(preparedData: {
     });
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
+function isTimeRangeGreaterThanSixMonths(generatedData) {
+    const startDate = convertToDate(generatedData[0].ts);
+    const endDate = convertToDate(generatedData[generatedData.length - 1].ts);
+    const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > 180;
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
+function isTimeRangeGreaterThanOneYear(generatedData) {
+    const startDate = convertToDate(generatedData[0].ts);
+    const endDate = convertToDate(generatedData[generatedData.length - 1].ts);
+    console.log('startDate',startDate);
+    console.log('endDate',endDate);
+
+    const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > 365;
+}
+
 const CandleStickChartDialog =
     observer((props: CandleStickChartProps) => {
 
-        const [xAxisResolution, setXAxisResolution] = useState(X_AXIS_RESOLUTION.FIVE_YEARS); // Bereich der X-Achse
+        const preparedData = prepareData(props.generatedData);
+
+        const indexFoundStartDate = getIndexStartDate(preparedData, props);
+        const indexFoundEndDate = getIndexEndDate(preparedData, props);
+        const offSampleBacktestTimeRangedData = preparedData.slice(indexFoundStartDate, indexFoundEndDate);
+
+        const fullTimeRangeData = randomlyAssignTradeToAnyData(offSampleBacktestTimeRangedData, []);
+        const sevenDayData = transformToSevenDayData(fullTimeRangeData);
+        const fullTimeRangeSevenDayData = transformToSevenDayData(sevenDayData);
+
+        let initialXAxisResolution = X_AXIS_RESOLUTION.ONE_DAY;
+        let initialVisibleData = offSampleBacktestTimeRangedData;
+        if (isTimeRangeGreaterThanOneYear(offSampleBacktestTimeRangedData)) {
+            console.log('isTimeRangeGreaterThanOneYear');
+            initialXAxisResolution = X_AXIS_RESOLUTION.FIVE_YEARS;
+            initialVisibleData = sevenDayData;
+        } else if (isTimeRangeGreaterThanSixMonths(offSampleBacktestTimeRangedData)) {
+            console.log('isTimeRangeGreaterThanSixMonths');
+            initialXAxisResolution = X_AXIS_RESOLUTION.ONE_YEAR;
+            initialVisibleData = sevenDayData;
+        }
+
+        const [xAxisResolution, setXAxisResolution] = useState<X_AXIS_RESOLUTION>(initialXAxisResolution); // Bereich der X-Achse
         const [isDragging, setIsDragging] = useState(false); // Bereich der X-Achse
         const [lastMouseX, setLastMouseX] = useState(0); // Bereich der X-Achse
         const [tickCount, setTickCount] = useState(0); // Bereich der X-Achse
         const [startIndex, setStartIndex] = useState(0); // Bereich der X-Achse
         const [startDate, setStartDate] = useState(""); // Bereich der X-Achse
 
-        const preparedData = prepareData(props.generatedData);
-
-        const indexFoundStartDate = getIndexStartDate(preparedData, props);
-        const indexFoundEndDate = getIndexEndDate(preparedData, props);
-        const initialVisibleData = preparedData.slice(indexFoundStartDate, indexFoundEndDate);
-
-        const fullTimeRangeData = randomlyAssignTradeToAnyData(initialVisibleData, []);
-
-        const sevenDayData = transformToSevenDayData(fullTimeRangeData);
-        const fullTimeRangeSevenDayData = transformToSevenDayData(sevenDayData);
 
         const chartContainerRef = useRef<HTMLDivElement>(null);
 
@@ -408,6 +443,7 @@ const CandleStickChartDialog =
                     newStartIndex = Math.max(0, startIndex - scrollAmount);
                 }
 
+                let lastIndex;
                 setLastMouseX(event.clientX);
                 switch (xAxisResolution) {
                     case X_AXIS_RESOLUTION.ONE_DAY:
@@ -415,13 +451,23 @@ const CandleStickChartDialog =
                     case X_AXIS_RESOLUTION.ONE_MONTH:
                     case X_AXIS_RESOLUTION.THREE_MONTH:
                     case X_AXIS_RESOLUTION.SIX_MONTH:
-                        const slice = fullTimeRangeData.slice(newStartIndex, newStartIndex + xAxisResolution);
+                        lastIndex = Math.min(fullTimeRangeData.length - 1, newStartIndex + visibleData.length - 1);
+                        console.log('startIndex', startIndex);
+                        console.log('scrollAmount', scrollAmount);
+                        console.log('newStartIndex', newStartIndex);
+                        console.log('visibleData.length', visibleData.length);
+                        console.log('lastIndex', lastIndex);
+                        const slice = fullTimeRangeData.slice(newStartIndex, lastIndex);
                         setVisibleData(slice);
                         break;
 
                     case X_AXIS_RESOLUTION.ONE_YEAR:
                     case X_AXIS_RESOLUTION.FIVE_YEARS:
-                        const slice1 = fullTimeRangeSevenDayData.slice(newStartIndex, newStartIndex + xAxisResolution);
+                        lastIndex = Math.min(fullTimeRangeSevenDayData.length - 1, newStartIndex + visibleData.length - 1)
+                        console.log('newStartIndex', newStartIndex);
+                        console.log('visibleData.length', visibleData.length);
+                        console.log('lastIndex', lastIndex);
+                        const slice1 = fullTimeRangeSevenDayData.slice(newStartIndex, lastIndex);
                         setVisibleData(slice1);
                         break;
                     default:
@@ -508,11 +554,11 @@ const CandleStickChartDialog =
                     e.preventDefault();
                     console.log(e.deltaY);
                     const scrollAmount = Math.round((e.deltaY)); // Adjust sensitivity here
-                    console.log('scrollAmount',scrollAmount);
+                    console.log('scrollAmount', scrollAmount);
                     let newStartIndex = 0;
                     if (startIndex != null || startIndex != undefined) {
                         newStartIndex = Math.max(0, startIndex - scrollAmount);
-                        console.log('newStartIndex 1',newStartIndex);
+                        console.log('newStartIndex 1', newStartIndex);
                     }
 
                     switch (xAxisResolution) {
@@ -521,15 +567,15 @@ const CandleStickChartDialog =
                         case X_AXIS_RESOLUTION.ONE_MONTH:
                         case X_AXIS_RESOLUTION.THREE_MONTH:
                         case X_AXIS_RESOLUTION.SIX_MONTH:
-                            newStartIndex = Math.min(fullTimeRangeData.length-1, newStartIndex);
+                            newStartIndex = Math.min(fullTimeRangeData.length - 1, newStartIndex);
                             const slice = fullTimeRangeData.slice(newStartIndex);
                             setVisibleData(slice);
                             break;
 
                         case X_AXIS_RESOLUTION.ONE_YEAR:
                         case X_AXIS_RESOLUTION.FIVE_YEARS:
-                            newStartIndex = Math.min(fullTimeRangeSevenDayData.length-1, newStartIndex);
-                            console.log("newStartIndex",newStartIndex);
+                            newStartIndex = Math.min(fullTimeRangeSevenDayData.length - 1, newStartIndex);
+                            console.log("newStartIndex", newStartIndex);
                             const slice1 = fullTimeRangeSevenDayData.slice(newStartIndex);
                             setVisibleData(slice1);
                             break;
@@ -540,7 +586,7 @@ const CandleStickChartDialog =
                     setStartIndex(newStartIndex ?? 0);
                 };
 
-                chartContainer.addEventListener('wheel', handleWheel, { passive: false });
+                chartContainer.addEventListener('wheel', handleWheel, {passive: false});
 
                 return () => {
                     chartContainer.removeEventListener('wheel', handleWheel);
@@ -568,7 +614,7 @@ const CandleStickChartDialog =
                         color: "hsl(var(--chart-1))",
                     },
                 }}
-                ref={chartContainerRef}
+                                ref={chartContainerRef}
                                 className="h-[400px]"
                                 onMouseDown={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleMouseDown(e)}
                                 onMouseMove={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleMouseMove(e)}
