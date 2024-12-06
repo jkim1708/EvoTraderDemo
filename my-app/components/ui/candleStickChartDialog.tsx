@@ -453,7 +453,11 @@ const CandleStickChartDialog =
                     case X_AXIS_RESOLUTION.ONE_MONTH:
                     case X_AXIS_RESOLUTION.THREE_MONTH:
                     case X_AXIS_RESOLUTION.SIX_MONTH:
+                        //prevent going out of off sample backtesting range
                         lastIndex = Math.min(fullTimeRangeData.length - 1, newStartIndex + visibleData.length - 1);
+                        //prevent start index bigger than last index
+                        lastIndex = Math.max(1,lastIndex)
+                        newStartIndex = Math.min(lastIndex-1, newStartIndex);
 
                         console.log('startIndex', startIndex);
                         console.log('scrollAmount', scrollAmount);
@@ -466,7 +470,12 @@ const CandleStickChartDialog =
 
                     case X_AXIS_RESOLUTION.ONE_YEAR:
                     case X_AXIS_RESOLUTION.FIVE_YEARS:
+                        //prevent going out of off sample backtesting range
                         lastIndex = Math.min(fullTimeRangeSevenDayData.length - 1, newStartIndex + visibleData.length - 1)
+                        //prevent start index bigger than last index
+                        lastIndex = Math.max(1,lastIndex)
+                        newStartIndex = Math.min(lastIndex-1, newStartIndex);
+
                         const slice1 = fullTimeRangeSevenDayData.slice(newStartIndex, lastIndex);
                         setVisibleData(slice1);
                         break;
