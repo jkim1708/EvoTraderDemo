@@ -456,8 +456,8 @@ const CandleStickChartDialog =
                         //prevent going out of off sample backtesting range
                         lastIndex = Math.min(fullTimeRangeData.length - 1, newStartIndex + visibleData.length - 1);
                         //prevent start index bigger than last index
-                        lastIndex = Math.max(1,lastIndex)
-                        newStartIndex = Math.min(lastIndex-1, newStartIndex);
+                        lastIndex = Math.max(10,lastIndex)
+                        newStartIndex = Math.min(lastIndex-10, newStartIndex);
 
                         console.log('startIndex', startIndex);
                         console.log('scrollAmount', scrollAmount);
@@ -473,7 +473,7 @@ const CandleStickChartDialog =
                         //prevent going out of off sample backtesting range
                         lastIndex = Math.min(fullTimeRangeSevenDayData.length - 1, newStartIndex + visibleData.length - 1)
                         //prevent start index bigger than last index
-                        lastIndex = Math.max(1,lastIndex)
+                        lastIndex = Math.max(10,lastIndex)
                         newStartIndex = Math.min(lastIndex-1, newStartIndex);
 
                         const slice1 = fullTimeRangeSevenDayData.slice(newStartIndex, lastIndex);
