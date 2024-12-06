@@ -348,6 +348,7 @@ const CandleStickChartDialog =
         const [lastMouseX, setLastMouseX] = useState(0); // Bereich der X-Achse
         const [tickCount, setTickCount] = useState(0); // Bereich der X-Achse
         const [startIndex, setStartIndex] = useState(0); // Bereich der X-Achse
+
         const [startDate, setStartDate] = useState(""); // Bereich der X-Achse
 
 
@@ -363,6 +364,8 @@ const CandleStickChartDialog =
             openClose: [number, number],
             trade: Trade | null,
         } []>(initialVisibleData); // Bereich der X-Achse
+
+        const [lastIndex, setLastIndex] = useState(initialVisibleData.length-1); // Bereich der X-Achse
 
         const asset = props.strategy.tradingRules[0].asset;
 
@@ -474,7 +477,7 @@ const CandleStickChartDialog =
                         lastIndex = Math.min(fullTimeRangeSevenDayData.length - 1, newStartIndex + visibleData.length - 1)
                         //prevent start index bigger than last index
                         lastIndex = Math.max(10,lastIndex)
-                        newStartIndex = Math.min(lastIndex-1, newStartIndex);
+                        newStartIndex = Math.min(lastIndex-10, newStartIndex);
 
                         const slice1 = fullTimeRangeSevenDayData.slice(newStartIndex, lastIndex);
                         setVisibleData(slice1);
@@ -483,6 +486,7 @@ const CandleStickChartDialog =
                 }
 
                 setStartIndex(newStartIndex ?? 0);
+                setLastIndex(lastIndex ?? 0);
 
             }
         }, [isDragging, lastMouseX]);
@@ -562,11 +566,13 @@ const CandleStickChartDialog =
                 const handleWheel = (e: WheelEvent) => {
                     e.preventDefault();
                     console.log(e.deltaY);
-                    const scrollAmount = Math.round((e.deltaY)); // Adjust sensitivity here
+                    const scrollAmount = Math.round((e.deltaY/100)); // Adjust sensitivity here
                     console.log('scrollAmount', scrollAmount);
                     let newStartIndex = 0;
-                    if (startIndex != null || startIndex != undefined) {
+                    let newLastIndex = 0;
+                    if (startIndex != null || startIndex != undefined || lastIndex != null || lastIndex != undefined) {
                         newStartIndex = Math.max(0, startIndex - scrollAmount);
+                        newLastIndex = Math.max(0, lastIndex - scrollAmount);
                         console.log('newStartIndex 1', newStartIndex);
                     }
 
@@ -576,15 +582,26 @@ const CandleStickChartDialog =
                         case X_AXIS_RESOLUTION.ONE_MONTH:
                         case X_AXIS_RESOLUTION.THREE_MONTH:
                         case X_AXIS_RESOLUTION.SIX_MONTH:
-                            newStartIndex = Math.min(fullTimeRangeData.length - 1, newStartIndex);
-                            const slice = fullTimeRangeData.slice(newStartIndex);
+                            newStartIndex = Math.min(fullTimeRangeData.length - 10, newStartIndex);
+                            //prevent last index out of range
+                            newLastIndex = Math.min(fullTimeRangeData.length - 1, lastIndex + scrollAmount);
+
+                            //prevent index crossing each other
+                            newLastIndex = Math.max(newStartIndex+10, newLastIndex);
+
+                            const slice = fullTimeRangeData.slice(newStartIndex,newLastIndex);
                             setVisibleData(slice);
+
                             break;
 
                         case X_AXIS_RESOLUTION.ONE_YEAR:
                         case X_AXIS_RESOLUTION.FIVE_YEARS:
-                            newStartIndex = Math.min(fullTimeRangeSevenDayData.length - 1, newStartIndex);
-                            console.log("newStartIndex", newStartIndex);
+                            newStartIndex = Math.min(fullTimeRangeSevenDayData.length - 10, newStartIndex);
+                            //prevent last index out of range
+                            newLastIndex = Math.min(fullTimeRangeSevenDayData.length - 1, lastIndex + scrollAmount);
+
+                            //prevent index crossing each other
+                            newLastIndex = Math.max(newStartIndex+10, newLastIndex);
                             const slice1 = fullTimeRangeSevenDayData.slice(newStartIndex);
                             setVisibleData(slice1);
                             break;
@@ -593,6 +610,8 @@ const CandleStickChartDialog =
 
                     setTickCount(visibleData.length);
                     setStartIndex(newStartIndex ?? 0);
+                    setLastIndex(newLastIndex ?? 0);
+
                 };
 
                 chartContainer.addEventListener('wheel', handleWheel, {passive: false});
