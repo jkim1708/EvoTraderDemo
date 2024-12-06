@@ -278,16 +278,6 @@ function getIndexEndDate(preparedData: {
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
-function isTimeRangeGreaterThanSixMonths(generatedData) {
-    const startDate = convertToDate(generatedData[0].ts);
-    const endDate = convertToDate(generatedData[generatedData.length - 1].ts);
-    const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays > 180;
-}
-
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
 function isTimeRangeGreaterThanOneYear(generatedData) {
     const startDate = convertToDate(generatedData[0].ts);
     const endDate = convertToDate(generatedData[generatedData.length - 1].ts);
