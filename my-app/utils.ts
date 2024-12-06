@@ -224,7 +224,7 @@ export function generateRandomDateRange(offSampleTestStartDate: Date, offSampleT
         if(isStartDateExistentAlready(randomDateRange, startDate)) {
             break;
         }
-        const endDate = new Date(addMinutesToDate(startDate, 60 * 24));
+        const endDate = new Date(addMinutesToDate(startDate, 60 * 12));
 
         randomDateRange.push({startDate, endDate});
     }

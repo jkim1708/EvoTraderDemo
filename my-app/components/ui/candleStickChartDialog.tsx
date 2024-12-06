@@ -5,11 +5,11 @@ import {
     Bar,
     XAxis,
     YAxis,
-    CartesianGrid, Tooltip, ResponsiveContainer, BarChart,
+    CartesianGrid, Tooltip, ResponsiveContainer, BarChart, ReferenceArea,
 } from 'recharts';
 import {
     convertToCustomDate,
-    convertToDate, X_AXIS_RESOLUTION,
+    convertToDate, findTsInDifferentFrequency, X_AXIS_RESOLUTION,
 } from "@/utils";
 import {observer} from "mobx-react-lite";
 import {Label} from "@/components/ui/label";
@@ -246,24 +246,6 @@ function CustomizedTick(props: CustomizedTickProps) {
         ;
 }
 
-function randomlyAssignTradeToAnyData(preparedData: {
-    ts: string;
-    low: string;
-    high: string;
-    open: number;
-    close: number;
-    lowHigh: [number, number];
-    openClose: [number, number];
-    trade: Trade | null
-}[], randomTrades: Trade[]) {
-    randomTrades.forEach((trade: Trade) => {
-        const randomIndex = Math.floor(Math.random() * preparedData.length);
-        preparedData[randomIndex].trade = trade;
-    });
-
-    return preparedData;
-}
-
 function getIndexStartDate(preparedData: {
     ts: string;
     low: string;
@@ -326,7 +308,7 @@ const CandleStickChartDialog =
         const indexFoundEndDate = getIndexEndDate(preparedData, props);
         const offSampleBacktestTimeRangedData = preparedData.slice(indexFoundStartDate, indexFoundEndDate);
 
-        const fullTimeRangeData = randomlyAssignTradeToAnyData(offSampleBacktestTimeRangedData, []);
+        const fullTimeRangeData = offSampleBacktestTimeRangedData;
         const sevenDayData = transformToSevenDayData(fullTimeRangeData);
         const fullTimeRangeSevenDayData = transformToSevenDayData(sevenDayData);
 
@@ -602,11 +584,11 @@ const CandleStickChartDialog =
                             <Tooltip content={customTooltipContent} cursor={<CustomTooltipCursor/>}
                                      position={{x: 100, y: -25}} offset={20}/>
 
-                            {/*{props.randomTrades.map((trade, index) => (<ReferenceArea yAxisId="1" key={index}*/}
-                            {/*                                                          x1={findTsInDifferentFrequency(trade.startTime.split(',')[0], visibleData, xAxisResolution, 'x1')}*/}
-                            {/*                                                          x2={findTsInDifferentFrequency(trade.endTime.split(',')[0], visibleData, xAxisResolution, 'x2')}*/}
-                            {/*                                                          fill={trade.kind == 'long' ? "blue" : "red"}*/}
-                            {/*                                                          fillOpacity={0.3}/>))}*/}
+                            {props.randomTrades.map((trade, index) => (<ReferenceArea yAxisId="1" key={index}
+                                                                                      x1={findTsInDifferentFrequency(trade.startTime.split(',')[0], visibleData, xAxisResolution, 'x1')}
+                                                                                      x2={findTsInDifferentFrequency(trade.endTime.split(',')[0], visibleData, xAxisResolution, 'x2')}
+                                                                                      fill={trade.kind == 'long' ? "blue" : "red"}
+                                                                                      fillOpacity={0.3}/>))}
                         </BarChart>
                     </ResponsiveContainer>
                 </ChartContainer>
