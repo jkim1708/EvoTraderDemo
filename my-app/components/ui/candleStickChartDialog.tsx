@@ -16,7 +16,6 @@ import {Label} from "@/components/ui/label";
 import {Button} from "@/components/ui/button";
 import {ChartContainer} from "@/components/ui/chart";
 import CandleStickChart from "@/components/ui/candleStickChart";
-import {Input} from "@/components/ui/input";
 import {TradingStrategy} from "@/store/RootStore";
 import {TradingRule} from "@/store/TradingRuleStore";
 
@@ -349,9 +348,6 @@ const CandleStickChartDialog =
         const [tickCount, setTickCount] = useState(0); // Bereich der X-Achse
         const [startIndex, setStartIndex] = useState(0); // Bereich der X-Achse
 
-        const [startDate, setStartDate] = useState(""); // Bereich der X-Achse
-
-
         const chartContainerRef = useRef<HTMLDivElement>(null);
 
         const [visibleData, setVisibleData] = useState<{
@@ -498,67 +494,6 @@ const CandleStickChartDialog =
         const handleContextMenu = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
             event.preventDefault();
         }, []);
-
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        function isOutsideOfRange(fullTimeRangeData, startIndex, xAxisResolution: X_AXIS_RESOLUTION.ONE_DAY | X_AXIS_RESOLUTION.FIVE_DAYS | X_AXIS_RESOLUTION.ONE_MONTH | X_AXIS_RESOLUTION.THREE_MONTH | X_AXIS_RESOLUTION.SIX_MONTH | X_AXIS_RESOLUTION.ONE_YEAR | X_AXIS_RESOLUTION.FIVE_YEARS) {
-            return ((startIndex + xAxisResolution) > fullTimeRangeData.length)
-        }
-
-
-        function findClosestDateIndex(fullTimeRangeSevenDayData: {
-            ts: string;
-            low: string;
-            high: string;
-            open: number;
-            close: number;
-            lowHigh: [number, number];
-            openClose: [number, number];
-            trade: Trade | null
-        }[], value: Date) {
-            let resultIndex;
-            fullTimeRangeSevenDayData.forEach((data, index) => {
-                if ((new Date(data.ts.split(',')[0]).getTime() < value.getTime()) && (value.getTime() < new Date(fullTimeRangeSevenDayData[index + 1].ts.split(',')[0]).getTime())) {
-                    resultIndex = index;
-                }
-            });
-
-            return resultIndex ?? -1;
-        }
-
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        const handleStartDateChange = (e) => {
-            setStartDate(e.target.value)
-            let end;
-            let startIndex;
-            switch (xAxisResolution) {
-                case X_AXIS_RESOLUTION.ONE_DAY:
-                case X_AXIS_RESOLUTION.FIVE_DAYS:
-                case X_AXIS_RESOLUTION.ONE_MONTH:
-                case X_AXIS_RESOLUTION.THREE_MONTH:
-                case X_AXIS_RESOLUTION.SIX_MONTH:
-                    startIndex = fullTimeRangeData.findIndex((d) => d.ts.split(',')[0].trim() === e.target.value);
-                    end = isOutsideOfRange(fullTimeRangeData, startIndex, xAxisResolution) ? (fullTimeRangeData.length - 1) : (startIndex + xAxisResolution);
-                    setVisibleData(fullTimeRangeData.slice(startIndex, end));
-                    break;
-
-                case X_AXIS_RESOLUTION.ONE_YEAR:
-                case X_AXIS_RESOLUTION.FIVE_YEARS:
-                    //needed because dates from calendar might not be in the chart since in years range view we have a ffrequency of 7 days
-                    startIndex = findClosestDateIndex(fullTimeRangeSevenDayData, new Date(e.target.value));
-                    end = isOutsideOfRange(fullTimeRangeSevenDayData, startIndex, xAxisResolution) ? (fullTimeRangeSevenDayData.length - 1) : (startIndex + xAxisResolution);
-                    setVisibleData(fullTimeRangeSevenDayData.slice(startIndex, end));
-                    break;
-                default:
-                    console.error('invalid x axis resolution');
-            }
-
-            setTickCount(visibleData.length);
-            setStartIndex(startIndex ?? 0);
-
-        };
-
 
         useEffect(() => {
             const chartContainer = chartContainerRef.current;
