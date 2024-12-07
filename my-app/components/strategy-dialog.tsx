@@ -88,6 +88,10 @@ const StrategyDialog = observer((props: StrategyDialogProps) => {
                         </div>
                     </div>
 
+                    <div className="font-semibold">
+                        Trades over Selected Backtesting Period : {strategy.backtestingOffSample.startDate} - {strategy.backtestingOffSample.endDate}
+                    </div>
+
                     <div>
                         <CandleStickChartDialog
                             generatedData={strategy.underline}
