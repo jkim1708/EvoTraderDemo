@@ -275,20 +275,6 @@ function getIndexEndDate(preparedData: {
         return (data.ts.split(',')[0].trim() === props.strategy.backtestingOffSample.endDate)
     });
 }
-
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
-function isTimeRangeGreaterThanOneYear(generatedData) {
-    const startDate = convertToDate(generatedData[0].ts);
-    const endDate = convertToDate(generatedData[generatedData.length - 1].ts);
-    console.log('startDate',startDate);
-    console.log('endDate',endDate);
-
-    const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays > 365;
-}
-
 function isTimeRangeGreaterThanThreeMonths(offSampleBacktestTimeRangedData: {
     ts: string;
     low: string;
