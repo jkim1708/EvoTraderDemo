@@ -92,3 +92,21 @@ body {
 .tradeKindButton {
   user-select: none; /* Standard syntax */
 }
+
+/* styles.css */
+.blue-circle-icon {
+  width: 10px;
+  height: 10px;
+  background-color: rgb(178,178,252);
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* styles.css */
+.red-square-icon {
+  width: 10px;
+  height: 10px;
+  background-color: rgb(249,193,189);
+  border-radius: 50%;
+  display: inline-block;
+}

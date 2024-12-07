@@ -31,6 +31,7 @@ export type StrategyDialogProps = {
     onClose: () => void,
 }
 
+
 const StrategyDialog = observer((props: StrategyDialogProps) => {
 
     const {strategy, onClose} = props;
@@ -39,7 +40,7 @@ const StrategyDialog = observer((props: StrategyDialogProps) => {
 
     const backtestingOffSampleTrades: TradingRule[] = strategy.backtestingOffSample.trades;
 
-        addTradesToRecentTrades(recentTrades, backtestingOffSampleTrades);
+    addTradesToRecentTrades(recentTrades, backtestingOffSampleTrades);
 
     return (
         <Card className="w-11/12 mx-auto">
@@ -88,9 +89,21 @@ const StrategyDialog = observer((props: StrategyDialogProps) => {
                         </div>
                     </div>
 
-                    <div className="font-semibold">
-                        Trades over Selected Backtesting Period : {strategy.backtestingOffSample.startDate} - {strategy.backtestingOffSample.endDate}
+                    <div className="font-semibold space-y-2">
+                        Trades over Selected Backtesting Period
+                        : {strategy.backtestingOffSample.startDate} - {strategy.backtestingOffSample.endDate}
                     </div>
+
+                    <div className="flex item-center space-x-2">
+                        <div className="align-baseline"><div className="blue-circle-icon"></div></div>
+                        <p>Long Trades</p></div>
+                    <div className="flex item-center space-x-2">
+                        <div className="align-baseline">
+                            <div className="red-square-icon"></div>
+                        </div>
+                            <p>Short Trades</p>
+                    </div>
+
 
                     <div>
                         <CandleStickChartDialog
@@ -116,12 +129,14 @@ const StrategyDialog = observer((props: StrategyDialogProps) => {
                             <TableBody>
                                 {recentTrades.map((trade: TradingRule, index: number) => (
                                     <TableRow key={index}>
-                                        <TableCell className={trade.kind=="short" ? "text-red-500":"text-green-500"}>{trade.kind}</TableCell>
+                                        <TableCell
+                                            className={trade.kind == "short" ? "text-red-500" : "text-green-500"}>{trade.kind}</TableCell>
                                         <TableCell>{trade.startTime}</TableCell>
                                         <TableCell>{trade.entryPrice ?? ""}</TableCell>
                                         <TableCell>{trade.endTime}</TableCell>
                                         <TableCell>{trade.exitPrice ?? ""}</TableCell>
-                                        <TableCell className={trade.profitNLoss<0 ? "text-red-500":"text-green-500"}>{trade.profitNLoss}</TableCell>
+                                        <TableCell
+                                            className={trade.profitNLoss < 0 ? "text-red-500" : "text-green-500"}>{trade.profitNLoss}</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
