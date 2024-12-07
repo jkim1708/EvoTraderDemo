@@ -321,11 +321,7 @@ const CandleStickChartDialog =
 
         let initialXAxisResolution = X_AXIS_RESOLUTION.ONE_DAY;
         let initialVisibleData = offSampleBacktestTimeRangedData;
-        if (isTimeRangeGreaterThanOneYear(offSampleBacktestTimeRangedData)) {
-            console.log('isTimeRangeGreaterThanOneYear');
-            initialXAxisResolution = X_AXIS_RESOLUTION.FIVE_YEARS;
-            initialVisibleData = sevenDayData;
-        } else if (isTimeRangeGreaterThanThreeMonths(offSampleBacktestTimeRangedData)) {
+        if (isTimeRangeGreaterThanThreeMonths(offSampleBacktestTimeRangedData)) {
             console.log('isTimeRangeGreaterThanSixMonths');
             initialXAxisResolution = X_AXIS_RESOLUTION.SIX_MONTH;
             initialVisibleData = initialVisibleData.filter((_, i) => {
@@ -636,18 +632,18 @@ const CandleStickChartDialog =
                     >
                         6M
                     </Button>
-                    < Button
-                        onClick={() => handleDButton(X_AXIS_RESOLUTION.ONE_YEAR)}
-                        {...xAxisResolution == X_AXIS_RESOLUTION.ONE_YEAR ? {} : {variant: "outline"}}
-                    >
-                        1Y
-                    </Button>
-                    < Button
-                        onClick={() => handleDButton(X_AXIS_RESOLUTION.FIVE_YEARS)}
-                        {...xAxisResolution == X_AXIS_RESOLUTION.FIVE_YEARS ? {} : {variant: "outline"}}
-                    >
-                        5Y
-                    </Button>
+                    {/*< Button*/}
+                    {/*    onClick={() => handleDButton(X_AXIS_RESOLUTION.ONE_YEAR)}*/}
+                    {/*    {...xAxisResolution == X_AXIS_RESOLUTION.ONE_YEAR ? {} : {variant: "outline"}}*/}
+                    {/*>*/}
+                    {/*    1Y*/}
+                    {/*</Button>*/}
+                    {/*< Button*/}
+                    {/*    onClick={() => handleDButton(X_AXIS_RESOLUTION.FIVE_YEARS)}*/}
+                    {/*    {...xAxisResolution == X_AXIS_RESOLUTION.FIVE_YEARS ? {} : {variant: "outline"}}*/}
+                    {/*>*/}
+                    {/*    5Y*/}
+                    {/*</Button>*/}
                 </div>
             </div>
         );
