@@ -394,7 +394,14 @@ const CandleStickChartDialog =
                 }
             }
 
+
             runAsync();
+
+            console.log('handle btn numberOfLastDaysToShow',numberOfLastDaysToShow);
+            console.log('handle btn fullTimeRangeData.length',fullTimeRangeData.length);
+            console.log('handle btn startIndex',startIndex);
+            console.log('handle btn lastIndex',fullTimeRangeData.slice(startIndex).length - 1);
+
             setXAxisResolution(numberOfLastDaysToShow);
             setTickCount(numberOfLastDaysToShow);
             if (startIndex) setStartIndex(startIndex);
@@ -478,11 +485,13 @@ const CandleStickChartDialog =
                     e.preventDefault();
                     console.log(e.deltaY);
                     const scrollAmount = Math.round((e.deltaY*(visibleData.length/100))); // Adjust sensitivity here
-                    console.log('scrollAmount', scrollAmount);
                     let newStartIndex = 0;
                     let newLastIndex = 0;
                     if (startIndex != null || startIndex != undefined || lastIndex != null || lastIndex != undefined) {
-                        newStartIndex = Math.max(0, startIndex - scrollAmount);
+                    console.log('scrollAmount', scrollAmount);
+                    console.log('handle wheel startIndex', startIndex);
+                    console.log('handle wheel lastIndex', lastIndex);
+                        newStartIndex = Math.max(0, startIndex + scrollAmount);
                         newLastIndex = Math.max(0, lastIndex - scrollAmount);
                         console.log('newStartIndex 1', newStartIndex);
                     }
@@ -495,7 +504,9 @@ const CandleStickChartDialog =
                         case X_AXIS_RESOLUTION.SIX_MONTH:
                             newStartIndex = Math.min(fullTimeRangeData.length - 10, newStartIndex);
                             //prevent last index out of range
-                            newLastIndex = Math.min(fullTimeRangeData.length - 1, lastIndex + scrollAmount);
+                            // newLastIndex = Math.min(fullTimeRangeData.length - 1, lastIndex + scrollAmount);
+                            newLastIndex = Math.min(fullTimeRangeData.length - 1, newLastIndex);
+                            console.log('newLastIndex',newLastIndex);
 
                             //prevent index crossing each other
                             newLastIndex = Math.max(newStartIndex+10, newLastIndex);
@@ -612,12 +623,12 @@ const CandleStickChartDialog =
                     >
                         3M
                     </Button>
-                    < Button
-                        onClick={() => handleDButton(X_AXIS_RESOLUTION.SIX_MONTH)}
-                        {...xAxisResolution == X_AXIS_RESOLUTION.SIX_MONTH ? {} : {variant: "outline"}}
-                    >
-                        6M
-                    </Button>
+                    {/*< Button*/}
+                    {/*    onClick={() => handleDButton(X_AXIS_RESOLUTION.SIX_MONTH)}*/}
+                    {/*    {...xAxisResolution == X_AXIS_RESOLUTION.SIX_MONTH ? {} : {variant: "outline"}}*/}
+                    {/*>*/}
+                    {/*    6M*/}
+                    {/*</Button>*/}
                     {/*< Button*/}
                     {/*    onClick={() => handleDButton(X_AXIS_RESOLUTION.ONE_YEAR)}*/}
                     {/*    {...xAxisResolution == X_AXIS_RESOLUTION.ONE_YEAR ? {} : {variant: "outline"}}*/}

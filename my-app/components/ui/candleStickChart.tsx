@@ -404,12 +404,12 @@ const CandleStickChart =
                         3M
                     </Button>
 
-                    < Button
-                        onClick={async () => handleDButton(X_AXIS_RESOLUTION.SIX_MONTH)}
-                        {...xAxisResolution == X_AXIS_RESOLUTION.SIX_MONTH ? {} : {variant: "outline"}}
-                    >
-                        6M
-                    </Button>
+                    {/*< Button*/}
+                    {/*    onClick={async () => handleDButton(X_AXIS_RESOLUTION.SIX_MONTH)}*/}
+                    {/*    {...xAxisResolution == X_AXIS_RESOLUTION.SIX_MONTH ? {} : {variant: "outline"}}*/}
+                    {/*>*/}
+                    {/*    6M*/}
+                    {/*</Button>*/}
                 </div>
             </div>
 
