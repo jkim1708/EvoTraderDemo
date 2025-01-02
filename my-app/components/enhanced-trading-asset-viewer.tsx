@@ -22,8 +22,7 @@ import {
     CANDLESTICK_FREQUENCY,
     convertToCustomDate,
     convertToDate,
-    generateData, generateRandomDateRange,
-    isValidDate,
+    generateData,
     SampleAssetData,
     transformToCandleStickSeries
 } from "@/utils";
@@ -98,16 +97,13 @@ const EnhancedTradingAssetViewer = observer(() => {
             CREATE,
             EDIT
         };
-        const [viewMode, setViewMode] = useState(VIEW_MODE.CREATE)
+        const [viewMode] = useState(VIEW_MODE.CREATE)
 
         // const [selectedRange, setSelectedRange] = useState<[number, number] | null>(null)
         // const [tradeType, setTradeType] = useState<'long' | 'short'>('long')
         const [editingTrade, setEditingTrade] = useState<TradingRule | null>(null)
         const [errors, setErrors] = useState([])
         const [showErrorDialog, setShowErrorDialog] = useState<boolean>(false)
-
-        const [startBacktestingOffSample, setStartBacktestingOffSample] = useState('');
-        const [endBacktestingOffSample, setEndBacktestingOffSample] = useState('');
 
         const resetSelectedTrades = () => {
             setTradingRule([]);
@@ -118,13 +114,13 @@ const EnhancedTradingAssetViewer = observer(() => {
         const appRouterInstance = useRouter();
 
 
-        useEffect(() => {
-            if (isEditMode) {
-                setViewMode(VIEW_MODE.EDIT);
-                setStartBacktestingOffSample(tradingStrategies.find(strategy => strategy.name === isEditMode)?.backtestingOffSample.startDate ?? '');
-                setEndBacktestingOffSample(tradingStrategies.find(strategy => strategy.name === isEditMode)?.backtestingOffSample.endDate ?? '');
-            }
-        }, []);
+        // useEffect(() => {
+        //     if (isEditMode) {
+        //         setViewMode(VIEW_MODE.EDIT);
+        //         setStartBacktestingOffSample(tradingStrategies.find(strategy => strategy.name === isEditMode)?.backtestingOffSample.startDate ?? '');
+        //         setEndBacktestingOffSample(tradingStrategies.find(strategy => strategy.name === isEditMode)?.backtestingOffSample.endDate ?? '');
+        //     }
+        // }, []);
 
         useEffect(() => {
             if (isEditMode) {
@@ -265,37 +261,6 @@ const EnhancedTradingAssetViewer = observer(() => {
             setEditingTrade(null)
         }
 
-        function generateRandomTrades(startBacktestingOffSample: string, endBacktestingOffSample: string, asset: "EURUSD" | "USDJPY" | "GBPUSD" | "EURCHF" | "EURNOK"): TradingRule[] {
-            const randomTrades: TradingRule[] = [] as TradingRule[];
-            // const date = generateRandomDateFromLast5Years();
-            const offSampleTestStartDate = new Date(startBacktestingOffSample);
-            const offSampleTestEndDate = new Date(endBacktestingOffSample);
-            const randomDateRange = generateRandomDateRange(offSampleTestStartDate, offSampleTestEndDate);
-
-
-
-            randomDateRange.forEach(dateRange => {
-                const pnl = ((Math.random()<0.3) ? -1: 1) *  parseFloat((Math.random() * (0.009 - 0.001) + 0.001).toFixed(8));
-                const entryPrice = parseFloat((Math.random() * (1.2 - 0.8) + 0.8).toFixed(4));
-                const exitPrice = pnl - entryPrice;
-
-                randomTrades.push({
-                    kind: Math.floor(Math.random() * 2.0) === 0 ? 'long' : 'short',
-                    startTime: convertToCustomDate(dateRange.startDate),
-                    endTime: convertToCustomDate(dateRange.endDate),
-                    asset: asset,
-                    profitNLoss: pnl,
-                    entryPrice: entryPrice,
-                    exitPrice: exitPrice,
-                })
-            }            )
-
-            if (randomTrades.length === 0) {
-                console.error("Could not generate random trades");
-            }
-            return randomTrades;
-        }
-
         function createTradingStrategy(param: {
             name: string;
             rules: TradingRule[],
@@ -318,9 +283,9 @@ const EnhancedTradingAssetViewer = observer(() => {
                 selectedEndDate: param.selectedEndDate,
                 frequency: param.frequency,
                 backtestingOffSample: {
-                    startDate: startBacktestingOffSample,
-                    endDate: endBacktestingOffSample,
-                    trades: generateRandomTrades(startBacktestingOffSample, endBacktestingOffSample, asset as "EURUSD" | "USDJPY" | "GBPUSD" | "EURCHF" | "EURNOK"),
+                    startDate: '',
+                    endDate: '',
+                    trades: [],
                 },
                 backtestingOnSample: {
                     startDate: data[0].ts.split(',')[0],
@@ -359,15 +324,11 @@ const EnhancedTradingAssetViewer = observer(() => {
             if (viewMode === VIEW_MODE.CREATE) {
 
                 const isNameValid = !isNameExistent(currentTradingStrategyName);
-                const isBacktestingOffSampleValid = isValidDate(startBacktestingOffSample) && isValidDate(endBacktestingOffSample)
                 // setIsStrategyParamValid((isNameValid && isBacktestingOffSampleValid));
 
-                if (!(isNameValid && isBacktestingOffSampleValid)) {
+                if (!(isNameValid)) {
                     if (!isNameValid) {
                         error.push("duplicate_trading_name");
-                    }
-                    if (!isBacktestingOffSampleValid) {
-                        error.push("no_backtesting_range");
                     }
 
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -528,49 +489,6 @@ const EnhancedTradingAssetViewer = observer(() => {
                     <CandleStickChart data={frequency == CANDLESTICK_FREQUENCY.HOURLY ? data : fourHourData}
                                       asset={asset}
                     />
-
-                    <p> Backtesting Offsample Time Range </p>
-                    <div className="flex space-x-4 mb-4">
-                        <div>
-                            <Label htmlFor="start-date-backtesting-off-sample" className="text-right">
-                                Start Date
-                            </Label>
-                            <Input
-                                id="start-date-backtesting-off-sample"
-                                type="date"
-                                value={
-                                    startBacktestingOffSample
-                                }
-                                onChange={(e) => {
-                                    setStartBacktestingOffSample(
-                                        e.target.value
-                                    )
-
-                                }}
-                                className="flex-1"
-                                max={new Date().toJSON().split('T')[0]}
-                            />
-                        </div>
-                        <div>
-                            <Label htmlFor="end-date-backtesting-off-sample" className="text-right">
-                                End Date
-                            </Label>
-                            <Input
-                                id="end-date-backtesting-off-sample"
-                                type="date"
-                                value={
-                                    endBacktestingOffSample
-                                }
-                                onChange={(e) => {
-                                    setEndBacktestingOffSample(
-                                        e.target.value
-                                    )
-
-                                }}
-                                className="flex-1"
-                            />
-                        </div>
-                    </div>
 
                     <div className="mt-6">
                         <h3 className="text-lg font-semibold mb-2">Selected Trades</h3>
