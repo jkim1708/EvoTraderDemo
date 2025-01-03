@@ -117,6 +117,7 @@ const EnhancedTradingAssetViewer = observer(() => {
         useEffect(() => {
             if (isEditMode) {
                 setViewMode(VIEW_MODE.EDIT);
+
             }
         }, []);
 
@@ -214,6 +215,9 @@ const EnhancedTradingAssetViewer = observer(() => {
             setFullTimeRangeMasterFourHourData(transformedData);
             setFourHourData(transformedData);
 
+            setNewStartDateVisibleDate(startDate, candleStickSeries, transformedData);
+
+
         }, [asset]);
 
         function setNewStartDateVisibleDate(startDate: string, fullTimeRangeData: CandleStickChart[], fullTimeRangeFourHourData: CandleStickChart[]) {
@@ -231,6 +235,7 @@ const EnhancedTradingAssetViewer = observer(() => {
 
         useEffect(() => {
             resetSelectedTrades();
+
         }, [startDate, asset, frequency]);
 
         const removeTrade = (startTime: string) => {

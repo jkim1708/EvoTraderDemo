@@ -146,7 +146,7 @@ const CandleStickChart =
         const [xAxisResolution, setXAxisResolution] = useState(X_AXIS_RESOLUTION.THREE_MONTH); // Bereich der X-Achse
         const [isDragging, setIsDragging] = useState(false); // Bereich der X-Achse
         const [lastMouseX, setLastMouseX] = useState(0); // Bereich der X-Achse
-        const [startIndex, setStartIndex] = useState(2950); // Bereich der X-Achse
+        const [startIndex, setStartIndex] = useState(0); // Bereich der X-Achse
         console.log('startIndex 2',startIndex);
 
         const asset = props.asset;
