@@ -236,13 +236,36 @@ const EnhancedTradingAssetViewer = observer(() => {
         }, [startDate, asset, frequency]);
 
         const removeTrade = (startTime: string) => {
-            setTradingRule(tradingRules.filter(trade => trade.startTime !== startTime))
-            setDefinedRefArea(tradingRules.filter(trade => trade.startTime !== startTime).map(trade => ({
-                referencedAreaLeft: trade.startTime,
-                referencedAreaRight: trade.endTime,
-                tradeKind: trade.kind
-            })));
-        }
+
+            if (!isEditMode) {
+                setTradingRule(tradingRules.filter(trade => trade.startTime !== startTime));
+                setDefinedRefArea(tradingRules.filter(trade => trade.startTime !== startTime).map(trade => (
+
+                    {
+                        referencedAreaLeft: trade.startTime,
+                        referencedAreaRight: trade.endTime,
+                        tradeKind: trade.kind
+                    })));
+
+            } else {
+                tradingStrategies.filter(strategy => strategy.name === isEditMode).forEach(strategy => {
+                    const filteredStrategies = strategy.tradingRules.filter(trade => trade.startTime !== startTime);
+                    if (filteredStrategies.length !== 0) {
+                        strategy.tradingRules = strategy.tradingRules.filter(trade => trade.startTime !== startTime);
+                        setDefinedRefArea(strategy.tradingRules.filter(trade => trade.startTime !== startTime).map(trade => (
+
+                            {
+                                referencedAreaLeft: trade.startTime,
+                                referencedAreaRight: trade.endTime,
+                                tradeKind: trade.kind
+                            })));
+
+                    } else {
+                        console.error('trade deletion cancelled since there need to be at least one trade per strategy')
+                    }
+                })
+            }
+        };
 
         const startEditTrade = (trade: TradingRule) => {
             setEditingTrade(trade);
