@@ -97,7 +97,7 @@ const EnhancedTradingAssetViewer = observer(() => {
             CREATE,
             EDIT
         };
-        const [viewMode] = useState(VIEW_MODE.CREATE)
+        const [viewMode, setViewMode] = useState(VIEW_MODE.CREATE)
 
         // const [selectedRange, setSelectedRange] = useState<[number, number] | null>(null)
         // const [tradeType, setTradeType] = useState<'long' | 'short'>('long')
@@ -114,13 +114,11 @@ const EnhancedTradingAssetViewer = observer(() => {
         const appRouterInstance = useRouter();
 
 
-        // useEffect(() => {
-        //     if (isEditMode) {
-        //         setViewMode(VIEW_MODE.EDIT);
-        //         setStartBacktestingOffSample(tradingStrategies.find(strategy => strategy.name === isEditMode)?.backtestingOffSample.startDate ?? '');
-        //         setEndBacktestingOffSample(tradingStrategies.find(strategy => strategy.name === isEditMode)?.backtestingOffSample.endDate ?? '');
-        //     }
-        // }, []);
+        useEffect(() => {
+            if (isEditMode) {
+                setViewMode(VIEW_MODE.EDIT);
+            }
+        }, []);
 
         useEffect(() => {
             if (isEditMode) {
@@ -251,9 +249,8 @@ const EnhancedTradingAssetViewer = observer(() => {
                 tradingStrategies.filter(strategy => strategy.name === isEditMode).forEach(strategy => {
                     const filteredStrategies = strategy.tradingRules.filter(trade => trade.startTime !== startTime);
                     if (filteredStrategies.length !== 0) {
-                        strategy.tradingRules = strategy.tradingRules.filter(trade => trade.startTime !== startTime);
+                        strategy.tradingRules = filteredStrategies;
                         setDefinedRefArea(strategy.tradingRules.filter(trade => trade.startTime !== startTime).map(trade => (
-
                             {
                                 referencedAreaLeft: trade.startTime,
                                 referencedAreaRight: trade.endTime,
