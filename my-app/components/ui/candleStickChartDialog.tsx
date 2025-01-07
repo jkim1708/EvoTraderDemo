@@ -18,6 +18,7 @@ import {ChartContainer} from "@/components/ui/chart";
 import CandleStickChart from "@/components/ui/candleStickChart";
 import {TradingStrategy} from "@/store/RootStore";
 import {TradingRule} from "@/store/TradingRuleStore";
+import {ArrowDownCircle, ArrowUpCircle} from "lucide-react";
 
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -527,105 +528,126 @@ const CandleStickChartDialog =
         }, [startIndex]);
 
         return (
-            <div>
-                <p> {asset} </p>
-                <ChartContainer config={{
-                    value: {
-                        label: "Value",
-                        color: "hsl(var(--chart-1))",
-                    },
-                }}
-                                ref={chartContainerRef}
-                                className="h-[400px]"
-                                onMouseDown={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleMouseDown(e)}
-                                onMouseMove={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleMouseMove(e)}
-                                onMouseUp={handleMouseUp}
-                                onMouseLeave={handleMouseUp}
-                                onContextMenu={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleContextMenu(e)}
-                >
-                    <ResponsiveContainer
-                        width="100%"
-                        height={500}
-                    >
-                        <BarChart
-                            width={800}
-                            height={250}
-                            data={visibleData}
-                            margin={{top: 20, right: 30, left: 20, bottom: 20}}
+            <div className={"border rounded p-3"}>
+                <div className={"flex space-x-8"}>
+                    <div className="flex space-x-2 mb-4 tradeKindButton">
+                        <Button
+                            // variant={currentSelectedTradeKind === 'long' ? 'default' : 'outline'}
+                            className={"bg-blue-700 opacity-30"}
+                            disabled={true}
                         >
-                            <XAxis dataKey="ts" tickCount={tickCount}
-                                   tick={CustomizedTick}
-                                   padding={{'left': 5}}/>
-                            <YAxis yAxisId="1" dataKey="lowHigh" domain={['auto', 'auto']} allowDecimals={true}/>
-                            <CartesianGrid strokeDasharray="3 3"/>
-                            <Bar
-                                yAxisId="1"
-                                dataKey="openClose"
-                                fill="#8884d8"
-                                shape={<Candlestick/>}
-                                isAnimationActive={false}
-                            />
+                            <ArrowUpCircle className="mr-2 h-4 w-4"/> Long
+                        </Button>
+                        <Button
+                            // variant={currentSelectedTradeKind === 'short' ? 'default' : 'outline'}
+                            className={"bg-orange-700 opacity-30"}
+                            disabled={true}
+                        >
+                            <ArrowDownCircle className="mr-2 h-4 w-4"/> Short
+                        </Button>
+                    </div>
 
-                            {/*// eslint-disable-next-line @typescript-eslint/ban-ts-comment*/}
-                            {/*// @ts-expect-error take care later*/}
-                            <Tooltip content={customTooltipContent} cursor={<CustomTooltipCursor/>}
-                                     position={{x: 100, y: -25}} offset={20}/>
-
-                            {props.randomTrades.map((trade, index) => (<ReferenceArea yAxisId="1" key={index}
-                                                                                      x1={findTsInDifferentFrequency(trade.startTime.split(',')[0], visibleData, xAxisResolution, 'x1')}
-                                                                                      x2={findTsInDifferentFrequency(trade.endTime.split(',')[0], visibleData, xAxisResolution, 'x2')}
-                                                                                      fill={trade.kind == 'long' ? "blue" : "red"}
-                                                                                      fillOpacity={0.3}/>))}
-                        </BarChart>
-                    </ResponsiveContainer>
-                </ChartContainer>
-                <Label> Range </Label>
-                <div className="flex space-x-4 mb-4 tradeKindButton">
-                    < Button
-                        onClick={() => handleDButton(X_AXIS_RESOLUTION.ONE_DAY)}
-                        {...xAxisResolution == X_AXIS_RESOLUTION.ONE_DAY ? {} : {variant: "outline"}}
-                    >
-                        1D
-                    </Button>
-                    < Button
-                        onClick={() => handleDButton(X_AXIS_RESOLUTION.FIVE_DAYS)}
-                        {...xAxisResolution == X_AXIS_RESOLUTION.FIVE_DAYS ? {} : {variant: "outline"}}
-                    >
-                        5D
-                    </Button>
-                    < Button
-                        onClick={() => handleDButton(X_AXIS_RESOLUTION.ONE_MONTH)}
-                        {...xAxisResolution == X_AXIS_RESOLUTION.ONE_MONTH ? {} : {variant: "outline"}}
-                    >
-                        1M
-                    </Button>
-                    < Button
-                        onClick={() => handleDButton(X_AXIS_RESOLUTION.THREE_MONTH)}
-                        {...xAxisResolution == X_AXIS_RESOLUTION.THREE_MONTH ? {} : {variant: "outline"}}
-                    >
-                        3M
-                    </Button>
-                    {/*< Button*/}
-                    {/*    onClick={() => handleDButton(X_AXIS_RESOLUTION.SIX_MONTH)}*/}
-                    {/*    {...xAxisResolution == X_AXIS_RESOLUTION.SIX_MONTH ? {} : {variant: "outline"}}*/}
-                    {/*>*/}
-                    {/*    6M*/}
-                    {/*</Button>*/}
-                    {/*< Button*/}
-                    {/*    onClick={() => handleDButton(X_AXIS_RESOLUTION.ONE_YEAR)}*/}
-                    {/*    {...xAxisResolution == X_AXIS_RESOLUTION.ONE_YEAR ? {} : {variant: "outline"}}*/}
-                    {/*>*/}
-                    {/*    1Y*/}
-                    {/*</Button>*/}
-                    {/*< Button*/}
-                    {/*    onClick={() => handleDButton(X_AXIS_RESOLUTION.FIVE_YEARS)}*/}
-                    {/*    {...xAxisResolution == X_AXIS_RESOLUTION.FIVE_YEARS ? {} : {variant: "outline"}}*/}
-                    {/*>*/}
-                    {/*    5Y*/}
-                    {/*</Button>*/}
+                    <div className="flex space-x-4 mb-4 tradeKindButton">
+                        < Button
+                            onClick={() => handleDButton(X_AXIS_RESOLUTION.ONE_DAY)}
+                            {...xAxisResolution == X_AXIS_RESOLUTION.ONE_DAY ? {} : {variant: "outline"}}
+                        >
+                            1D
+                        </Button>
+                        < Button
+                            onClick={() => handleDButton(X_AXIS_RESOLUTION.FIVE_DAYS)}
+                            {...xAxisResolution == X_AXIS_RESOLUTION.FIVE_DAYS ? {} : {variant: "outline"}}
+                        >
+                            5D
+                        </Button>
+                        < Button
+                            onClick={() => handleDButton(X_AXIS_RESOLUTION.ONE_MONTH)}
+                            {...xAxisResolution == X_AXIS_RESOLUTION.ONE_MONTH ? {} : {variant: "outline"}}
+                        >
+                            1M
+                        </Button>
+                        < Button
+                            onClick={() => handleDButton(X_AXIS_RESOLUTION.THREE_MONTH)}
+                            {...xAxisResolution == X_AXIS_RESOLUTION.THREE_MONTH ? {} : {variant: "outline"}}
+                        >
+                            3M
+                        </Button>
+                        {/*< Button*/}
+                        {/*    onClick={() => handleDButton(X_AXIS_RESOLUTION.SIX_MONTH)}*/}
+                        {/*    {...xAxisResolution == X_AXIS_RESOLUTION.SIX_MONTH ? {} : {variant: "outline"}}*/}
+                        {/*>*/}
+                        {/*    6M*/}
+                        {/*</Button>*/}
+                        {/*< Button*/}
+                        {/*    onClick={() => handleDButton(X_AXIS_RESOLUTION.ONE_YEAR)}*/}
+                        {/*    {...xAxisResolution == X_AXIS_RESOLUTION.ONE_YEAR ? {} : {variant: "outline"}}*/}
+                        {/*>*/}
+                        {/*    1Y*/}
+                        {/*</Button>*/}
+                        {/*< Button*/}
+                        {/*    onClick={() => handleDButton(X_AXIS_RESOLUTION.FIVE_YEARS)}*/}
+                        {/*    {...xAxisResolution == X_AXIS_RESOLUTION.FIVE_YEARS ? {} : {variant: "outline"}}*/}
+                        {/*>*/}
+                        {/*    5Y*/}
+                        {/*</Button>*/}
+                    </div>
                 </div>
-            </div>
-        );
-    });
 
-export default CandleStickChartDialog;
+                    <p> {asset} </p>
+                    <ChartContainer config={{
+                        value: {
+                            label: "Value",
+                            color: "hsl(var(--chart-1))",
+                        },
+                    }}
+                                    ref={chartContainerRef}
+                                    className="h-[400px]"
+                                    onMouseDown={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleMouseDown(e)}
+                                    onMouseMove={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleMouseMove(e)}
+                                    onMouseUp={handleMouseUp}
+                                    onMouseLeave={handleMouseUp}
+                                    onContextMenu={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleContextMenu(e)}
+                    >
+                        <ResponsiveContainer
+                            width="100%"
+                            height={500}
+                        >
+                            <BarChart
+                                width={800}
+                                height={250}
+                                data={visibleData}
+                                margin={{top: 20, right: 30, left: 20, bottom: 20}}
+                            >
+                                <XAxis dataKey="ts" tickCount={tickCount}
+                                       tick={CustomizedTick}
+                                       padding={{'left': 5}}/>
+                                <YAxis yAxisId="1" dataKey="lowHigh" domain={['auto', 'auto']} allowDecimals={true}/>
+                                <CartesianGrid strokeDasharray="3 3"/>
+                                <Bar
+                                    yAxisId="1"
+                                    dataKey="openClose"
+                                    fill="#8884d8"
+                                    shape={<Candlestick/>}
+                                    isAnimationActive={false}
+                                />
+
+                                {/*// eslint-disable-next-line @typescript-eslint/ban-ts-comment*/}
+                                {/*// @ts-expect-error take care later*/}
+                                <Tooltip content={customTooltipContent} cursor={<CustomTooltipCursor/>}
+                                         position={{x: 100, y: -25}} offset={20}/>
+
+                                {props.randomTrades.map((trade, index) => (<ReferenceArea yAxisId="1" key={index}
+                                                                                          x1={findTsInDifferentFrequency(trade.startTime.split(',')[0], visibleData, xAxisResolution, 'x1')}
+                                                                                          x2={findTsInDifferentFrequency(trade.endTime.split(',')[0], visibleData, xAxisResolution, 'x2')}
+                                                                                          fill={trade.kind == 'long' ? "blue" : "red"}
+                                                                                          fillOpacity={0.3}/>))}
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </ChartContainer>
+                    <Label> Range </Label>
+
+                </div>
+                );
+                });
+
+                export default CandleStickChartDialog;

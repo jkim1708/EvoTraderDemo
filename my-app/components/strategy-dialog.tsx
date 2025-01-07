@@ -146,11 +146,6 @@ const StrategyDialog = observer((props: StrategyDialogProps) => {
                         </div>
                     </div>
 
-                    <div className="font-semibold space-y-2">
-                        Trades over Selected Backtesting Period
-                        : {strategy.backtestingOffSample.startDate} - {strategy.backtestingOffSample.endDate}
-                    </div>
-
                     <p> Backtesting Offsample Time Range </p>
                     <div className="flex space-x-4 mb-4">
                         <div>
@@ -194,17 +189,17 @@ const StrategyDialog = observer((props: StrategyDialogProps) => {
                         </div>
                     </div>
 
-                    <div className="flex item-center space-x-2">
-                        <div className="align-baseline">
-                            <div className="blue-circle-icon"></div>
-                        </div>
-                        <p>Long Trades</p></div>
-                    <div className="flex item-center space-x-2">
-                        <div className="align-baseline">
-                            <div className="red-square-icon"></div>
-                        </div>
-                        <p>Short Trades</p>
-                    </div>
+                    {/*<div className="flex item-center space-x-2">*/}
+                    {/*    <div className="align-baseline">*/}
+                    {/*        <div className="blue-circle-icon"></div>*/}
+                    {/*    </div>*/}
+                    {/*    <p>Long Trades</p></div>*/}
+                    {/*<div className="flex item-center space-x-2">*/}
+                    {/*    <div className="align-baseline">*/}
+                    {/*        <div className="red-square-icon"></div>*/}
+                    {/*    </div>*/}
+                    {/*    <p>Short Trades</p>*/}
+                    {/*</div>*/}
 
                     {showChart && (
                         <div>

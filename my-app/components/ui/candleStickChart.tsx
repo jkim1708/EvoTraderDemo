@@ -148,7 +148,7 @@ const CandleStickChart =
         const [isDragging, setIsDragging] = useState(false); // Bereich der X-Achse
         const [lastMouseX, setLastMouseX] = useState(0); // Bereich der X-Achse
         const [startIndex, setStartIndex] = useState(0); // Bereich der X-Achse
-        console.log('startIndex 2',startIndex);
+        console.log('startIndex 2', startIndex);
 
         const asset = props.asset;
         const data = props.data;
@@ -295,8 +295,8 @@ const CandleStickChart =
         }, []);
 
         const visibleData = data.slice(startIndex, startIndex + xAxisResolution)
-        console.log('startIndex',startIndex)
-        console.log('xAxisResolution',xAxisResolution)
+        console.log('startIndex', startIndex)
+        console.log('xAxisResolution', xAxisResolution)
 
         const handleContextMenu = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
             event.preventDefault();
