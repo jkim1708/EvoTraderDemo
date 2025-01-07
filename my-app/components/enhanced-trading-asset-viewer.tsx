@@ -51,8 +51,6 @@ const EnhancedTradingAssetViewer = observer(() => {
                 tradingRules,
                 setTradingRule,
                 setDefinedRefArea,
-                currentSelectedTradeKind,
-                setCurrentSelectedTradeKind,
                 setCurrentTradingStrategyName,
                 currentTradingStrategyName,
                 currentTradingStrategyOnSampleRange,
