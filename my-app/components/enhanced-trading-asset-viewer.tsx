@@ -497,16 +497,18 @@ const EnhancedTradingAssetViewer = observer(() => {
                     </div>
                     <div className="flex space-x-4 mb-4 tradeKindButton">
                         <Button
+                            // variant={currentSelectedTradeKind === 'long' ? 'default' : 'outline'}
                             variant={currentSelectedTradeKind === 'long' ? 'default' : 'outline'}
                             onClick={() => setCurrentSelectedTradeKind('long')}
-                            className={currentSelectedTradeKind === 'long' ?"bg-green-700": 'default'}
+                            className={currentSelectedTradeKind === 'long' ? "bg-green-700 opacity-30" : 'outline opacity-30'}
                         >
                             <ArrowUpCircle className="mr-2 h-4 w-4"/> Long
                         </Button>
                         <Button
+                            // variant={currentSelectedTradeKind === 'short' ? 'default' : 'outline'}
                             variant={currentSelectedTradeKind === 'short' ? 'default' : 'outline'}
                             onClick={() => setCurrentSelectedTradeKind('short')}
-                            className={currentSelectedTradeKind === 'short' ? "bg-red-700" : 'default'}
+                            className={currentSelectedTradeKind === 'short' ? "bg-red-700 opacity-30" : 'outline opacity-30'}
                         >
                             <ArrowDownCircle className="mr-2 h-4 w-4"/> Short
                         </Button>
