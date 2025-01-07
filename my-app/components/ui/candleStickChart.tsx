@@ -303,8 +303,28 @@ const CandleStickChart =
 
         return (
             <div className={"border rounded p-3"}>
-                <Label> Range </Label>
-                <div className="flex space-x-4 mb-4 tradeKindButton">
+                <div className={"flex space-x-8"}>
+                <div className="flex space-x-2 mb-4 tradeKindButton">
+                    <Button
+                        // variant={currentSelectedTradeKind === 'long' ? 'default' : 'outline'}
+                        variant={currentSelectedTradeKind === 'long' ? 'default' : 'outline'}
+                        onClick={() => setCurrentSelectedTradeKind('long')}
+                        className={currentSelectedTradeKind === 'long' ? "bg-green-700 opacity-30" : 'outline opacity-30'}
+                    >
+                        <ArrowUpCircle className="mr-2 h-4 w-4"/> Long
+                    </Button>
+                    <Button
+                        // variant={currentSelectedTradeKind === 'short' ? 'default' : 'outline'}
+                        variant={currentSelectedTradeKind === 'short' ? 'default' : 'outline'}
+                        onClick={() => setCurrentSelectedTradeKind('short')}
+                        className={currentSelectedTradeKind === 'short' ? "bg-red-700 opacity-30" : 'outline opacity-30'}
+                    >
+                        <ArrowDownCircle className="mr-2 h-4 w-4"/> Short
+                    </Button>
+                </div>
+
+                {/*<Label> Range </Label>*/}
+                <div className="flex space-x-2 mb-4 tradeKindButton">
                     < Button
                         onClick={() => handleDButton(X_AXIS_RESOLUTION.ONE_DAY)}
                         {...xAxisResolution == X_AXIS_RESOLUTION.ONE_DAY ? {} : {variant: "outline"}}
@@ -337,6 +357,7 @@ const CandleStickChart =
                     {/*    6M*/}
                     {/*</Button>*/}
                 </div>
+                    </div>
 
                 <p className={"assetName"}> {asset} </p>
                 <Suspense>
