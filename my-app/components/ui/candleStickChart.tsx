@@ -8,7 +8,7 @@ import {useStores} from "@/store/Provider";
 import {Button} from "@/components/ui/button";
 import {ChartContainer} from "@/components/ui/chart";
 import {CategoricalChartState} from "recharts/types/chart/types";
-import {Label} from "@/components/ui/label";
+import {ArrowDownCircle, ArrowUpCircle} from "lucide-react";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
@@ -138,7 +138,8 @@ const CandleStickChart =
                 currentSelectedAsset,
                 definedRefArea,
                 currentSelectedTradeKind,
-                setCurrentTradingStrategyOnSampleRange
+                setCurrentTradingStrategyOnSampleRange,
+                setCurrentSelectedTradeKind,
             },
         } = useStores();
 
