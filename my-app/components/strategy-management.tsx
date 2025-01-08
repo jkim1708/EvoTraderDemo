@@ -80,7 +80,7 @@ const StrategyManagement = observer(() => {
                         onAnalyze={setStrategy}
                     />
                     <div className="flex justify-end">
-                        <Link href="/">
+                        <Link href="/strategy-creator-setup">
                             <Button>
                                 Create new Algorithm
                             </Button>
