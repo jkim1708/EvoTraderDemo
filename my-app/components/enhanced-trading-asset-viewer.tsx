@@ -64,6 +64,7 @@ const EnhancedTradingAssetViewer = observer(() => {
 
         let initialStartDate;
         let initialAsset;
+        let initialFrequency;
 
         //initialize edit Page
         if (isEditMode) {
@@ -82,9 +83,20 @@ const EnhancedTradingAssetViewer = observer(() => {
                 setCurrentTradingStrategyOnSampleRange(parseInt(strategy.backtestingOnSample.endDate));
             });
         }
+        // after setup page
+        else {
+            initialStartDate = searchParams.get('startDate');
+            const paramFrequency = searchParams.get('frequency');
+            if(paramFrequency == 'hourly'){
+                initialFrequency = CANDLESTICK_FREQUENCY.HOURLY;
+            } else if(paramFrequency == 'four_hourly') {
+                initialFrequency = CANDLESTICK_FREQUENCY.FOUR_HOURLY;
+            }
+            initialAsset = searchParams.get('asset');
+        }
 
         const [startDate, setStartDate] = useState(initialStartDate ?? new Date('2020-02-01').toISOString().split('T')[0])
-        const [frequency, setFrequency] = useState(CANDLESTICK_FREQUENCY.HOURLY)
+        const [frequency, setFrequency] = useState(initialFrequency ?? CANDLESTICK_FREQUENCY.HOURLY)
         const [asset, setAsset] = useState(initialAsset ?? "EURUSD")
         const [data, setData] = useState([] as CandleStickChart[])
         const [fullTimeRangeData, setFullTimeRangeData] = useState([] as CandleStickChart[])
