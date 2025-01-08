@@ -2,7 +2,6 @@
 
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Label} from "@/components/ui/label";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {Input} from "@/components/ui/input";
 import {useState} from "react";
 import {observer} from "mobx-react-lite";
@@ -16,7 +15,7 @@ const StrategyCreatorSetup = observer(() => {
 
     const appRouterInstance = useRouter();
 
-    const assets = ['EURUSD', 'GBPUSD', 'EURCHF', 'EURNOK']
+    // const assets = ['EURUSD', 'GBPUSD', 'EURCHF', 'EURNOK']
 
     const [startDate, setStartDate] = useState<string>(new Date('2020-02-01').toJSON().split('T')[0]);
 
