@@ -11,7 +11,7 @@ import {useRouter} from "next/navigation";
 
 const StrategyCreatorSetup = observer(() => {
 
-    const [asset, setAsset] = useState<string>('EURUSD');
+    const [asset, setAsset] = useState('EURUSD');
 
     const appRouterInstance = useRouter();
 
@@ -23,11 +23,15 @@ const StrategyCreatorSetup = observer(() => {
 
     const [tradingName, setTradingName] = useState<string>('My Trading Rule');
 
-    function handleClickEURUSD() {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    function handleClickEURUSD(event) {
         setAsset('EURUSD');
     }
 
-    function handleClickGBPUSD() {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    function handleClickGBPUSD(event) {
         setAsset('GBPUSD');
     }
 
@@ -59,7 +63,7 @@ const StrategyCreatorSetup = observer(() => {
                                 }}/>
                             </div>
                         </div>
-                        <form className="space-y-4 mb-6">
+                        <div className="space-y-4 mb-6">
                             {/*<div className="flex space-x-4">*/}
                             <div className="space-y-2">
                                 <Label htmlFor="asset">Asset</Label>
@@ -151,7 +155,7 @@ const StrategyCreatorSetup = observer(() => {
                                 </div>
                             </div>
                             {/*</div>*/}
-                        </form>
+                        </div>
                         <div className="flex space-x-4 mb-4 flex justify-end mt-6">
                             <Button variant="default" size="sm"
                                 onClick={handleStartCreateStrategy}>
