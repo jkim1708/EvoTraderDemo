@@ -23,15 +23,11 @@ const StrategyCreatorSetup = observer(() => {
 
     const [tradingName, setTradingName] = useState<string>('My Trading Rule');
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    function handleClickEURUSD(event) {
+    function handleClickEURUSD() {
         setAsset('EURUSD');
     }
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    function handleClickGBPUSD(event) {
+    function handleClickGBPUSD() {
         setAsset('GBPUSD');
     }
 
