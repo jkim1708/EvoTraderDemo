@@ -13,6 +13,8 @@ const StrategyCreatorSetup = observer(() => {
 
     const [asset, setAsset] = useState('EURUSD');
 
+    const assets = ['EURUSD', 'GBPUSD', 'EURCHF', 'EURNOK']
+
     const appRouterInstance = useRouter();
 
     // const assets = ['EURUSD', 'GBPUSD', 'EURCHF', 'EURNOK']
@@ -22,14 +24,6 @@ const StrategyCreatorSetup = observer(() => {
     const [frequency, setFrequency] = useState<CANDLESTICK_FREQUENCY>(CANDLESTICK_FREQUENCY.HOURLY);
 
     const [tradingName, setTradingName] = useState<string>('My Trading Rule');
-
-    function handleClickEURUSD() {
-        setAsset('EURUSD');
-    }
-
-    function handleClickGBPUSD() {
-        setAsset('GBPUSD');
-    }
 
     function handleStartCreateStrategy() {
         appRouterInstance.push('/?asset=' + asset + '&startDate=' + startDate + '&frequency=' + frequency + '&tradingName=' + tradingName);
@@ -73,36 +67,36 @@ const StrategyCreatorSetup = observer(() => {
                                 {/*    */}
                                 {/*</Select>*/}
                                 <div className={"space-x-2"}>
-                                    {/*{assets.map((a) => (*/}
-                                    {/*    // <SelectItem key={a} value={a}>{a}</SelectItem>*/}
-                                    {/*    <Button*/}
-                                    {/*        className="rounded-full py-0.5 px-2.5 bordertext-sm transition-all shadow-sm"*/}
-                                    {/*        key={a}*/}
-                                    {/*        variant={asset == a ? 'default' : 'outline'}*/}
-                                    {/*        value={a}*/}
-                                    {/*        onClick={ () => {*/}
-                                    {/*            console.log('value',a);*/}
-                                    {/*            setAsset(a as unknown as string)*/}
-                                    {/*        }}*/}
-                                    {/*        // variant={'outline'}*/}
-                                    {/*    >{a}</Button>*/}
-                                    {/*))}*/}
+                                    {assets.map((a) => (
+                                        // <SelectItem key={a} value={a}>{a}</SelectItem>
+                                        <Button
+                                            className="rounded-full py-0.5 px-2.5 bordertext-sm transition-all shadow-sm"
+                                            key={a}
+                                            variant={asset == a ? 'default' : 'outline'}
+                                            value={a}
+                                            onClick={ () => {
+                                                console.log('value',a);
+                                                setAsset(a as unknown as string)
+                                            }}
+                                            // variant={'outline'}
+                                        >{a}</Button>
+                                    ))}
 
-                                    <Button
-                                        className="rounded-full py-0.5 px-2.5 bordertext-sm transition-all shadow-sm"
-                                        variant={asset == 'EURUSD' ? 'default' : 'outline'}
-                                        value={'EURUSD'}
-                                        onClick={handleClickEURUSD}
-                                        // variant={'outline'}
-                                    >EURUSD</Button>
+                                    {/*<Button*/}
+                                    {/*    className="rounded-full py-0.5 px-2.5 bordertext-sm transition-all shadow-sm"*/}
+                                    {/*    variant={asset == 'EURUSD' ? 'default' : 'outline'}*/}
+                                    {/*    value={'EURUSD'}*/}
+                                    {/*    onClick={handleClickEURUSD}*/}
+                                    {/*    // variant={'outline'}*/}
+                                    {/*>EURUSD</Button>*/}
 
-                                    <Button
-                                        className="rounded-full py-0.5 px-2.5 bordertext-sm transition-all shadow-sm"
-                                        variant={asset == 'GBPUSD' ? 'default' : 'outline'}
-                                        value={'GBPUSD'}
-                                        onClick={handleClickGBPUSD}
-                                        // variant={'outline'}
-                                    >GBPUSD</Button>
+                                    {/*<Button*/}
+                                    {/*    className="rounded-full py-0.5 px-2.5 bordertext-sm transition-all shadow-sm"*/}
+                                    {/*    variant={asset == 'GBPUSD' ? 'default' : 'outline'}*/}
+                                    {/*    value={'GBPUSD'}*/}
+                                    {/*    onClick={handleClickGBPUSD}*/}
+                                    {/*    // variant={'outline'}*/}
+                                    {/*>GBPUSD</Button>*/}
                                 </div>
 
                             </div>

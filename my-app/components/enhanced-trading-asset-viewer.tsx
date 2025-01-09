@@ -6,7 +6,6 @@ import {Button} from "@/components/ui/button"
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
 import {Input} from "@/components/ui/input"
 import {Label} from "@/components/ui/label"
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
 import {ArrowDownCircle, ArrowUpCircle, Edit2, Trash2} from "lucide-react"
 import {
     Dialog,
@@ -34,16 +33,6 @@ import {v4 as uuidv4} from 'uuid';
 import Link from "next/link";
 import {TradingStrategy} from "@/store/RootStore";
 import {useRouter, useSearchParams} from "next/navigation";
-
-
-// const calculatePnL = (trade: Trade, data: { date: string; value: number }[]) => {
-//     const startValue = data.find(d => d.date === trade.startDate)?.value || 0
-//     const endValue = data.find(d => d.date === trade.endDate)?.value || 0
-//     const pnl = trade.type === 'long' ? endValue - startValue : startValue - endValue
-//     return pnl.toFixed(4)
-// }
-
-const assets = ['EURUSD', 'GBPUSD', 'EURCHF', 'EURNOK']
 
 const EnhancedTradingAssetViewer = observer(() => {
         const {
@@ -96,7 +85,7 @@ const EnhancedTradingAssetViewer = observer(() => {
         }
 
         const [startDate, setStartDate] = useState(initialStartDate ?? new Date('2020-02-01').toISOString().split('T')[0])
-        const [frequency, setFrequency] = useState(initialFrequency ?? CANDLESTICK_FREQUENCY.HOURLY)
+        const [frequency] = useState(initialFrequency ?? CANDLESTICK_FREQUENCY.HOURLY)
         const [asset, setAsset] = useState(initialAsset ?? "EURUSD")
         const [data, setData] = useState([] as CandleStickChart[])
         const [fullTimeRangeData, setFullTimeRangeData] = useState([] as CandleStickChart[])
@@ -422,14 +411,6 @@ const EnhancedTradingAssetViewer = observer(() => {
                 return true;
             }
             return false;
-        }
-
-        function handleFrequencySelect(value: string) {
-            if (value == 'four_hourly') {
-                setFrequency(CANDLESTICK_FREQUENCY.FOUR_HOURLY)
-            } else {
-                setFrequency(CANDLESTICK_FREQUENCY.HOURLY)
-            }
         }
 
         return (
