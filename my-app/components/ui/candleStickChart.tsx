@@ -9,7 +9,6 @@ import {Button} from "@/components/ui/button";
 import {ChartContainer} from "@/components/ui/chart";
 import {CategoricalChartState} from "recharts/types/chart/types";
 import {ArrowDownCircle, ArrowUpCircle} from "lucide-react";
-import {green} from "@mui/material/colors";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
