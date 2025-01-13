@@ -9,6 +9,7 @@ import {Button} from "@/components/ui/button";
 import {ChartContainer} from "@/components/ui/chart";
 import {CategoricalChartState} from "recharts/types/chart/types";
 import {ArrowDownCircle, ArrowUpCircle} from "lucide-react";
+import {green} from "@mui/material/colors";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
@@ -303,24 +304,24 @@ const CandleStickChart =
         }, []);
 
         return (
-            <div className={"border rounded-xl p-3"}>
-                <div className={"flex space-x-8 mt-3"}>
+            <div className={"border rounded-xl p-6"}>
+                <div className={"flex space-x-8 "}>
                     <div className="flex space-x-2 mb-4 tradeKindButton">
                         <Button
                             // variant={currentSelectedTradeKind === 'long' ? 'default' : 'outline'}
                             variant={currentSelectedTradeKind === 'long' ? 'default' : 'outline'}
                             onClick={() => setCurrentSelectedTradeKind('long')}
-                            className={currentSelectedTradeKind === 'long' ? "bg-green-700 opacity-30" : 'outline opacity-30'}
+                            className={currentSelectedTradeKind === 'long' ? "bg-green-700 opacity-30" : 'outline outline-green-700/30'}
                         >
-                            <ArrowUpCircle className="mr-2 h-4 w-4"/> Long
+                            <ArrowUpCircle className="mr-2 h-4 w-4 green-700/30" color={currentSelectedTradeKind === 'long' ? "white" : '#BED2BE'}/> <div className={currentSelectedTradeKind === 'long' ? "white" :"text-green-700 opacity-30"}>Long</div>
                         </Button>
                         <Button
                             // variant={currentSelectedTradeKind === 'short' ? 'default' : 'outline'}
                             variant={currentSelectedTradeKind === 'short' ? 'default' : 'outline'}
                             onClick={() => setCurrentSelectedTradeKind('short')}
-                            className={currentSelectedTradeKind === 'short' ? "bg-red-700 opacity-30" : 'outline opacity-30'}
+                            className={currentSelectedTradeKind === 'short' ? "bg-red-700 opacity-30" : 'outline outline-red-700/30'}
                         >
-                            <ArrowDownCircle className="mr-2 h-4 w-4"/> Short
+                            <ArrowDownCircle className="mr-2 h-4 w-4 outline-red-700/30" color={currentSelectedTradeKind === 'short' ? "white" : '#E6BEBE'}/> <div className={currentSelectedTradeKind === 'short' ? "white" : "text-red-700 opacity-30"}>Short</div>
                         </Button>
                     </div>
 
