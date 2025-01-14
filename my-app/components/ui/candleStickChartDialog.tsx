@@ -348,8 +348,8 @@ const CandleStickChartDialog =
 
         console.log('initialVisibleData', initialVisibleData);
 
-        const startDate = '2024-02-01, 0:00';
-        const endDate = '2024-05-01, 0:00';
+        // const startDate = '2024-02-01, 0:00';
+        // const endDate = '2024-05-01, 0:00';
 
 
         const [lastIndex, setLastIndex] = useState(initialVisibleData.length - 1); // Bereich der X-Achse
@@ -450,7 +450,7 @@ const CandleStickChartDialog =
                         lastIndex = Math.max(10, lastIndex)
                         newStartIndex = Math.min(lastIndex - 10, newStartIndex);
 
-                        const slice = fullTimeRangeData.slice(newStartIndex, lastIndex);
+                        // const slice = fullTimeRangeData.slice(newStartIndex, lastIndex);
                         // // // setVisibleData(slice);
                         break;
                         
@@ -474,7 +474,7 @@ const CandleStickChartDialog =
                         lastIndex = Math.max(10, lastIndex)
                         newStartIndex = Math.min(lastIndex - 10, newStartIndex);
 
-                        const slice1 = fullTimeRangeSevenDayData.slice(newStartIndex, lastIndex);
+                        // const slice1 = fullTimeRangeSevenDayData.slice(newStartIndex, lastIndex);
                         // // // setVisibleData(slice1);
                         break;
                     default:
@@ -524,7 +524,7 @@ const CandleStickChartDialog =
                             //prevent index crossing each other
                             newLastIndex = Math.max(newStartIndex + 10, newLastIndex);
 
-                            const slice = fullTimeRangeData.slice(newStartIndex, newLastIndex);
+                            // const slice = fullTimeRangeData.slice(newStartIndex, newLastIndex);
                             // // setVisibleData(slice);
 
                             break;
@@ -543,7 +543,7 @@ const CandleStickChartDialog =
                                 //prevent index crossing each other
                                 newLastIndex = Math.max(newStartIndex + 10, newLastIndex);
 
-                                const slice = initialVisibleData.slice(newStartIndex, newLastIndex);
+                                // const slice = initialVisibleData.slice(newStartIndex, newLastIndex);
 
                                 setDataStartIndex(newStartIndex + 34500);
                                 setDataEndIndex(newLastIndex + 34500);
@@ -562,7 +562,7 @@ const CandleStickChartDialog =
 
                             //prevent index crossing each other
                             newLastIndex = Math.max(newStartIndex + 10, newLastIndex);
-                            const slice1 = fullTimeRangeSevenDayData.slice(newStartIndex);
+                            // const slice1 = fullTimeRangeSevenDayData.slice(newStartIndex);
                             // // setVisibleData(slice1);
                             break;
                         default:
