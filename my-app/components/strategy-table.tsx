@@ -81,6 +81,11 @@ const StrategyTable = observer(({onAnalyze}: { onAnalyze: (strategy: TradingStra
         router.push(`/?strategyName=${strategy.name}`);
     }
 
+    function handleDeleteStrategy(strategy: TradingStrategy) {
+        const indexToDelete = tradingStrategies.findIndex((s) => s.name !== strategy.name);
+        tradingStrategies.splice(indexToDelete, 1);
+    }
+
     return (
         <Table>
             <TableHeader>
@@ -131,6 +136,10 @@ const StrategyTable = observer(({onAnalyze}: { onAnalyze: (strategy: TradingStra
 
                         <Button variant="outline" onClick={() => editStrategyHandler(strategy)}>
                             Edit
+                        </Button>
+
+                        <Button variant="outline" onClick={()=> handleDeleteStrategy(strategy)}>
+                            Delete
                         </Button>
                     </div>
                 </TableCell>
