@@ -48,7 +48,13 @@ const EnhancedTradingAssetViewer = observer(() => {
             tradingStrategyStore: {setTradingStrategy, tradingStrategies, tradeOnSample, tradeOffSample},
         } = useStores();
 
+
         const searchParams = useSearchParams();
+
+        setCurrentTradingStrategyName(searchParams.get('tradingName') ?? 'My Trading Rule');
+
+
+
         const isEditMode = searchParams.get('strategyName')
 
         let initialStartDate;
