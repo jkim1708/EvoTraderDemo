@@ -35,6 +35,8 @@ import {TradingStrategy} from "@/store/RootStore";
 import {useRouter, useSearchParams} from "next/navigation";
 
 const EnhancedTradingAssetViewer = observer(() => {
+
+
         const {
             tradingRuleStore: {
                 tradingRules,
@@ -48,12 +50,9 @@ const EnhancedTradingAssetViewer = observer(() => {
             tradingStrategyStore: {setTradingStrategy, tradingStrategies, tradeOnSample, tradeOffSample},
         } = useStores();
 
-
         const searchParams = useSearchParams();
 
         setCurrentTradingStrategyName(searchParams.get('tradingName') ?? 'My Trading Rule');
-
-
 
         const isEditMode = searchParams.get('strategyName')
 
@@ -299,6 +298,8 @@ const EnhancedTradingAssetViewer = observer(() => {
             frequency: CANDLESTICK_FREQUENCY
         }): TradingStrategy {
             const {name, rules} = param;
+
+            rules[0].asset = asset as 'EURUSD' | 'USDJPY' | 'GBPUSD' | 'EURCHF' | 'EURNOK';
 
             return {
                 id: uuidv4(),
