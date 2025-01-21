@@ -5,7 +5,7 @@ import {
     Bar,
     XAxis,
     YAxis,
-    CartesianGrid, Tooltip, ResponsiveContainer, BarChart, ReferenceArea,
+    CartesianGrid, Tooltip, ResponsiveContainer, BarChart, ReferenceArea, Brush,
 } from 'recharts';
 import {
     convertToCustomDate,
@@ -14,7 +14,7 @@ import {
 import {observer} from "mobx-react-lite";
 import {Label} from "@/components/ui/label";
 import {Button} from "@/components/ui/button";
-import {ChartContainer} from "@/components/ui/chart";
+// import {ChartContainer} from "@/components/ui/chart";
 import CandleStickChart from "@/components/ui/candleStickChart";
 import {TradingStrategy} from "@/store/RootStore";
 import {TradingRule} from "@/store/TradingRuleStore";
@@ -262,11 +262,11 @@ function transformToSevenDayData(candleStickSeries): {
 function CustomizedTick(props: CustomizedTickProps) {
     const {x, y, payload} = props;
 
-    // const date = payload.value.split(",")[0];
-    // const hour = payload.value.split(",")[1];
+    const date = payload.value.split(",")[0];
+    const hour = payload.value.split(",")[1];
 
-    const date = payload.value + "";
-    const hour = '1';
+    // const date = payload.value + "";
+    // const hour = '1';
 
     return (
         <g transform={`translate(${x - 20},${y})`}>
@@ -345,7 +345,6 @@ const CandleStickChartDialog =
         let initialVisibleData = offSampleBacktestTimeRangedData;
         let offSampleBacktestLongThanThreeMonths = false;
         if (isTimeRangeGreaterThanThreeMonths(offSampleBacktestTimeRangedData)) {
-            console.log('off sample backtest longer than 3 months');
             offSampleBacktestLongThanThreeMonths = true;
             initialXAxisResolution = X_AXIS_RESOLUTION.SIX_MONTH;
             initialVisibleData = initialVisibleData.filter((_, i) => {
@@ -359,13 +358,17 @@ const CandleStickChartDialog =
         // const [tickCount, setTickCount] = useState(0); // Bereich der X-Achse
         const [startIndex, setStartIndex] = useState(0); // Bereich der X-Achse
 
-        const [dataStartIndex, setDataStartIndex] = useState(34500);
-        const [dataEndIndex, setDataEndIndex] = useState(initialVisibleData.length + 34500);
+        // const [
+        //     // dataStartIndex,
+        //     setDataStartIndex] = useState(34500);
+        // const [
+        //     // dataEndIndex,
+        //     setDataEndIndex] = useState(initialVisibleData.length + 34500);
 
         const [loaded, setLoaded] = useState(false);
         const {
             clipPathRefs,
-            xPadding,
+            // xPadding,
             onChartMouseDown,
             onChartMouseUp,
             setWrapperRef,
@@ -398,7 +401,6 @@ const CandleStickChartDialog =
                 ) {
                     const wrapperRect = wrapperRef.current.getBoundingClientRect();
                     const gridRect = gridRef.current.getBoundingClientRect();
-                    console.log(wrapperRect);
                     clipPathRefsz.current.axis.current.setAttribute(
                         "width",
                         `${gridRect.width + 50}px`
@@ -425,8 +427,8 @@ const CandleStickChartDialog =
         const resizeObserverCallback = useCallback(
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             (e) => {
-                console.log(e);
                 if (wrapperRef.current) {
                     const xAxis = wrapperRef.current.querySelector(
                         `.${CHART_CLASSES.xAxis}`
@@ -458,8 +460,6 @@ const CandleStickChartDialog =
             openClose: [number, number],
             trade: Trade | null,
         } []>(initialVisibleData); // Bereich der X-Achse
-
-        console.log('initialVisibleData', initialVisibleData);
 
         const [xPaddingz, setxPaddingz] = useState<[number, number]>([0, 0]);
 
@@ -582,9 +582,7 @@ const CandleStickChartDialog =
                         setxPaddingz([xPaddingz[0] + scrollAmount,xPaddingz[1] - scrollAmount]);
 
                         const target = event.target as HTMLElement | null;
-                            console.log('target -', target);
                         if (target && clipPathRefsz?.current?.axis?.current) {
-                            console.log('target', target);
                             const {
                                 width,
                                 left
@@ -624,13 +622,13 @@ const CandleStickChartDialog =
             }
         }, [isDragging, lastMouseX]);
 
-        const handleMouseUp = useCallback(() => {
-            setIsDragging(false);
-        }, []);
+        // const   handleMouseUp = useCallback(() => {
+        //     setIsDragging(false);
+        // }, []);
 
-        const handleContextMenu = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-            event.preventDefault();
-        }, []);
+        // const handleContextMenu = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        //     event.preventDefault();
+        // }, []);
 
         useEffect(() => {
             const chartContainer = wrapperRef.current;
@@ -642,10 +640,7 @@ const CandleStickChartDialog =
                     let newStartIndex = 0;
                     let newLastIndex = 0;
                     if (startIndex != null || startIndex != undefined || lastIndex != null || lastIndex != undefined) {
-                        console.log('startIndex - ', startIndex);
                         newStartIndex = Math.max(0, startIndex + scrollAmount);
-                        console.log('lastIndex - ', lastIndex);
-                        console.log('scrollAmount - ', scrollAmount);
                         newLastIndex = Math.max(0, lastIndex - scrollAmount);
                     }
 
@@ -670,21 +665,17 @@ const CandleStickChartDialog =
                         case X_AXIS_RESOLUTION.SIX_MONTH:
                             if (offSampleBacktestLongThanThreeMonths) {
                                 newStartIndex = Math.min(initialVisibleData.length - 10, newStartIndex);
-                                console.log('initialVisibleData length', initialVisibleData.length);
-                                console.log('newStartIndex 5', newStartIndex);
                                 //prevent last index out of range
                                 // newLastIndex = Math.min(fullTimeRangeData.length - 1, lastIndex + scrollAmount);
-                                console.log('newLastIndex old ', newLastIndex);
                                 newLastIndex = Math.min(initialVisibleData.length - 1, newLastIndex);
-                                console.log('newLastIndex ', newLastIndex);
 
                                 //prevent index crossing each other
                                 newLastIndex = Math.max(newStartIndex + 10, newLastIndex);
 
                                 // const slice = initialVisibleData.slice(newStartIndex, newLastIndex);
 
-                                setDataStartIndex(newStartIndex + 34500);
-                                setDataEndIndex(newLastIndex + 34500);
+                                // setDataStartIndex(newStartIndex + 34500);
+                                // setDataEndIndex(newLastIndex + 34500);
 
 
                                 // // setVisibleData(slice);
@@ -705,7 +696,6 @@ const CandleStickChartDialog =
                             break;
                         default:
                     }
-                    console.log('newStartIndex', newStartIndex);
                     // setTickCount(visibleData.length);
                     setStartIndex(newStartIndex ?? 0);
                     setLastIndex(newLastIndex ?? 0);
@@ -787,24 +777,25 @@ const CandleStickChartDialog =
                 </div>
 
                 <p> {asset} </p>
-                <ChartContainer config={{
-                    value: {
-                        label: "Value",
-                        color: "hsl(var(--chart-1))",
-                    },
-                }}
-                                ref={setWrapperRef}
-                                className="h-[400px]"
-                                // onMouseDown={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleMouseDown(e)}
-                                // onMouseMove={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleMouseMove(e)}
-                                // onMouseUp={handleMouseUp}
+                {/*<ChartContainer config={{*/}
+                {/*    value: {*/}
+                {/*        label: "Value",*/}
+                {/*        color: "hsl(var(--chart-1))",*/}
+                {/*    },*/}
+                {/*}}*/}
+                {/*                ref={setWrapperRef}*/}
+                {/*                className="h-[400px]"*/}
+                {/*                // onMouseDown={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleMouseDown(e)}*/}
+                {/*                // onMouseMove={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleMouseMove(e)}*/}
+                {/*                // onMouseUp={handleMouseUp}*/}
 
-                                onMouseLeave={handleMouseUp}
-                                onContextMenu={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleContextMenu(e)}
-                >
+                {/*                onMouseLeave={handleMouseUp}*/}
+                {/*                onContextMenu={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleContextMenu(e)}*/}
+                {/*>*/}
                     <ResponsiveContainer
                         width="100%"
                         height={500}
+                        ref={setWrapperRef}
                     >
                         <BarChart
                             width={800}
@@ -818,13 +809,17 @@ const CandleStickChartDialog =
                             <defs>
                                 <RechartsClipPaths ref={clipPathRefs}/>
                             </defs>
-                            <XAxis dataKey="index"
+                            {/*<XAxis dataKey="index"*/}
+                            {/*    // tickCount={tickCount}*/}
+                            {/*       tick={CustomizedTick}*/}
+                            {/*       padding={{left: xPadding[0], right: xPadding[1]}}*/}
+                            {/*       domain={[dataStartIndex, dataEndIndex]}*/}
+                            {/*       type={'number'}*/}
+                            {/*       allowDataOverflow*/}
+                            {/*/>*/}
+                            <XAxis dataKey="ts"
                                 // tickCount={tickCount}
                                    tick={CustomizedTick}
-                                   padding={{left: xPadding[0], right: xPadding[1]}}
-                                   domain={[dataStartIndex, dataEndIndex]}
-                                   type={'number'}
-                                   allowDataOverflow
                             />
                             <YAxis yAxisId="1" dataKey="lowHigh" domain={['auto', 'auto']} allowDecimals={true}/>
                             <CartesianGrid strokeDasharray="3 3"/>
@@ -835,7 +830,7 @@ const CandleStickChartDialog =
                                 shape={<Candlestick/>}
                                 isAnimationActive={false}
                             />
-
+                            <Brush dataKey="ts" height={30} stroke="#8884d8" />
                             {/*// eslint-disable-next-line @typescript-eslint/ban-ts-comment*/}
                             {/*// @ts-expect-error take care later*/}
                             <Tooltip content={customTooltipContent} cursor={<CustomTooltipCursor/>}
@@ -848,7 +843,7 @@ const CandleStickChartDialog =
                                                                                       fillOpacity={0.3}/>))}
                         </BarChart>
                     </ResponsiveContainer>
-                </ChartContainer>
+                {/*</ChartContainer>*/}
                 <Label> Range </Label>
 
             </div>
