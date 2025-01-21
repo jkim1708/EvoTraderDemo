@@ -52,7 +52,7 @@ const EnhancedTradingAssetViewer = observer(() => {
 
         const searchParams = useSearchParams();
 
-        setCurrentTradingStrategyName(searchParams.get('tradingName') ?? 'My Trading Rule');
+
 
         const isEditMode = searchParams.get('strategyName')
 
@@ -62,6 +62,7 @@ const EnhancedTradingAssetViewer = observer(() => {
 
         //initialize edit Page
         if (isEditMode) {
+            console.log('test');
             setCurrentTradingStrategyName(isEditMode as string);
             tradingStrategies.filter(strategy => strategy.name === isEditMode).forEach(strategy => {
                 initialStartDate = strategy.selectedStartDate;
@@ -74,11 +75,14 @@ const EnhancedTradingAssetViewer = observer(() => {
                         tradeKind: trade.kind
                     })));
                 initialAsset = strategy.tradingRules[0].asset;
+                console.log('test 2');
                 setCurrentTradingStrategyOnSampleRange(parseInt(strategy.backtestingOnSample.endDate));
+                console.log('test 3');
             });
         }
         // after setup page
         else {
+            setCurrentTradingStrategyName(searchParams.get('tradingName') ?? 'My Trading Rule');
             initialStartDate = searchParams.get('startDate');
             const paramFrequency = searchParams.get('frequency');
             if(paramFrequency == 'hourly'){
