@@ -1,6 +1,6 @@
 "use client"
 
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState} from 'react';
 import {
     Bar,
     XAxis,
@@ -19,6 +19,8 @@ import CandleStickChart from "@/components/ui/candleStickChart";
 import {TradingStrategy} from "@/store/RootStore";
 import {TradingRule} from "@/store/TradingRuleStore";
 import {ArrowDownCircle, ArrowUpCircle} from "lucide-react";
+import {useResizeObserver} from "@/components/hooks/useResizeObserver";
+import {useZoomAndPan} from "@/components/hooks/useZoomAndPan";
 
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -154,6 +156,33 @@ const prepareData = (data: CandleStickChart[]): {
         };
     });
 };
+
+const CHART_CLASSES = {
+    xAxis: "xAxis",
+    grid: "recharts-cartesian-grid",
+    line: "chart-bar"
+};
+
+// eslint-disable-next-line react/display-name
+const RechartsClipPaths = forwardRef((_, ref) => {
+    const grid = useRef<SVGRectElement>(null);
+    const axis = useRef<SVGRectElement>(null);
+    useImperativeHandle(ref, () => ({
+        grid,
+        axis
+    }));
+
+    return (
+        <>
+            <clipPath id="chart-xaxis-clip">
+                <rect fill="rgba(0,0,0,0)" height="100%" ref={axis} />
+            </clipPath>
+            <clipPath id="chart-grid-clip">
+                <rect fill="rgba(0,0,0,0)" height="100%" ref={grid} />
+            </clipPath>
+        </>
+    );
+});
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
@@ -333,7 +362,91 @@ const CandleStickChartDialog =
         const [dataStartIndex, setDataStartIndex] = useState(34500);
         const [dataEndIndex, setDataEndIndex] = useState(initialVisibleData.length + 34500);
 
-        const chartContainerRef = useRef<HTMLDivElement>(null);
+        const [loaded, setLoaded] = useState(false);
+        const {
+            clipPathRefs,
+            xPadding,
+            onChartMouseDown,
+            onChartMouseUp,
+            setWrapperRef,
+            onChartMouseMove
+        } = useZoomAndPan({
+            chartLoaded: loaded
+        });
+
+        const clipPathRefsz = useRef<{
+            grid: React.MutableRefObject<SVGRectElement | null>;
+            axis: React.MutableRefObject<SVGRectElement | null>;
+        } | null>(null);
+
+        useEffect(() => {
+            setTimeout(() => {
+                setLoaded(true);
+            }, 100);
+        }, []);
+
+        const wrapperRef = useRef<null | HTMLDivElement>(null);
+        const gridRef = useRef<SVGSVGElement | null>(null);
+
+        const setClipPaths = useCallback(
+            (xAxis: SVGSVGElement) => {
+                if (
+                    wrapperRef.current &&
+                    gridRef.current &&
+                    clipPathRefsz?.current?.axis?.current &&
+                    clipPathRefsz?.current?.grid?.current
+                ) {
+                    const wrapperRect = wrapperRef.current.getBoundingClientRect();
+                    const gridRect = gridRef.current.getBoundingClientRect();
+                    console.log(wrapperRect);
+                    clipPathRefsz.current.axis.current.setAttribute(
+                        "width",
+                        `${gridRect.width + 50}px`
+                    );
+                    clipPathRefsz.current.axis.current.style.transform = `translateX(${
+                        gridRect.x - wrapperRect.x - 50 / 2
+                    }px)`;
+
+                    clipPathRefsz.current.grid.current.setAttribute(
+                        "width",
+                        `${gridRect.width}px`
+                    );
+                    clipPathRefsz.current.grid.current.style.transform = `translateX(${
+                        gridRect.x - wrapperRect.x
+                    }px)`;
+
+                    gridRef.current?.setAttribute("clip-path", "url(#chart-grid-clip)");
+                    xAxis.setAttribute("clip-path", "url(#chart-xaxis-clip)");
+                }
+            },
+            []
+        );
+
+        const resizeObserverCallback = useCallback(
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+            (e) => {
+                console.log(e);
+                if (wrapperRef.current) {
+                    const xAxis = wrapperRef.current.querySelector(
+                        `.${CHART_CLASSES.xAxis}`
+                    ) as SVGSVGElement | null;
+                    if (xAxis) {
+                        setClipPaths(xAxis);
+                    }
+                }
+            },
+            [setClipPaths]
+        );
+
+        const unobserve = useResizeObserver({
+            element: wrapperRef,
+            callback: resizeObserverCallback,
+            delay: 100
+        });
+
+        useEffect(() => () => unobserve());
+
 
         const [visibleData] = useState<{
             ts: string,
@@ -347,6 +460,8 @@ const CandleStickChartDialog =
         } []>(initialVisibleData); // Bereich der X-Achse
 
         console.log('initialVisibleData', initialVisibleData);
+
+        const [xPaddingz, setxPaddingz] = useState<[number, number]>([0, 0]);
 
         // const startDate = '2024-02-01, 0:00';
         // const endDate = '2024-05-01, 0:00';
@@ -421,14 +536,17 @@ const CandleStickChartDialog =
 
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const handleMouseDown = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
             if (event.button === 2) { // Right mouse button
                 event.preventDefault();
                 setIsDragging(true);
                 setLastMouseX(event.clientX);
+
             }
         }, []);
 
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const handleMouseMove = useCallback(async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
             if (isDragging) {
                 const deltaX = event.clientX - lastMouseX;
@@ -438,7 +556,7 @@ const CandleStickChartDialog =
                     newStartIndex = Math.max(0, startIndex - scrollAmount);
                 }
                 let lastIndex;
-                setLastMouseX(event.clientX);
+                // setLastMouseX(event.clientX);
                 switch (xAxisResolution) {
                     case X_AXIS_RESOLUTION.ONE_DAY:
                     case X_AXIS_RESOLUTION.FIVE_DAYS:
@@ -453,7 +571,7 @@ const CandleStickChartDialog =
                         // const slice = fullTimeRangeData.slice(newStartIndex, lastIndex);
                         // // // setVisibleData(slice);
                         break;
-                        
+
                     case X_AXIS_RESOLUTION.SIX_MONTH:
                         //prevent going out of off sample backtesting range
                         lastIndex = Math.min(initialVisibleData.length - 1, newStartIndex + initialVisibleData.length - 1);
@@ -461,8 +579,28 @@ const CandleStickChartDialog =
                         lastIndex = Math.max(10, lastIndex)
                         newStartIndex = Math.min(lastIndex - 10, newStartIndex);
 
-                        setDataStartIndex(newStartIndex + 34500);
-                        setDataEndIndex(lastIndex + 34500);
+                        setxPaddingz([xPaddingz[0] + scrollAmount,xPaddingz[1] - scrollAmount]);
+
+                        const target = event.target as HTMLElement | null;
+                            console.log('target -', target);
+                        if (target && clipPathRefsz?.current?.axis?.current) {
+                            console.log('target', target);
+                            const {
+                                width,
+                                left
+                            } = clipPathRefsz.current.axis.current.getBoundingClientRect();
+                            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                            const x = Math.min(Math.max(event.clientX - left, 0), width);
+                            // setMousePositionToGrid((state) => {
+                            //     if (!state?.width) return { x, width };
+                            //     return {
+                            //         ...state,
+                            //         x
+                            //     };
+                            // });
+                        }
+                        // setDataStartIndex(newStartIndex + 34500);
+                        // setDataEndIndex(lastIndex + 34500);
 
                         break;
 
@@ -480,8 +618,8 @@ const CandleStickChartDialog =
                     default:
                 }
 
-                setStartIndex(newStartIndex ?? 0);
-                setLastIndex(lastIndex ?? 0);
+                // setStartIndex(newStartIndex ?? 0);
+                // setLastIndex(lastIndex ?? 0);
 
             }
         }, [isDragging, lastMouseX]);
@@ -495,7 +633,7 @@ const CandleStickChartDialog =
         }, []);
 
         useEffect(() => {
-            const chartContainer = chartContainerRef.current;
+            const chartContainer = wrapperRef.current;
             if (chartContainer) {
                 const handleWheel = (e: WheelEvent) => {
                     e.preventDefault();
@@ -655,11 +793,12 @@ const CandleStickChartDialog =
                         color: "hsl(var(--chart-1))",
                     },
                 }}
-                                ref={chartContainerRef}
+                                ref={setWrapperRef}
                                 className="h-[400px]"
-                                onMouseDown={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleMouseDown(e)}
-                                onMouseMove={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleMouseMove(e)}
-                                onMouseUp={handleMouseUp}
+                                // onMouseDown={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleMouseDown(e)}
+                                // onMouseMove={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleMouseMove(e)}
+                                // onMouseUp={handleMouseUp}
+
                                 onMouseLeave={handleMouseUp}
                                 onContextMenu={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleContextMenu(e)}
                 >
@@ -672,11 +811,17 @@ const CandleStickChartDialog =
                             height={250}
                             data={visibleData}
                             margin={{top: 20, right: 30, left: 20, bottom: 20}}
+                            onMouseDown={onChartMouseDown}
+                            onMouseMove={onChartMouseMove}
+                            onMouseUp={onChartMouseUp}
                         >
+                            <defs>
+                                <RechartsClipPaths ref={clipPathRefs}/>
+                            </defs>
                             <XAxis dataKey="index"
                                 // tickCount={tickCount}
                                    tick={CustomizedTick}
-                                   padding={{'left': 5}}
+                                   padding={{left: xPadding[0], right: xPadding[1]}}
                                    domain={[dataStartIndex, dataEndIndex]}
                                    type={'number'}
                                    allowDataOverflow
