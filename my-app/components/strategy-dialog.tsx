@@ -87,7 +87,8 @@ const StrategyDialog = observer((props: StrategyDialogProps) => {
     const recentTrades = strategy.backtestingOffSample.trades;
 
     useEffect(() => {
-        if (startBacktestingOffSample && endBacktestingOffSample) {
+        if (endBacktestingOffSample) {
+            // setStartBacktestingOffSample(new Date(new Date(endBacktestingOffSample).getTime() - 1000 * 60 * 60 * 24 * 180).toJSON().split('T')[0]);
             strategy.backtestingOffSample.trades = generateRandomTrades(startBacktestingOffSample, endBacktestingOffSample, strategy.tradingRules[0].asset)
             recentTrades.push(...transformToRecentTrades(strategy.backtestingOffSample.trades));
 
@@ -106,7 +107,7 @@ const StrategyDialog = observer((props: StrategyDialogProps) => {
                     <CardTitle className="text-xl">
                         {strategy.name} - Trading Strategy Analyzer (TSA) {strategy.status == 'active' ?
                         <div className="text-2xl font-bold text-orange-500"> {strategy.status}</div> : <div
-                            className="text-2xl font-bold text-grey-500"> {strategy.status}
+                            className="text-2xl font-bold text-muted-foreground"> {strategy.status}
                         </div>}
 
                     </CardTitle>
@@ -134,15 +135,15 @@ const StrategyDialog = observer((props: StrategyDialogProps) => {
                     <div className="grid grid-cols-3 gap-4">
                         <div>
                             <div className="text-sm text-muted-foreground">Win Rate</div>
-                            <div className="text-2xl font-bold text-orange-500">{strategy.winRate}</div>
+                            <div className={strategy.status === 'active' ? "text-2xl font-bold text-metrics-winRate" : "text-2xl font-bold text-black"}>{strategy.winRate}</div>
                         </div>
                         <div>
                             <div className="text-sm text-muted-foreground">Profit Factor</div>
-                            <div className="text-2xl font-bold text-orange-500">{strategy.profitFactor}</div>
+                            <div className={strategy.status === 'active' ? "text-2xl font-bold text-metrics-profitFactor" : "text-2xl font-bold text-black-black"}>{strategy.profitFactor}</div>
                         </div>
                         <div>
                             <div className="text-sm text-muted-foreground">Sharpe Ratio</div>
-                            <div className="text-2xl font-bold text-orange-500">{strategy.sharpeRatio}</div>
+                            <div className={strategy.status === 'active' ? "text-2xl font-bold text-metrics-sharpeRatio" : "text-2xl font-bold text-black"}>{strategy.sharpeRatio}</div>
                         </div>
                     </div>
 

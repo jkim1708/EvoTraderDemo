@@ -124,9 +124,9 @@ const StrategyTable = observer(({onAnalyze}: { onAnalyze: (strategy: TradingStra
                         ))}
                     </div>
                 </TableCell>
-                <TableCell className="text-blue-500">{strategy.winRate}</TableCell>
-                <TableCell>{strategy.profitFactor}</TableCell>
-                <TableCell>{strategy.sharpeRatio}</TableCell>
+                <TableCell className={strategy.status === "active" ? "text-metrics-winRate" : "text-black" }>{strategy.winRate}</TableCell>
+                <TableCell className={strategy.status === "active" ? "text-metrics-profitFactor" : "text-black" }>{strategy.profitFactor}</TableCell>
+                <TableCell className={strategy.status === "active" ? "text-metrics-sharpeRatio": "text-black" }>{strategy.sharpeRatio}</TableCell>
                 <TableCell>Lemon Markets</TableCell>
                 <TableCell>
                     <div className="space-x-2">
