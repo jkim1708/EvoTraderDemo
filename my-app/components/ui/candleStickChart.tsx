@@ -405,7 +405,7 @@ const CandleStickChart =
                                     resetRefAreaSelection();
                                 }}
                             >
-                                <XAxis dataKey="ts" tickCount={data.length} tick={CustomizedTick}
+                                <XAxis dataKey="ts" tickCount={visibleData.length} tick={CustomizedTick}
                                        padding={{'left': 5}}/>
                                 <YAxis yAxisId="1" dataKey="lowHigh" domain={['auto', 'auto']} allowDecimals={true}/>
                                 <CartesianGrid strokeDasharray="3 3"/>

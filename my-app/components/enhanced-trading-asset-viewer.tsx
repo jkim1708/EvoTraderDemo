@@ -82,9 +82,9 @@ const EnhancedTradingAssetViewer = observer(() => {
             setCurrentTradingStrategyName(searchParams.get('tradingName') ?? 'My Trading Rule');
             initialStartDate = searchParams.get('startDate');
             const paramFrequency = searchParams.get('frequency');
-            if(paramFrequency == 'hourly'){
+            if(paramFrequency == '0'){
                 initialFrequency = CANDLESTICK_FREQUENCY.HOURLY;
-            } else if(paramFrequency == 'four_hourly') {
+            } else if(paramFrequency == '1') {
                 initialFrequency = CANDLESTICK_FREQUENCY.FOUR_HOURLY;
             }
             initialAsset = searchParams.get('asset');
@@ -211,17 +211,16 @@ const EnhancedTradingAssetViewer = observer(() => {
 
         useEffect(() => {
             const tickSeries: SampleAssetData = generateData(new Date('2019-10-01'), new Date(), asset, 15);
-            const candleStickSeries: CandleStickChart[] = transformToCandleStickSeries(tickSeries, frequency) ?? [];
+            const candleStickSeries: CandleStickChart[] = transformToCandleStickSeries(tickSeries, CANDLESTICK_FREQUENCY.HOURLY) ?? [];
 
             setFullTimeRangeData(candleStickSeries);
             setData(candleStickSeries);
 
             const transformedData = transformToFourHourData(candleStickSeries);
             setFullTimeRangeMasterFourHourData(transformedData);
-            setFourHourData(transformedData);
+            // setFourHourData(transformedData);
 
             setNewStartDateVisibleDate(startDate, candleStickSeries, transformedData);
-
 
         }, [asset]);
 
