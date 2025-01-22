@@ -75,7 +75,6 @@ const StrategyDialog = observer((props: StrategyDialogProps) => {
         {tradingStrategyStore: {tradingStrategies}}
             = useStores();
 
-    const [startBacktestingOffSample, setStartBacktestingOffSample] = useState('');
     const [endBacktestingOffSample, setEndBacktestingOffSample] = useState('');
     const [showChart, setShowChart] = useState(false);
 
@@ -87,18 +86,22 @@ const StrategyDialog = observer((props: StrategyDialogProps) => {
     const recentTrades = strategy.backtestingOffSample.trades;
 
     useEffect(() => {
+        let startDate;
+        console.log('endBacktestingOffSample',endBacktestingOffSample);
+        console.log('new Date(endBacktestingOffSample).getTime() - 1000 * 60 * 60 * 24 * 180)',convertToCustomDate(new Date((new Date(endBacktestingOffSample).getTime() - 1000 * 60 * 60 * 24 * 180))).split(',')[0]);
         if (endBacktestingOffSample) {
-            // setStartBacktestingOffSample(new Date(new Date(endBacktestingOffSample).getTime() - 1000 * 60 * 60 * 24 * 180).toJSON().split('T')[0]);
-            strategy.backtestingOffSample.trades = generateRandomTrades(startBacktestingOffSample, endBacktestingOffSample, strategy.tradingRules[0].asset)
+            // setStartBacktestingOffSample(new Date((new Date(endBacktestingOffSample).getTime() - 1000 * 60 * 60 * 24 * 180)));
+            startDate = convertToCustomDate(new Date((new Date(endBacktestingOffSample).getTime() - 1000 * 60 * 60 * 24 * 180))).split(',')[0];
+            strategy.backtestingOffSample.trades = generateRandomTrades(startDate, endBacktestingOffSample, strategy.tradingRules[0].asset)
             recentTrades.push(...transformToRecentTrades(strategy.backtestingOffSample.trades));
 
-            strategy.backtestingOffSample.startDate = startBacktestingOffSample;
+            strategy.backtestingOffSample.startDate = startDate;
             strategy.backtestingOffSample.endDate = endBacktestingOffSample;
 
             setShowChart(true);
         };
 
-    }, [startBacktestingOffSample, endBacktestingOffSample]);
+    }, [endBacktestingOffSample]);
 
     return (
         <Card className="w-11/12 mx-auto">
@@ -149,26 +152,26 @@ const StrategyDialog = observer((props: StrategyDialogProps) => {
 
                     <p> Backtesting Offsample Time Range </p>
                     <div className="flex space-x-4 mb-4">
-                        <div>
-                            <Label htmlFor="start-date-backtesting-off-sample" className="text-right">
-                                Start Date
-                            </Label>
-                            <Input
-                                id="start-date-backtesting-off-sample"
-                                type="date"
-                                value={
-                                    startBacktestingOffSample
-                                }
-                                onChange={(e) => {
-                                    setStartBacktestingOffSample(
-                                        e.target.value
-                                    )
+                        {/*<div>*/}
+                        {/*    <Label htmlFor="start-date-backtesting-off-sample" className="text-right">*/}
+                        {/*        Start Date*/}
+                        {/*    </Label>*/}
+                        {/*    <Input*/}
+                        {/*        id="start-date-backtesting-off-sample"*/}
+                        {/*        type="date"*/}
+                        {/*        value={*/}
+                        {/*            startBacktestingOffSample*/}
+                        {/*        }*/}
+                        {/*        onChange={(e) => {*/}
+                        {/*            setStartBacktestingOffSample(*/}
+                        {/*                e.target.value*/}
+                        {/*            )*/}
 
-                                }}
-                                className="flex-1"
-                                max={new Date().toJSON().split('T')[0]}
-                            />
-                        </div>
+                        {/*        }}*/}
+                        {/*        className="flex-1"*/}
+                        {/*        max={new Date().toJSON().split('T')[0]}*/}
+                        {/*    />*/}
+                        {/*</div>*/}
                         <div>
                             <Label htmlFor="end-date-backtesting-off-sample" className="text-right">
                                 End Date
