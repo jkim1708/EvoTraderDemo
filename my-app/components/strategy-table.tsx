@@ -82,7 +82,7 @@ const StrategyTable = observer(({onAnalyze}: { onAnalyze: (strategy: TradingStra
     }
 
     function handleDeleteStrategy(strategy: TradingStrategy) {
-        const indexToDelete = tradingStrategies.findIndex((s) => s.name !== strategy.name);
+        const indexToDelete = tradingStrategies.findIndex((s) => s.name == strategy.name);
         tradingStrategies.splice(indexToDelete, 1);
     }
 
