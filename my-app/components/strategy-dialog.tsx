@@ -150,7 +150,7 @@ const StrategyDialog = observer((props: StrategyDialogProps) => {
                         </div>
                     </div>
 
-                    <p> Backtesting Offsample Time Range </p>
+                    <p> Backtesting Off-Sample Time Range (last 6 months) </p>
                     <div className="flex space-x-4 mb-4">
                         {/*<div>*/}
                         {/*    <Label htmlFor="start-date-backtesting-off-sample" className="text-right">*/}
@@ -174,7 +174,7 @@ const StrategyDialog = observer((props: StrategyDialogProps) => {
                         {/*</div>*/}
                         <div>
                             <Label htmlFor="end-date-backtesting-off-sample" className="text-right">
-                                End Date
+                                Selected End Date
                             </Label>
                             <Input
                                 id="end-date-backtesting-off-sample"
