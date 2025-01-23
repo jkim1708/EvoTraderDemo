@@ -89,14 +89,16 @@ const StrategyDialog = observer((props: StrategyDialogProps) => {
         let startDate;
         console.log('endBacktestingOffSample',endBacktestingOffSample);
         console.log('new Date(endBacktestingOffSample).getTime() - 1000 * 60 * 60 * 24 * 180)',convertToCustomDate(new Date((new Date(endBacktestingOffSample).getTime() - 1000 * 60 * 60 * 24 * 180))).split(',')[0]);
-        if (endBacktestingOffSample) {
-            // setStartBacktestingOffSample(new Date((new Date(endBacktestingOffSample).getTime() - 1000 * 60 * 60 * 24 * 180)));
-            startDate = convertToCustomDate(new Date((new Date(endBacktestingOffSample).getTime() - 1000 * 60 * 60 * 24 * 180))).split(',')[0];
-            strategy.backtestingOffSample.trades = generateRandomTrades(startDate, endBacktestingOffSample, strategy.tradingRules[0].asset)
+        if (endBacktestingOffSample || strategy.backtestingOffSample.endDate) {
+
+            const usedEndDate = endBacktestingOffSample ? endBacktestingOffSample : strategy.backtestingOffSample.endDate;
+
+            startDate = convertToCustomDate(new Date((new Date(usedEndDate).getTime() - 1000 * 60 * 60 * 24 * 180))).split(',')[0];
+            strategy.backtestingOffSample.trades = generateRandomTrades(startDate, usedEndDate, strategy.tradingRules[0].asset)
             recentTrades.push(...transformToRecentTrades(strategy.backtestingOffSample.trades));
 
             strategy.backtestingOffSample.startDate = startDate;
-            strategy.backtestingOffSample.endDate = endBacktestingOffSample;
+            strategy.backtestingOffSample.endDate = usedEndDate;
 
             setShowChart(true);
         };
