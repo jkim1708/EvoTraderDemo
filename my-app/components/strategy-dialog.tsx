@@ -213,6 +213,8 @@ const StrategyDialog = observer((props: StrategyDialogProps) => {
                                     generatedData={strategy.underline}
                                     randomTrades={recentTrades}
                                     strategy={strategy}
+                                    // for rerendering
+                                    key={strategy.backtestingOffSample.endDate}
                                 />
                             </div>
 
