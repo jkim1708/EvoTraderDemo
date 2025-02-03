@@ -5,7 +5,7 @@ import {
     Bar,
     XAxis,
     YAxis,
-    CartesianGrid, Tooltip, ResponsiveContainer, BarChart, ReferenceArea, Brush,
+    CartesianGrid, Tooltip, ResponsiveContainer, BarChart, ReferenceArea, Brush, ComposedChart, Line,
 } from 'recharts';
 import {
     convertToCustomDate,
@@ -800,7 +800,7 @@ const CandleStickChartDialog =
                         height={500}
                         ref={setWrapperRef}
                     >
-                        <BarChart
+                        <ComposedChart
                             width={800}
                             height={250}
                             data={visibleData}
@@ -826,6 +826,7 @@ const CandleStickChartDialog =
                             />
                             <YAxis yAxisId="1" dataKey="lowHigh" domain={['auto', 'auto']} allowDecimals={true}/>
                             <CartesianGrid strokeDasharray="3 3"/>
+                            <Line type="monotone" dataKey="movingAverage" yAxisId="1" stroke="#ff7300" dot={false}/>
                             <Bar
                                 yAxisId="1"
                                 dataKey="openClose"
@@ -844,7 +845,7 @@ const CandleStickChartDialog =
                                                                                       x2={findTsInDifferentFrequency(trade.endTime.split(',')[0], visibleData, xAxisResolution, 'x2')}
                                                                                       fill={trade.kind == 'long' ? "blue" : "red"}
                                                                                       fillOpacity={0.3}/>))}
-                        </BarChart>
+                        </ComposedChart>
                     </ResponsiveContainer>
                 {/*</ChartContainer>*/}
                 <Label> Range </Label>
