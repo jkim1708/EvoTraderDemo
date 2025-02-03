@@ -179,18 +179,10 @@ const CandleStickChart =
 
         const asset = props.asset;
         const data = attachMovingAverageData(props.data);
-        // const handleChartClick = props.handleChartClick;
+        // const data = props.data;
 
         const [refAreaLeft, setRefAreaLeft] = useState('');
         const [refAreaRight, setRefAreaRight] = useState('');
-
-        const CustomTooltipCursor = ({x, y, height}: { x: string, y: string, height: string }) => (
-            <path
-                d={`M${x},${y} L${x},${y + height}`}
-                stroke="rgba(0, 0, 0, 0.2)"
-                strokeWidth="1"
-            />
-        );
 
         // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/ban-ts-comment
         // @ts-expect-error
@@ -327,7 +319,6 @@ const CandleStickChart =
             event.preventDefault();
         }, []);
 
-
         return (
             <div className={"border rounded-xl p-6"}>
                 <div className={"flex space-x-8 "}>
@@ -443,6 +434,7 @@ const CandleStickChart =
                                        padding={{'left': 5}}/>
                                 <YAxis yAxisId="1" dataKey="lowHigh" domain={['auto', 'auto']} allowDecimals={true}/>
                                 <CartesianGrid strokeDasharray="3 3"/>
+                                <Line type="monotone" dataKey="movingAverage" yAxisId="1" stroke="#ff7300" dot={false}/>
                                 <Bar
                                     yAxisId="1"
                                     dataKey="openClose"
@@ -451,10 +443,11 @@ const CandleStickChart =
                                     isAnimationActive={false}
                                 >
                                 </Bar>
-                                <Line type="monotone" dataKey="movingAverage" yAxisId="1" stroke="#ff7300" dot={false}/>
-                                {/*// eslint-disable-next-line @typescript-eslint/ban-ts-comment*/}
-                                {/*// @ts-expect-error take care later*/}
-                                <Tooltip cursor={<CustomTooltipCursor/>} content={customTooltipContent}
+
+                                <Tooltip
+                                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                    // @ts-expect-error take care later
+                                    content={customTooltipContent}
                                          position={{x: 100, y: -25}} offset={20}/>
                                 {definedRefArea.map((area, index) => (
                                     <ReferenceArea key={index} yAxisId="1" x1={area.referencedAreaLeft}
