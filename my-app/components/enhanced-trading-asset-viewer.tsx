@@ -156,7 +156,8 @@ const EnhancedTradingAssetViewer = observer(() => {
                 ts: string, // Start of the 4-hour period
                 lowHigh: [number, number],
                 openClose: [string, string],
-                movingAverage: string
+                movingAverage: string,
+                rsi: string
             }[] = [];
 
             // Start the aggregation process
@@ -168,7 +169,8 @@ const EnhancedTradingAssetViewer = observer(() => {
                 ts: string, // Start of the 4-hour period
                 lowHigh: [number, number],
                 openClose: [number, number],
-                movingAverage: string
+                movingAverage: string,
+                rsi: string
             }[] = [];
             let currentStartTime: Date | null = null;
 
@@ -199,7 +201,8 @@ const EnhancedTradingAssetViewer = observer(() => {
                         ts: convertToCustomDate(currentStartTime), // Start of the 4-hour period
                         lowHigh: [low, high],
                         openClose: [open, close],
-                        movingAverage: ''
+                        movingAverage: '',
+                        rsi: ''
                     });
 
                     // Start a new group with the current candle

@@ -99,6 +99,7 @@ type CandleStickChart = {
     close: string,
     ts: string,
     movingAverage: string,
+    rsi: string,
 };
 
 export type CandleStickChartProps = {
@@ -156,6 +157,49 @@ function attachMovingAverageData(data: CandleStickChart[]): CandleStickChart[] {
     return data;
 }
 
+function calculateRSI(data: CandleStickChart[], period: number = 14): CandleStickChart[] {
+    let gains = 0;
+    let losses = 0;
+
+    // Initialize the first period
+    for (let i = 0; i <= period; i++) {
+        const change = parseFloat(data[i].close) - parseFloat(data[i +1].close);
+        if (change > 0) {
+            gains += change;
+        } else {
+            losses -= change;
+        }
+        data[i]['rsi'] = '40';
+    }
+
+    let avgGain = gains / period;
+    let avgLoss = losses / period;
+
+    // Calculate RSI for the rest of the data
+    for (let i = period + 1; i < data.length; i++) {
+        const change = parseFloat(data[i].close) - parseFloat(data[i - 1].close);
+        if (change > 0) {
+            gains = change;
+            losses = 0;
+        } else {
+            gains = 0;
+            losses = -change;
+        }
+
+        avgGain = (avgGain * (period - 1) + gains) / period;
+        avgLoss = (avgLoss * (period - 1) + losses) / period;
+
+        const rs = avgGain / avgLoss;
+        const rsi = 100 - (100 / (1 + rs));
+
+        data[i]['rsi'] = rsi.toString();
+    }
+
+    console.log('rsi data', data);
+
+    return data;
+}
+
 const CandleStickChart =
     observer((props: CandleStickChartProps) => {
 
@@ -178,7 +222,8 @@ const CandleStickChart =
         const [startIndex, setStartIndex] = useState(0); // Bereich der X-Achse
 
         const asset = props.asset;
-        const data = attachMovingAverageData(props.data);
+        const dataWithMovingAverage = attachMovingAverageData(props.data);
+        const data = ((dataWithMovingAverage.length > 0) ? calculateRSI(dataWithMovingAverage) : dataWithMovingAverage);
         // const data = props.data;
 
         const [refAreaLeft, setRefAreaLeft] = useState('');
@@ -322,7 +367,7 @@ const CandleStickChart =
         return (
             <div className={"border rounded-xl p-6"}>
                 <div className={"flex space-x-8 "}>
-                    <div className="flex space-x-2 mb-4 tradeKindButton">
+                    <div className="flex space-x-2 mb-8 tradeKindButton">
                         <Button
                             // variant={currentSelectedTradeKind === 'long' ? 'default' : 'outline'}
                             variant={currentSelectedTradeKind === 'long' ? 'default' : 'outline'}
@@ -473,14 +518,15 @@ const CandleStickChart =
                             color: "hsl(var(--chart-1))",
                         },
                     }}
-                                    className="h-[200px]">
-                        <LineChart data={visibleData}>
-                            <XAxis dataKey="ts" tickCount={visibleData.length} tick={CustomizedTick}
-                                   padding={{'left': 5}}/>
-                            <YAxis yAxisId="1" dataKey="lowHigh" domain={['auto', 'auto']} allowDecimals={true}/>
-                            <CartesianGrid strokeDasharray="3 3"/>
-                            <Line type="monotone" dataKey="movingAverage" yAxisId="1" stroke="#ff7300" dot={false}/>
-                        </LineChart>
+
+                                    className="h-[200px] mb-10">
+                            <LineChart data={visibleData}>
+                                <XAxis dataKey="ts" tickCount={visibleData.length} tick={CustomizedTick}
+                                       padding={{'left': 5}}/>
+                                <YAxis yAxisId="1" dataKey="rsi" domain={['auto', 'auto']} allowDecimals={true}/>
+                                <CartesianGrid strokeDasharray="3 3"/>
+                                <Line type="monotone" dataKey="rsi" yAxisId="1" stroke="#ff7300" dot={false}/>
+                            </LineChart>
                     </ChartContainer>
                 </Suspense>
 

@@ -5,7 +5,7 @@ import {
     Bar,
     XAxis,
     YAxis,
-    CartesianGrid, Tooltip, ResponsiveContainer, BarChart, ReferenceArea, Brush, ComposedChart, Line, LineChart,
+    CartesianGrid, Tooltip, ResponsiveContainer, ReferenceArea, Brush, ComposedChart, Line,
 } from 'recharts';
 import {
     convertToCustomDate,
@@ -117,6 +117,7 @@ interface CandleStickChartAnalyze {
     close: string,
     ts: string,
     movingAverage: string,
+    rsi: string,
 }
 
 export type CandleStickChartProps = {
