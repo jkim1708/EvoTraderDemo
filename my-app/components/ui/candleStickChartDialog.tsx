@@ -5,7 +5,7 @@ import {
     Bar,
     XAxis,
     YAxis,
-    CartesianGrid, Tooltip, ResponsiveContainer, BarChart, ReferenceArea, Brush, ComposedChart, Line,
+    CartesianGrid, Tooltip, ResponsiveContainer, BarChart, ReferenceArea, Brush, ComposedChart, Line, LineChart,
 } from 'recharts';
 import {
     convertToCustomDate,
@@ -178,10 +178,10 @@ const RechartsClipPaths = forwardRef((_, ref) => {
     return (
         <>
             <clipPath id="chart-xaxis-clip">
-                <rect fill="rgba(0,0,0,0)" height="100%" ref={axis} />
+                <rect fill="rgba(0,0,0,0)" height="100%" ref={axis}/>
             </clipPath>
             <clipPath id="chart-grid-clip">
-                <rect fill="rgba(0,0,0,0)" height="100%" ref={grid} />
+                <rect fill="rgba(0,0,0,0)" height="100%" ref={grid}/>
             </clipPath>
         </>
     );
@@ -428,8 +428,8 @@ const CandleStickChartDialog =
         );
 
         const resizeObserverCallback = useCallback(
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             (e) => {
                 if (wrapperRef.current) {
@@ -582,7 +582,7 @@ const CandleStickChartDialog =
                         lastIndex = Math.max(10, lastIndex)
                         newStartIndex = Math.min(lastIndex - 10, newStartIndex);
 
-                        setxPaddingz([xPaddingz[0] + scrollAmount,xPaddingz[1] - scrollAmount]);
+                        setxPaddingz([xPaddingz[0] + scrollAmount, xPaddingz[1] - scrollAmount]);
 
                         const target = event.target as HTMLElement | null;
                         if (target && clipPathRefsz?.current?.axis?.current) {
@@ -795,59 +795,58 @@ const CandleStickChartDialog =
                 {/*                onMouseLeave={handleMouseUp}*/}
                 {/*                onContextMenu={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleContextMenu(e)}*/}
                 {/*>*/}
-                    <ResponsiveContainer
-                        width="100%"
-                        height={500}
-                        ref={setWrapperRef}
+                <ResponsiveContainer
+                    width="100%"
+                    height={500}
+                    ref={setWrapperRef}
+                >
+                    <ComposedChart
+                        width={800}
+                        height={250}
+                        data={visibleData}
+                        margin={{top: 20, right: 30, left: 20, bottom: 20}}
+                        onMouseDown={onChartMouseDown}
+                        onMouseMove={onChartMouseMove}
+                        onMouseUp={onChartMouseUp}
                     >
-                        <ComposedChart
-                            width={800}
-                            height={250}
-                            data={visibleData}
-                            margin={{top: 20, right: 30, left: 20, bottom: 20}}
-                            onMouseDown={onChartMouseDown}
-                            onMouseMove={onChartMouseMove}
-                            onMouseUp={onChartMouseUp}
-                        >
-                            <defs>
-                                <RechartsClipPaths ref={clipPathRefs}/>
-                            </defs>
-                            {/*<XAxis dataKey="index"*/}
-                            {/*    // tickCount={tickCount}*/}
-                            {/*       tick={CustomizedTick}*/}
-                            {/*       padding={{left: xPadding[0], right: xPadding[1]}}*/}
-                            {/*       domain={[dataStartIndex, dataEndIndex]}*/}
-                            {/*       type={'number'}*/}
-                            {/*       allowDataOverflow*/}
-                            {/*/>*/}
-                            <XAxis dataKey="ts"
-                                // tickCount={tickCount}
-                                   tick={CustomizedTick}
-                            />
-                            <YAxis yAxisId="1" dataKey="lowHigh" domain={['auto', 'auto']} allowDecimals={true}/>
-                            <CartesianGrid strokeDasharray="3 3"/>
-                            <Line type="monotone" dataKey="movingAverage" yAxisId="1" stroke="#ff7300" dot={false}/>
-                            <Bar
-                                yAxisId="1"
-                                dataKey="openClose"
-                                fill="#8884d8"
-                                shape={<Candlestick/>}
-                                isAnimationActive={false}
-                            />
-                            <Brush dataKey="ts" height={30} stroke="#8884d8" />
-                            {/*// eslint-disable-next-line @typescript-eslint/ban-ts-comment*/}
-                            {/*// @ts-expect-error take care later*/}
-                            <Tooltip content={customTooltipContent} cursor={<CustomTooltipCursor/>}
-                                     position={{x: 100, y: -25}} offset={20}/>
+                        <defs>
+                            <RechartsClipPaths ref={clipPathRefs}/>
+                        </defs>
+                        {/*<XAxis dataKey="index"*/}
+                        {/*    // tickCount={tickCount}*/}
+                        {/*       tick={CustomizedTick}*/}
+                        {/*       padding={{left: xPadding[0], right: xPadding[1]}}*/}
+                        {/*       domain={[dataStartIndex, dataEndIndex]}*/}
+                        {/*       type={'number'}*/}
+                        {/*       allowDataOverflow*/}
+                        {/*/>*/}
+                        <XAxis dataKey="ts"
+                            // tickCount={tickCount}
+                               tick={CustomizedTick}
+                        />
+                        <YAxis yAxisId="1" dataKey="lowHigh" domain={['auto', 'auto']} allowDecimals={true}/>
+                        <CartesianGrid strokeDasharray="3 3"/>
+                        <Line type="monotone" dataKey="movingAverage" yAxisId="1" stroke="#ff7300" dot={false}/>
+                        <Bar
+                            yAxisId="1"
+                            dataKey="openClose"
+                            fill="#8884d8"
+                            shape={<Candlestick/>}
+                            isAnimationActive={false}
+                        />
+                        <Brush dataKey="ts" height={30} stroke="#8884d8"/>
+                        {/*// eslint-disable-next-line @typescript-eslint/ban-ts-comment*/}
+                        {/*// @ts-expect-error take care later*/}
+                        <Tooltip content={customTooltipContent} cursor={<CustomTooltipCursor/>}
+                                 position={{x: 100, y: -25}} offset={20}/>
 
-                            {props.randomTrades.map((trade, index) => (<ReferenceArea yAxisId="1" key={index}
-                                                                                      x1={findTsInDifferentFrequency(trade.startTime.split(',')[0], visibleData, xAxisResolution, 'x1')}
-                                                                                      x2={findTsInDifferentFrequency(trade.endTime.split(',')[0], visibleData, xAxisResolution, 'x2')}
-                                                                                      fill={trade.kind == 'long' ? "blue" : "red"}
-                                                                                      fillOpacity={0.3}/>))}
-                        </ComposedChart>
-                    </ResponsiveContainer>
-                {/*</ChartContainer>*/}
+                        {props.randomTrades.map((trade, index) => (<ReferenceArea yAxisId="1" key={index}
+                                                                                  x1={findTsInDifferentFrequency(trade.startTime.split(',')[0], visibleData, xAxisResolution, 'x1')}
+                                                                                  x2={findTsInDifferentFrequency(trade.endTime.split(',')[0], visibleData, xAxisResolution, 'x2')}
+                                                                                  fill={trade.kind == 'long' ? "blue" : "red"}
+                                                                                  fillOpacity={0.3}/>))}
+                    </ComposedChart>
+                </ResponsiveContainer>
                 <Label> Range </Label>
 
             </div>

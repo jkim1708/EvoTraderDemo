@@ -4,7 +4,7 @@ import React, {Suspense, useCallback, useState} from 'react';
 import {
     Bar,
     CartesianGrid,
-    ComposedChart, Line,
+    ComposedChart, Line, LineChart,
     ReferenceArea,
     ResponsiveContainer,
     Tooltip,
@@ -448,7 +448,7 @@ const CandleStickChart =
                                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                                     // @ts-expect-error take care later
                                     content={customTooltipContent}
-                                         position={{x: 100, y: -25}} offset={20}/>
+                                    position={{x: 100, y: -25}} offset={20}/>
                                 {definedRefArea.map((area, index) => (
                                     <ReferenceArea key={index} yAxisId="1" x1={area.referencedAreaLeft}
                                                    x2={area.referencedAreaRight} strokeOpacity={0.3}
@@ -463,10 +463,26 @@ const CandleStickChart =
                                 ) : null}
 
                             </ComposedChart>
+
                         </ResponsiveContainer>
+
+                    </ChartContainer>
+                    <ChartContainer config={{
+                        value: {
+                            label: "Value",
+                            color: "hsl(var(--chart-1))",
+                        },
+                    }}
+                                    className="h-[200px]">
+                        <LineChart data={visibleData}>
+                            <XAxis dataKey="ts" tickCount={visibleData.length} tick={CustomizedTick}
+                                   padding={{'left': 5}}/>
+                            <YAxis yAxisId="1" dataKey="lowHigh" domain={['auto', 'auto']} allowDecimals={true}/>
+                            <CartesianGrid strokeDasharray="3 3"/>
+                            <Line type="monotone" dataKey="movingAverage" yAxisId="1" stroke="#ff7300" dot={false}/>
+                        </LineChart>
                     </ChartContainer>
                 </Suspense>
-
 
             </div>
 
