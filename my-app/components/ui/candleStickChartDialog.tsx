@@ -5,7 +5,7 @@ import {
     Bar,
     XAxis,
     YAxis,
-    CartesianGrid, Tooltip, ResponsiveContainer, ReferenceArea, Brush, ComposedChart, Line,
+    CartesianGrid, Tooltip, ResponsiveContainer, ReferenceArea, Brush, ComposedChart, Line, LineChart, ReferenceLine,
 } from 'recharts';
 import {
     convertToCustomDate,
@@ -21,6 +21,7 @@ import {TradingRule} from "@/store/TradingRuleStore";
 import {ArrowDownCircle, ArrowUpCircle} from "lucide-react";
 import {useResizeObserver} from "@/components/hooks/useResizeObserver";
 import {useZoomAndPan} from "@/components/hooks/useZoomAndPan";
+import {ChartContainer} from "@/components/ui/chart";
 
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -143,9 +144,10 @@ const prepareData = (data: CandleStickChart[]): {
     lowHigh: [number, number],
     openClose: [number, number],
     movingAverage: string,
+    rsi: string,
     trade: Trade | null,
 } [] => {
-    return data.map(({open, close, low, high, ts, movingAverage}, index) => {
+    return data.map(({open, close, low, high, ts, movingAverage, rsi}, index) => {
         return {
             index,
             ts,
@@ -156,6 +158,7 @@ const prepareData = (data: CandleStickChart[]): {
             lowHigh: [parseFloat(low), parseFloat(high)] as [number, number],
             openClose: [parseFloat(open), parseFloat(close)] as [number, number],
             movingAverage: movingAverage,
+            rsi: rsi,
             trade: null,
         };
     });
@@ -835,6 +838,15 @@ const CandleStickChartDialog =
                             shape={<Candlestick/>}
                             isAnimationActive={false}
                         />
+
+                            <YAxis orientation='right' yAxisId="2" dataKey="rsi" domain={['auto', 'auto']} allowDecimals={true}/>
+                            <ReferenceLine y={80} yAxisId="2" stroke="purple"/>
+                            <ReferenceLine y={20} yAxisId="2" stroke="purple"/>
+                            <ReferenceLine y={30} yAxisId="2" strokeDasharray={"3 3"} stroke="purple"/>
+                            <ReferenceLine y={70} yAxisId="2" strokeDasharray={"3 3"} stroke="purple"/>
+                            <Line type="monotone" dataKey="rsi" yAxisId="2" stroke="#5078BE" dot={false}/>
+
+
                         <Brush dataKey="ts" height={30} stroke="#8884d8"/>
                         {/*// eslint-disable-next-line @typescript-eslint/ban-ts-comment*/}
                         {/*// @ts-expect-error take care later*/}
@@ -847,7 +859,28 @@ const CandleStickChartDialog =
                                                                                   fill={trade.kind == 'long' ? "blue" : "red"}
                                                                                   fillOpacity={0.3}/>))}
                     </ComposedChart>
+
                 </ResponsiveContainer>
+                <ChartContainer config={{
+                    value: {
+                        label: "Value",
+                        color: "hsl(var(--chart-1))",
+                    },
+                }}
+
+                                className="h-[200px]">
+                    <LineChart data={visibleData} margin={{top: 20, right: 30, left: 20, bottom: 20}}>
+                        <XAxis dataKey="ts" tickCount={visibleData.length} tick={CustomizedTick}
+                               padding={{'left': 5}}/>
+                        <YAxis yAxisId="1" dataKey="rsi" domain={['auto', 'auto']} allowDecimals={true}/>
+                        <ReferenceLine y={80} yAxisId="1" label={80} stroke="purple"/>
+                        <ReferenceLine y={20} yAxisId="1" label={20} stroke="purple"/>
+                        <ReferenceLine y={30} yAxisId="1" label={30} strokeDasharray={"3 3"} stroke="purple"/>
+                        <ReferenceLine y={70} yAxisId="1" label={70} strokeDasharray={"3 3"} stroke="purple"/>
+                        <CartesianGrid strokeDasharray="3 3"/>
+                        <Line type="monotone" dataKey="rsi" yAxisId="1" stroke="#5078BE" dot={false}/>
+                    </LineChart>
+                </ChartContainer>
                 <Label> Range </Label>
 
             </div>
