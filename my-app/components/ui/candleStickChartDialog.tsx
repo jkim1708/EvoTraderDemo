@@ -116,6 +116,7 @@ interface CandleStickChartAnalyze {
     open: string,
     close: string,
     ts: string,
+    movingAverage: string,
 }
 
 export type CandleStickChartProps = {
@@ -140,9 +141,10 @@ const prepareData = (data: CandleStickChart[]): {
     close: number,
     lowHigh: [number, number],
     openClose: [number, number],
+    movingAverage: string,
     trade: Trade | null,
 } [] => {
-    return data.map(({open, close, low, high, ts}, index) => {
+    return data.map(({open, close, low, high, ts, movingAverage}, index) => {
         return {
             index,
             ts,
@@ -152,6 +154,7 @@ const prepareData = (data: CandleStickChart[]): {
             close: parseFloat(close),
             lowHigh: [parseFloat(low), parseFloat(high)] as [number, number],
             openClose: [parseFloat(open), parseFloat(close)] as [number, number],
+            movingAverage: movingAverage,
             trade: null,
         };
     });

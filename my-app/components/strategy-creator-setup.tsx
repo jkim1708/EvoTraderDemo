@@ -75,7 +75,6 @@ const StrategyCreatorSetup = observer(() => {
                                             variant={asset == a ? 'default' : 'outline'}
                                             value={a}
                                             onClick={ () => {
-                                                console.log('value',a);
                                                 setAsset(a as unknown as string)
                                             }}
                                             // variant={'outline'}

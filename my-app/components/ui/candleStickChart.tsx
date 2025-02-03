@@ -1,7 +1,16 @@
 "use client"
 
 import React, {Suspense, useCallback, useState} from 'react';
-import {Bar, BarChart, CartesianGrid, ReferenceArea, ResponsiveContainer, Tooltip, XAxis, YAxis,} from 'recharts';
+import {
+    Bar,
+    CartesianGrid,
+    ComposedChart, Line,
+    ReferenceArea,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    YAxis,
+} from 'recharts';
 import {convertToDate, isInExistingInReferenceArea, X_AXIS_RESOLUTION,} from "@/utils";
 import {observer} from "mobx-react-lite";
 import {useStores} from "@/store/Provider";
@@ -89,6 +98,7 @@ type CandleStickChart = {
     open: string,
     close: string,
     ts: string,
+    movingAverage: string,
 };
 
 export type CandleStickChartProps = {
@@ -128,6 +138,24 @@ function CustomizedTick(props: CustomizedTickProps) {
         ;
 }
 
+function attachMovingAverageData(data: CandleStickChart[]): CandleStickChart[] {
+    data.map((tickData, index) => {
+        const movingAverage = data.slice(Math.max(0, index - 50), index)
+                .reduce((acc, tickData) => {
+                    return acc + parseFloat(tickData.close);
+                }, 0)
+
+            / 50;
+        if (index < 50) {
+            tickData['movingAverage'] = tickData.close;
+        } else {
+            tickData['movingAverage'] = movingAverage.toString();
+        }
+    });
+
+    return data;
+}
+
 const CandleStickChart =
     observer((props: CandleStickChartProps) => {
 
@@ -148,10 +176,9 @@ const CandleStickChart =
         const [isDragging, setIsDragging] = useState(false); // Bereich der X-Achse
         const [lastMouseX, setLastMouseX] = useState(0); // Bereich der X-Achse
         const [startIndex, setStartIndex] = useState(0); // Bereich der X-Achse
-        console.log('startIndex 2', startIndex);
 
         const asset = props.asset;
-        const data = props.data;
+        const data = attachMovingAverageData(props.data);
         // const handleChartClick = props.handleChartClick;
 
         const [refAreaLeft, setRefAreaLeft] = useState('');
@@ -295,12 +322,11 @@ const CandleStickChart =
         }, []);
 
         const visibleData = data.slice(startIndex, startIndex + xAxisResolution)
-        console.log('startIndex', startIndex)
-        console.log('xAxisResolution', xAxisResolution)
 
         const handleContextMenu = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
             event.preventDefault();
         }, []);
+
 
         return (
             <div className={"border rounded-xl p-6"}>
@@ -312,7 +338,11 @@ const CandleStickChart =
                             onClick={() => setCurrentSelectedTradeKind('long')}
                             className={currentSelectedTradeKind === 'long' ? "bg-green-700 opacity-30" : 'outline outline-green-700/30'}
                         >
-                            <ArrowUpCircle className="mr-2 h-4 w-4 green-700/30" color={currentSelectedTradeKind === 'long' ? "white" : '#BED2BE'}/> <div className={currentSelectedTradeKind === 'long' ? "white" :"text-green-700 opacity-30"}>Long</div>
+                            <ArrowUpCircle className="mr-2 h-4 w-4 green-700/30"
+                                           color={currentSelectedTradeKind === 'long' ? "white" : '#BED2BE'}/>
+                            <div
+                                className={currentSelectedTradeKind === 'long' ? "white" : "text-green-700 opacity-30"}>Long
+                            </div>
                         </Button>
                         <Button
                             // variant={currentSelectedTradeKind === 'short' ? 'default' : 'outline'}
@@ -320,7 +350,11 @@ const CandleStickChart =
                             onClick={() => setCurrentSelectedTradeKind('short')}
                             className={currentSelectedTradeKind === 'short' ? "bg-red-700 opacity-30" : 'outline outline-red-700/30'}
                         >
-                            <ArrowDownCircle className="mr-2 h-4 w-4 outline-red-700/30" color={currentSelectedTradeKind === 'short' ? "white" : '#E6BEBE'}/> <div className={currentSelectedTradeKind === 'short' ? "white" : "text-red-700 opacity-30"}>Short</div>
+                            <ArrowDownCircle className="mr-2 h-4 w-4 outline-red-700/30"
+                                             color={currentSelectedTradeKind === 'short' ? "white" : '#E6BEBE'}/>
+                            <div
+                                className={currentSelectedTradeKind === 'short' ? "white" : "text-red-700 opacity-30"}>Short
+                            </div>
                         </Button>
                     </div>
 
@@ -381,7 +415,7 @@ const CandleStickChart =
                             width="100%"
                             height={500}
                         >
-                            <BarChart
+                            <ComposedChart
                                 width={800}
                                 height={250}
                                 data={visibleData}
@@ -417,7 +451,7 @@ const CandleStickChart =
                                     isAnimationActive={false}
                                 >
                                 </Bar>
-
+                                <Line type="monotone" dataKey="movingAverage" yAxisId="1" stroke="#ff7300" dot={false}/>
                                 {/*// eslint-disable-next-line @typescript-eslint/ban-ts-comment*/}
                                 {/*// @ts-expect-error take care later*/}
                                 <Tooltip cursor={<CustomTooltipCursor/>} content={customTooltipContent}
@@ -434,10 +468,12 @@ const CandleStickChart =
                                                    fill={currentSelectedTradeKind === 'long' ? '#34eb6e' : '#eb3434'}
                                                    opacity={0.3}/>
                                 ) : null}
-                            </BarChart>
+
+                            </ComposedChart>
                         </ResponsiveContainer>
                     </ChartContainer>
                 </Suspense>
+
 
             </div>
 

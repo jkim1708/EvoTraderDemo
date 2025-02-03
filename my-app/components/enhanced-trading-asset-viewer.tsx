@@ -155,7 +155,8 @@ const EnhancedTradingAssetViewer = observer(() => {
                 close: string,
                 ts: string, // Start of the 4-hour period
                 lowHigh: [number, number],
-                openClose: [string, string]
+                openClose: [string, string],
+                movingAverage: string
             }[] = [];
 
             // Start the aggregation process
@@ -166,7 +167,8 @@ const EnhancedTradingAssetViewer = observer(() => {
                 close: string,
                 ts: string, // Start of the 4-hour period
                 lowHigh: [number, number],
-                openClose: [number, number]
+                openClose: [number, number],
+                movingAverage: string
             }[] = [];
             let currentStartTime: Date | null = null;
 
@@ -196,8 +198,8 @@ const EnhancedTradingAssetViewer = observer(() => {
                         close,
                         ts: convertToCustomDate(currentStartTime), // Start of the 4-hour period
                         lowHigh: [low, high],
-                        openClose: [open, close]
-
+                        openClose: [open, close],
+                        movingAverage: ''
                     });
 
                     // Start a new group with the current candle
@@ -211,7 +213,8 @@ const EnhancedTradingAssetViewer = observer(() => {
 
         useEffect(() => {
             const tickSeries: SampleAssetData = generateData(new Date('2019-10-01'), new Date(), asset, 15);
-            const candleStickSeries: CandleStickChart[] = transformToCandleStickSeries(tickSeries, CANDLESTICK_FREQUENCY.HOURLY) ?? [];
+            const candleStickSeries: CandleStickChart[] = transformToCandleStickSeries(tickSeries) ?? [];
+
 
             setFullTimeRangeData(candleStickSeries);
             setData(candleStickSeries);

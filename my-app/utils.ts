@@ -71,7 +71,7 @@ export enum CANDLESTICK_FREQUENCY {
     FOUR_HOURLY,
 }
 
-function extractDateTime(date: Date, frequency: CANDLESTICK_FREQUENCY): string {
+function extractDateTime(date: Date): string {
 
     const day = date.getDate();
     const dayStr = day < 10 ? "0" + day : day;
@@ -86,12 +86,12 @@ function extractDateTime(date: Date, frequency: CANDLESTICK_FREQUENCY): string {
 export function transformToCandleStickSeries(tickData: {
     date: Date,
     value: number
-}[], frequency: CANDLESTICK_FREQUENCY) {
+}[]) {
 
     if (tickData === undefined || tickData === null) return;
 
     const groupedData = tickData.reduce((acc, tick) => {
-        const dateTime = extractDateTime(tick.date, frequency);
+        const dateTime = extractDateTime(tick.date);
         if (!acc[dateTime]) {
             acc[dateTime] = [];
         }
@@ -107,6 +107,7 @@ export function transformToCandleStickSeries(tickData: {
         const ts = convertToCustomDate(group[0].date);
         const lowHigh = [low, high];
         const openClose = [open, close];
+        const movingAverage = '';
 
         return {
             high,
@@ -115,7 +116,8 @@ export function transformToCandleStickSeries(tickData: {
             close,
             ts,
             lowHigh,
-            openClose
+            openClose,
+            movingAverage
         };
     });
 }
@@ -139,11 +141,6 @@ export function convertToDate(date: string): Date {
     const day = dateParts[2];
     const hourStr = Number(hour) < 10 ? "0" + hour : hour;
     return new Date(`${dateParts[0]}-${month}-${day}T${hourStr}:00:00`);
-}
-
-export function isValidDate(dateString: string): boolean {
-    const date = new Date(dateString);
-    return !isNaN(date.getTime());
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -208,8 +205,8 @@ export function isStartDateExistentAlready(randomDateRange: { startDate: Date; e
         return (date.startDate.toISOString().split('T')[0] === startDate.toISOString().split('T')[0]);
     })
 
-    if (foundDate) return true;
-    return false;
+    return !!foundDate;
+
 }
 
 

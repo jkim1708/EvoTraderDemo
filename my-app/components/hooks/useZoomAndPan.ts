@@ -80,7 +80,6 @@ export const useZoomAndPan = ({
       ) {
         const wrapperRect = wrapperRef.current.getBoundingClientRect();
         const gridRect = gridRef.current.getBoundingClientRect();
-        console.log(wrapperRect);
         clipPathRefs.current.axis.current.setAttribute(
           "width",
           `${gridRect.width + chartAxisClipPadding}px`
@@ -108,7 +107,6 @@ export const useZoomAndPan = ({
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-expect-error
     (e) => {
-      console.log(e);
       if (wrapperRef.current) {
         const xAxis = wrapperRef.current.querySelector(
           `.${CHART_CLASSES.xAxis}`

@@ -87,8 +87,6 @@ const StrategyDialog = observer((props: StrategyDialogProps) => {
 
     useEffect(() => {
         let startDate;
-        console.log('endBacktestingOffSample',endBacktestingOffSample);
-        console.log('new Date(endBacktestingOffSample).getTime() - 1000 * 60 * 60 * 24 * 180)',convertToCustomDate(new Date((new Date(endBacktestingOffSample).getTime() - 1000 * 60 * 60 * 24 * 180))).split(',')[0]);
         if (endBacktestingOffSample || strategy.backtestingOffSample.endDate) {
 
             const usedEndDate = endBacktestingOffSample ? endBacktestingOffSample : strategy.backtestingOffSample.endDate;
