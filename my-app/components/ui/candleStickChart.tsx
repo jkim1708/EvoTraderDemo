@@ -5,7 +5,7 @@ import {
     Bar,
     CartesianGrid,
     ComposedChart, Line, LineChart,
-    ReferenceArea,
+    ReferenceArea, ReferenceLine,
     ResponsiveContainer,
     Tooltip,
     XAxis,
@@ -141,13 +141,13 @@ function CustomizedTick(props: CustomizedTickProps) {
 
 function attachMovingAverageData(data: CandleStickChart[]): CandleStickChart[] {
     data.map((tickData, index) => {
-        const movingAverage = data.slice(Math.max(0, index - 50), index)
+        const movingAverage = data.slice(Math.max(0, index - (14*24)), index)
                 .reduce((acc, tickData) => {
                     return acc + parseFloat(tickData.close);
                 }, 0)
 
-            / 50;
-        if (index < 50) {
+            / (14*24);
+        if (index < (14*24)) {
             tickData['movingAverage'] = tickData.close;
         } else {
             tickData['movingAverage'] = movingAverage.toString();
@@ -157,7 +157,7 @@ function attachMovingAverageData(data: CandleStickChart[]): CandleStickChart[] {
     return data;
 }
 
-function calculateRSI(data: CandleStickChart[], period: number = 14): CandleStickChart[] {
+function calculateRSI(data: CandleStickChart[], period: number = 24*14): CandleStickChart[] {
     let gains = 0;
     let losses = 0;
 
@@ -176,8 +176,8 @@ function calculateRSI(data: CandleStickChart[], period: number = 14): CandleStic
     let avgLoss = losses / period;
 
     // Calculate RSI for the rest of the data
-    for (let i = period + 1; i < data.length; i++) {
-        const change = parseFloat(data[i].close) - parseFloat(data[i - 1].close);
+    for (let i = period; i < data.length; i++) {
+        const change = parseFloat(data[i].close) - parseFloat(data[i - 24].close);
         if (change > 0) {
             gains = change;
             losses = 0;
@@ -194,8 +194,6 @@ function calculateRSI(data: CandleStickChart[], period: number = 14): CandleStic
 
         data[i]['rsi'] = rsi.toString();
     }
-
-    console.log('rsi data', data);
 
     return data;
 }
@@ -519,13 +517,17 @@ const CandleStickChart =
                         },
                     }}
 
-                                    className="h-[200px] mb-10">
-                            <LineChart data={visibleData}>
+                                    className="h-[200px] mb-10 pb-6">
+                            <LineChart data={visibleData} margin={{top: 20, right: 30, left: 20, bottom: 20}}>
                                 <XAxis dataKey="ts" tickCount={visibleData.length} tick={CustomizedTick}
                                        padding={{'left': 5}}/>
                                 <YAxis yAxisId="1" dataKey="rsi" domain={['auto', 'auto']} allowDecimals={true}/>
+                                <ReferenceLine y={80} yAxisId="1" label={80} stroke="purple"/>
+                                <ReferenceLine y={20} yAxisId="1" label={20} stroke="purple"/>
+                                <ReferenceLine y={30} yAxisId="1" label={30} strokeDasharray={"3 3"} stroke="purple"/>
+                                <ReferenceLine y={70} yAxisId="1" label={70} strokeDasharray={"3 3"} stroke="purple"/>
                                 <CartesianGrid strokeDasharray="3 3"/>
-                                <Line type="monotone" dataKey="rsi" yAxisId="1" stroke="#ff7300" dot={false}/>
+                                <Line type="monotone" dataKey="rsi" yAxisId="1" stroke="#5078BE" dot={false}/>
                             </LineChart>
                     </ChartContainer>
                 </Suspense>
