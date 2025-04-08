@@ -18,7 +18,6 @@ import {Button} from "@/components/ui/button";
 import {ChartContainer} from "@/components/ui/chart";
 import {CategoricalChartState} from "recharts/types/chart/types";
 import {ArrowDownCircle, ArrowUpCircle} from "lucide-react";
-import {next} from "sucrase/dist/types/parser/tokenizer";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
@@ -340,51 +339,28 @@ const CandleStickChart =
             }
         }, []);
 
-        // const handleMouseMove = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        //     if (isDragging) {
-        //         const deltaX = event.clientX - lastMouseX;
-        //         const scrollAmount = Math.round(deltaX / 5); // Adjust sensitivity here
-        //         setStartIndex(prevIndex => {
-        //             const newIndex = Math.max(0, Math.min(data.length - xAxisResolution, prevIndex - scrollAmount));
-        //             return newIndex;
-        //         });
-        //         setLastMouseX(event.clientX);
-        //         setCurrentTradingStrategyOnSampleRange(xAxisResolution);
-        //     }
-        // }, [isDragging, lastMouseX, xAxisResolution, data.length]);
+        const handleMouseMove = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+            if (isDragging) {
+                const deltaX = event.clientX - lastMouseX;
+                const scrollAmount = Math.round(deltaX / 5); // Adjust sensitivity here
+                setStartIndex(prevIndex => {
+                    const newIndex = Math.max(0, Math.min(data.length - xAxisResolution, prevIndex - scrollAmount));
+                    return newIndex;
+                });
+                setLastMouseX(event.clientX);
+                setCurrentTradingStrategyOnSampleRange(xAxisResolution);
+            }
+        }, [isDragging, lastMouseX, xAxisResolution, data.length]);
 
         const handleMouseUp = useCallback(() => {
             setIsDragging(false);
         }, []);
 
-        console.log("startIndex", startIndex);
-        console.log("xAxisResolution", xAxisResolution);
         const visibleData = data.slice(startIndex, startIndex + xAxisResolution)
 
         const handleContextMenu = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
             event.preventDefault();
         }, []);
-
-        const debounce = (fn, delay)=> {
-            let timeoutId;
-            return (...args) => {
-                clearTimeout(timeoutId);
-                timeoutId = setTimeout(() => fn(...args), delay);
-            };
-        }
-
-        const handleOnMouseMove = (nextState: CategoricalChartState, event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-            if (event.button === 0) {
-            if (nextState.activeLabel) {
-                //     // && refAreaLeft && !isInExistingInReferenceArea(definedRefArea, nextState.activeLabel))
-                if (nextState.activeLabel != refAreaRight) {
-                    setRefAreaRight(nextState.activeLabel)
-                }
-            }
-            }
-        }
-
-        const debouncedHandleOnMouseMove = useCallback(debounce(handleOnMouseMove, 0), [handleOnMouseMove]);
 
         return (
             <div className={"border rounded-xl p-6"}>
@@ -462,33 +438,35 @@ const CandleStickChart =
                     }}
                                     className="h-[400px]"
                                     onMouseDown={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleMouseDown(e)}
-                                    // onMouseMove={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleOnMouseMove(e)}
+                                    onMouseMove={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleMouseMove(e)}
                                     onMouseUp={handleMouseUp}
                                     onMouseLeave={handleMouseUp}
                                     onContextMenu={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleContextMenu(e)}
                     >
 
 
-                        {/*<ResponsiveContainer*/}
-                        {/*    // width="100%"*/}
-                        {/*    // height={500}*/}
-                        {/*>*/}
+                        <ResponsiveContainer
+                            width="100%"
+                            height={500}
+                        >
                             <ComposedChart
                                 width={800}
                                 height={250}
                                 data={visibleData}
                                 margin={{top: 20, right: 30, left: 20, bottom: 20}}
                                 onMouseDown={(nextState: CategoricalChartState, event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-                                    console.log("onMouseDown", event.button);
                                     if (event.button === 0) {
-                                         if (nextState.activeLabel)
-                                        // && !isInExistingInReferenceArea(definedRefArea, nextState.activeLabel)) {
+                                        if (nextState.activeLabel && !isInExistingInReferenceArea(definedRefArea, nextState.activeLabel)) {
                                             setRefAreaLeft(nextState.activeLabel)
-                                        // }
+                                        }
                                         ;
                                     }
                                 }}
-                                onMouseMove={debouncedHandleOnMouseMove}
+                                onMouseMove={(nextState: CategoricalChartState, event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+                                    if (event.button === 0) {
+                                        if (nextState.activeLabel && refAreaLeft && !isInExistingInReferenceArea(definedRefArea, nextState.activeLabel)) setRefAreaRight(nextState.activeLabel)
+                                    }
+                                }}
                                 // eslint-disable-next-line react/jsx-no-bind
                                 onMouseUp={defineReferenceArea.bind(this)}
                                 onMouseLeave={() => {
@@ -514,7 +492,7 @@ const CandleStickChart =
                                     // @ts-expect-error take care later
                                     content={customTooltipContent}
                                     position={{x: 100, y: -25}} offset={20}/>
-                                    {definedRefArea.map((area, index) => (
+                                {definedRefArea.map((area, index) => (
                                     <ReferenceArea key={index} yAxisId="1" x1={area.referencedAreaLeft}
                                                    x2={area.referencedAreaRight} strokeOpacity={0.3}
                                                    fill={area.tradeKind === 'long' ? '#34eb6e' : '#eb3434'}
@@ -529,7 +507,7 @@ const CandleStickChart =
 
                             </ComposedChart>
 
-                        {/*</ResponsiveContainer>*/}
+                        </ResponsiveContainer>
 
                     </ChartContainer>
                     <ChartContainer config={{
