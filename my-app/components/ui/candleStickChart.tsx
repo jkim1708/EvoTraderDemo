@@ -1,10 +1,6 @@
-// @ts-ignore
-// @ts-ignore
-// @ts-ignore
-
 "use client"
 
-import React, {Suspense, useCallback, useState, memo} from 'react';
+import React, {Suspense, useCallback, useState} from 'react';
 import {
     Bar,
     CartesianGrid,
@@ -168,15 +164,14 @@ const CandleStickChart =
                 currentSelectedAsset,
                 definedRefArea,
                 currentSelectedTradeKind,
-                setCurrentTradingStrategyOnSampleRange,
                 setCurrentSelectedTradeKind,
             },
         } = useStores();
 
 
         const [xAxisResolution, setXAxisResolution] = useState(X_AXIS_RESOLUTION.THREE_MONTH); // Bereich der X-Achse
-        const [isDragging, setIsDragging] = useState(false); // Bereich der X-Achse
-        const [lastMouseX, setLastMouseX] = useState(0); // Bereich der X-Achse
+        // const [isDragging, setIsDragging] = useState(false); // Bereich der X-Achse
+        // const [lastMouseX, setLastMouseX] = useState(0); // Bereich der X-Achse
         const [startIndex, setStartIndex] = useState(0); // Bereich der X-Achse
 
         const asset = props.asset;
@@ -281,27 +276,27 @@ const CandleStickChart =
             console.log("handleMouseDown", event.button);
             if (event.button === 2) { // Right mouse button
                 event.preventDefault();
-                setIsDragging(true);
-                setLastMouseX(event.clientX);
+                // setIsDragging(true);
+                // setLastMouseX(event.clientX);
             }
         }, []);
 
-        const handleMouseMove = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-            if (isDragging) {
-                const deltaX = event.clientX - lastMouseX;
-                const scrollAmount = Math.round(deltaX / 5); // Adjust sensitivity here
-                setStartIndex(prevIndex => {
-                    const newIndex = Math.max(0, Math.min(data.length - xAxisResolution, prevIndex - scrollAmount));
-                    return newIndex;
-                });
-                setLastMouseX(event.clientX);
-                setCurrentTradingStrategyOnSampleRange(xAxisResolution);
-            }
-        }, [isDragging, lastMouseX, xAxisResolution, data.length]);
+        // const handleMouseMove = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        //     if (isDragging) {
+        //         const deltaX = event.clientX - lastMouseX;
+        //         const scrollAmount = Math.round(deltaX / 5); // Adjust sensitivity here
+        //         setStartIndex(prevIndex => {
+        //             const newIndex = Math.max(0, Math.min(data.length - xAxisResolution, prevIndex - scrollAmount));
+        //             return newIndex;
+        //         });
+        //         setLastMouseX(event.clientX);
+        //         setCurrentTradingStrategyOnSampleRange(xAxisResolution);
+        //     }
+        // }, [isDragging, lastMouseX, xAxisResolution, data.length]);
 
-        const handleMouseUp = useCallback(() => {
-            setIsDragging(false);
-        }, []);
+        // const handleMouseUp = useCallback(() => {
+        //     setIsDragging(false);
+        // }, []);
 
         const visibleData = data.slice(startIndex, startIndex + xAxisResolution)
 
@@ -386,8 +381,8 @@ const CandleStickChart =
                                     className="h-[400px]"
                                     onMouseDown={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleMouseDown(e)}
                                     // onMouseMove={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleMouseMove(e)}
-                                    onMouseUp={handleMouseUp}
-                                    onMouseLeave={handleMouseUp}
+                                    // onMouseUp={handleMouseUp}
+                                    // onMouseLeave={handleMouseUp}
                                     onContextMenu={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleContextMenu(e)}
                     >
 
