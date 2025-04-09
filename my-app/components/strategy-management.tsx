@@ -66,6 +66,8 @@ const StrategyManagement = observer(() => {
     }
 
 
+    console.log("selectedStrategy",selectedStrategy)
+
 
     return (
         <div className="space-y-2">

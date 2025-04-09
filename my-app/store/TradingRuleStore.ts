@@ -15,6 +15,7 @@ class TradingRuleStore {
     currentTradingStrategyName: string;
 
     setCurrentTradingStrategyName = (name: string) => {
+        console.log("setCurrentTradingStrategyName", name)
         this.currentTradingStrategyName = name;
     }
     tradingRules: TradingRule[];
@@ -31,6 +32,7 @@ class TradingRuleStore {
         this.tradingRules = [];
         this.currentSelectedTradeKind = 'long';
         this.currentSelectedAsset = 'EURUSD';
+        console.log("TradingRuleStore constructor")
         this.currentTradingStrategyName = 'My Trading Strategy Name'
         // this.searchParam = "";
         makeAutoObservable(this);
@@ -84,6 +86,7 @@ class TradingRuleStore {
         if (!tradingRules) return;
         this.setTradingRule(tradingRules);
     };
+
 }
 
 export default TradingRuleStore;

@@ -786,7 +786,7 @@ const CandleStickChartDialog =
                         />
                         <YAxis yAxisId="1" dataKey="lowHigh" domain={['auto', 'auto']} allowDecimals={true}/>
                         <CartesianGrid strokeDasharray="3 3"/>
-                        <Line type="monotone" dataKey="movingAverage" yAxisId="1" stroke="#ff7300" dot={false}/>
+                        <Line type="monotone" dataKey="movingAverage" yAxisId="1" stroke="#ff7300" dot={false} isAnimationActive={false}/>
                         <Bar
                             yAxisId="1"
                             dataKey="openClose"
@@ -800,7 +800,7 @@ const CandleStickChartDialog =
                             <ReferenceLine y={20} yAxisId="2" stroke="purple"/>
                             <ReferenceLine y={30} yAxisId="2" strokeDasharray={"3 3"} stroke="purple"/>
                             <ReferenceLine y={70} yAxisId="2" strokeDasharray={"3 3"} stroke="purple"/>
-                            <Line type="monotone" dataKey="rsi" yAxisId="2" stroke="#5078BE" dot={false}/>
+                            <Line type="monotone" dataKey="rsi" yAxisId="2" stroke="#5078BE" dot={false} isAnimationActive={false}/>
 
 
                         <Brush dataKey="ts" height={30} stroke="#8884d8"/>

@@ -1,6 +1,10 @@
+// @ts-ignore
+// @ts-ignore
+// @ts-ignore
+
 "use client"
 
-import React, {Suspense, useCallback, useState} from 'react';
+import React, {Suspense, useCallback, useState, memo} from 'react';
 import {
     Bar,
     CartesianGrid,
@@ -44,7 +48,7 @@ const Candlestick = props => {
     // x = x + offset;
 
     return (
-        <Suspense>
+        // <Suspense>
             <g stroke={color} fill={color} strokeWidth="2">
                 <path
                     d={`
@@ -88,7 +92,7 @@ const Candlestick = props => {
                     />
                 )}
             </g>
-        </Suspense>
+        // </Suspense>
     );
 };
 
@@ -139,64 +143,20 @@ function CustomizedTick(props: CustomizedTickProps) {
         ;
 }
 
-function attachMovingAverageData(data: CandleStickChart[]): CandleStickChart[] {
-    data.map((tickData, index) => {
-        const movingAverage = data.slice(Math.max(0, index - (14*24)), index)
-                .reduce((acc, tickData) => {
-                    return acc + parseFloat(tickData.close);
-                }, 0)
 
-            / (14*24);
-        if (index < (14*24)) {
-            tickData['movingAverage'] = tickData.close;
-        } else {
-            tickData['movingAverage'] = movingAverage.toString();
-        }
-    });
 
-    return data;
-}
+// eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/ban-ts-comment
+// @ts-expect-error
+const customTooltipContent = ({payload}) => {
+    const open = payload[0] ? parseFloat(payload[0].payload.open).toFixed(4) : "";
+    const close = payload[0] ? parseFloat(payload[0].payload.close).toFixed(4) : "";
+    const high = payload[0] ? parseFloat(payload[0].payload.high).toFixed(4) : "";
+    const low = payload[0] ? parseFloat(payload[0].payload.low).toFixed(4) : "";
 
-function calculateRSI(data: CandleStickChart[], period: number = 24*14): CandleStickChart[] {
-    let gains = 0;
-    let losses = 0;
-
-    // Initialize the first period
-    for (let i = 0; i <= period; i++) {
-        const change = parseFloat(data[i].close) - parseFloat(data[i +1].close);
-        if (change > 0) {
-            gains += change;
-        } else {
-            losses -= change;
-        }
-        data[i]['rsi'] = '40';
-    }
-
-    let avgGain = gains / period;
-    let avgLoss = losses / period;
-
-    // Calculate RSI for the rest of the data
-    for (let i = period; i < data.length; i++) {
-        const change = parseFloat(data[i].close) - parseFloat(data[i - 24].close);
-        if (change > 0) {
-            gains = change;
-            losses = 0;
-        } else {
-            gains = 0;
-            losses = -change;
-        }
-
-        avgGain = (avgGain * (period - 1) + gains) / period;
-        avgLoss = (avgLoss * (period - 1) + losses) / period;
-
-        const rs = avgGain / avgLoss;
-        const rsi = 100 - (100 / (1 + rs));
-
-        data[i]['rsi'] = rsi.toString();
-    }
-
-    return data;
-}
+    return (
+        <p> o {open} h {high} l {low} c {close} </p>
+    )
+};
 
 const CandleStickChart =
     observer((props: CandleStickChartProps) => {
@@ -220,25 +180,12 @@ const CandleStickChart =
         const [startIndex, setStartIndex] = useState(0); // Bereich der X-Achse
 
         const asset = props.asset;
-        const dataWithMovingAverage = attachMovingAverageData(props.data);
-        const data = ((dataWithMovingAverage.length > 0) ? calculateRSI(dataWithMovingAverage) : dataWithMovingAverage);
-        // const data = props.data;
+        // const dataWithMovingAverage = attachMovingAverageData(props.data);
+        // const data = ((dataWithMovingAverage.length > 0) ? calculateRSI(dataWithMovingAverage) : dataWithMovingAverage);
+        const data = props.data;
 
         const [refAreaLeft, setRefAreaLeft] = useState('');
         const [refAreaRight, setRefAreaRight] = useState('');
-
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        const customTooltipContent = ({payload}) => {
-            const open = payload[0] ? parseFloat(payload[0].payload.open).toFixed(4) : "";
-            const close = payload[0] ? parseFloat(payload[0].payload.close).toFixed(4) : "";
-            const high = payload[0] ? parseFloat(payload[0].payload.high).toFixed(4) : "";
-            const low = payload[0] ? parseFloat(payload[0].payload.low).toFixed(4) : "";
-
-            return (
-                <p> o {open} h {high} l {low} c {close} </p>
-            )
-        }
 
         function resetRefAreaSelection() {
             setRefAreaLeft('');
@@ -305,8 +252,7 @@ const CandleStickChart =
             return false;
         }
 
-        const defineReferenceArea = () => {
-
+        const defineReferenceArea =() => {
             if (isRefAreaSelectionDefined() && !isRefAreaSelectionOverlapping(definedRefArea, refAreaLeft, refAreaRight)) {
                 saveReferenceAreaSelection();
                 const profitNLoss = calculateProfitNLoss(refAreaLeft, refAreaRight, currentSelectedTradeKind);
@@ -314,7 +260,7 @@ const CandleStickChart =
                 createTrade(profitNLoss ?? 0);
             }
             resetRefAreaSelection();
-        }
+        };
 
         async function handleDButton(numberOfLastDaysToShow: X_AXIS_RESOLUTION) {
 
@@ -332,6 +278,7 @@ const CandleStickChart =
 
         //
         const handleMouseDown = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+            console.log("handleMouseDown", event.button);
             if (event.button === 2) { // Right mouse button
                 event.preventDefault();
                 setIsDragging(true);
@@ -431,14 +378,14 @@ const CandleStickChart =
                 <p className={"assetName"}> {asset} </p>
                 <Suspense>
                     <ChartContainer config={{
-                        value: {
-                            label: "Value",
-                            color: "hsl(var(--chart-1))",
-                        },
+                        // value: {
+                        //     label: "Value",
+                        //     color: "hsl(var(--chart-1))",
+                        // },
                     }}
                                     className="h-[400px]"
                                     onMouseDown={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleMouseDown(e)}
-                                    onMouseMove={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleMouseMove(e)}
+                                    // onMouseMove={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleMouseMove(e)}
                                     onMouseUp={handleMouseUp}
                                     onMouseLeave={handleMouseUp}
                                     onContextMenu={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleContextMenu(e)}
@@ -464,7 +411,9 @@ const CandleStickChart =
                                 }}
                                 onMouseMove={(nextState: CategoricalChartState, event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
                                     if (event.button === 0) {
-                                        if (nextState.activeLabel && refAreaLeft && !isInExistingInReferenceArea(definedRefArea, nextState.activeLabel)) setRefAreaRight(nextState.activeLabel)
+                                        if (nextState.activeLabel && refAreaLeft && !isInExistingInReferenceArea(definedRefArea, nextState.activeLabel)) {
+                                            setRefAreaRight(nextState.activeLabel)
+                                        }
                                     }
                                 }}
                                 // eslint-disable-next-line react/jsx-no-bind

@@ -120,6 +120,7 @@ const EnhancedTradingAssetViewer = observer(() => {
 
 
         useEffect(() => {
+            console.log("use Effect empty")
             if (isEditMode) {
                 setViewMode(VIEW_MODE.EDIT);
 
@@ -127,6 +128,7 @@ const EnhancedTradingAssetViewer = observer(() => {
         }, []);
 
         useEffect(() => {
+            console.log("use Effect isEditMode")
             if (isEditMode) {
                 setCurrentTradingStrategyName(isEditMode as string);
                 tradingStrategies.filter(strategy => strategy.name === isEditMode).forEach(strategy => {
@@ -214,12 +216,75 @@ const EnhancedTradingAssetViewer = observer(() => {
             return aggregatedData;
         }
 
-        useEffect(() => {
-            const tickSeries: SampleAssetData = generateData(new Date('2019-10-01'), new Date(), asset, 15);
+    function calculateRSI(data: CandleStickChart[], period: number = 24*14): CandleStickChart[] {
+        let gains = 0;
+        let losses = 0;
+
+        // Initialize the first period
+        for (let i = 0; i <= period; i++) {
+            const change = parseFloat(data[i].close) - parseFloat(data[i +1].close);
+            if (change > 0) {
+                gains += change;
+            } else {
+                losses -= change;
+            }
+            data[i]['rsi'] = '40';
+        }
+
+        let avgGain = gains / period;
+        let avgLoss = losses / period;
+
+        // Calculate RSI for the rest of the data
+        for (let i = period; i < data.length; i++) {
+            const change = parseFloat(data[i].close) - parseFloat(data[i - 24].close);
+            if (change > 0) {
+                gains = change;
+                losses = 0;
+            } else {
+                gains = 0;
+                losses = -change;
+            }
+
+            avgGain = (avgGain * (period - 1) + gains) / period;
+            avgLoss = (avgLoss * (period - 1) + losses) / period;
+
+            const rs = avgGain / avgLoss;
+            const rsi = 100 - (100 / (1 + rs));
+
+            data[i]['rsi'] = rsi.toString();
+        }
+
+        return data;
+    }
+
+    function attachMovingAverageData(data: CandleStickChart[]): CandleStickChart[] {
+        data.map((tickData, index) => {
+            const movingAverage = data.slice(Math.max(0, index - (14*24)), index)
+                    .reduce((acc, tickData) => {
+                        return acc + parseFloat(tickData.close);
+                    }, 0)
+
+                / (14*24);
+            if (index < (14*24)) {
+                tickData['movingAverage'] = tickData.close;
+            } else {
+                tickData['movingAverage'] = movingAverage.toString();
+            }
+        });
+
+        return data;
+    }
+
+
+    useEffect(() => {
+            const tickSeries: SampleAssetData =generateData(new Date('2019-10-01'), new Date(), asset, 15);
             const candleStickSeries: CandleStickChart[] = transformToCandleStickSeries(tickSeries) ?? [];
 
+            const dataWithMovingAverage = attachMovingAverageData(candleStickSeries);
+            const allData = ((dataWithMovingAverage.length > 0) ? calculateRSI(dataWithMovingAverage) : dataWithMovingAverage);
 
-            setFullTimeRangeData(candleStickSeries);
+
+            setFullTimeRangeData(allData);
             setData(candleStickSeries);
 
             const transformedData = transformToFourHourData(candleStickSeries);
@@ -249,8 +314,9 @@ const EnhancedTradingAssetViewer = observer(() => {
         }, [startDate, asset, frequency]);
 
         const removeTrade = (startTime: string) => {
-
+            console.log("remove trade", startTime)
             if (!isEditMode) {
+                console.log("!isEditMode", isEditMode)
                 setTradingRule(tradingRules.filter(trade => trade.startTime !== startTime));
                 setDefinedRefArea(tradingRules.filter(trade => trade.startTime !== startTime).map(trade => (
 
@@ -261,8 +327,12 @@ const EnhancedTradingAssetViewer = observer(() => {
                     })));
 
             } else {
+                console.log("isEditMode", isEditMode)
+                console.log("tradingStrategies", tradingStrategies[0].name)
                 tradingStrategies.filter(strategy => strategy.name === isEditMode).forEach(strategy => {
+                console.log("strategy", strategy.tradingRules[0].startTime)
                     const filteredStrategies = strategy.tradingRules.filter(trade => trade.startTime !== startTime);
+                console.log("filteredStrategies.length", filteredStrategies.length)
                     if (filteredStrategies.length !== 0) {
                         strategy.tradingRules = filteredStrategies;
                         setDefinedRefArea(strategy.tradingRules.filter(trade => trade.startTime !== startTime).map(trade => (
@@ -273,7 +343,12 @@ const EnhancedTradingAssetViewer = observer(() => {
                             })));
 
                     } else {
-                        console.error('trade deletion cancelled since there need to be at least one trade per strategy')
+                        const error = [];
+                        error.push("at_least_one_trade");
+
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        // @ts-expect-error
+                        setErrors(error);
                     }
                 })
             }
@@ -577,6 +652,14 @@ const EnhancedTradingAssetViewer = observer(() => {
                                                 // @ts-expect-error
                                                 errors.includes("no_backtesting_range") ?
                                                     "No backtesting range selected" : ""}
+
+                                        </p>
+                                        <p>
+                                            {
+                                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                                // @ts-expect-error
+                                                errors.includes("at_least_one_trade") ?
+                                                    "At least one trade needs to exist" : ""}
 
                                         </p>
                                     </div>
