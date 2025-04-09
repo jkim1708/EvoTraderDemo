@@ -359,7 +359,7 @@ const CandleStickChartDialog =
             });
         }
 
-        const [xAxisResolution, setXAxisResolution] = useState<X_AXIS_RESOLUTION>(initialXAxisResolution); // Bereich der X-Achse
+        const [xAxisResolution] = useState<X_AXIS_RESOLUTION>(initialXAxisResolution); // Bereich der X-Achse
         const [isDragging, setIsDragging] = useState(false); // Bereich der X-Achse
         const [lastMouseX, setLastMouseX] = useState(0); // Bereich der X-Achse
         // const [tickCount, setTickCount] = useState(0); // Bereich der X-Achse
@@ -533,15 +533,15 @@ const CandleStickChartDialog =
         //                 console.error('invalid x axis resolution');
         //         }
         //     }
-
-
-            runAsync();
-
-            setXAxisResolution(numberOfLastDaysToShow);
-            // setTickCount(numberOfLastDaysToShow);
-            if (startIndex) setStartIndex(startIndex);
-
-        }
+        //
+        //
+        //     runAsync();
+        //
+        //     setXAxisResolution(numberOfLastDaysToShow);
+        //     // setTickCount(numberOfLastDaysToShow);
+        //     if (startIndex) setStartIndex(startIndex);
+        //
+        // }
 
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const handleMouseDown = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
