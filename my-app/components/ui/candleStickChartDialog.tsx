@@ -500,39 +500,39 @@ const CandleStickChartDialog =
         }
 
 
-        function handleDButton(numberOfLastDaysToShow: X_AXIS_RESOLUTION) {
-            let startIndex;
-
-            const runAsync = () => {
-                switch (numberOfLastDaysToShow) {
-                    case X_AXIS_RESOLUTION.ONE_DAY:
-                    case X_AXIS_RESOLUTION.FIVE_DAYS:
-                    case X_AXIS_RESOLUTION.ONE_MONTH:
-                    case X_AXIS_RESOLUTION.THREE_MONTH:
-                        startIndex = fullTimeRangeData.length - numberOfLastDaysToShow;
-                        // // setVisibleData(fullTimeRangeData.slice(startIndex));
-                        setLastIndex(fullTimeRangeData.slice(startIndex).length - 1);
-                        break;
-                    case X_AXIS_RESOLUTION.SIX_MONTH:
-                        startIndex = fullTimeRangeData.length - numberOfLastDaysToShow;
-                        //set visible range and take out every 3rd element
-                        const thirdRangeData = fullTimeRangeData.slice(startIndex).filter((_, i) => {
-                            return i % 3 === 0
-                        });
-                        // // setVisibleData(thirdRangeData);
-                        setLastIndex(thirdRangeData.length - 1);
-                        break;
-
-                    case X_AXIS_RESOLUTION.ONE_YEAR:
-                    case X_AXIS_RESOLUTION.FIVE_YEARS:
-                        startIndex = fullTimeRangeSevenDayData.length - numberOfLastDaysToShow;
-                        // // setVisibleData(fullTimeRangeSevenDayData.slice(startIndex));
-                        setLastIndex(fullTimeRangeSevenDayData.slice(startIndex).length - 1);
-                        break;
-                    default:
-                        console.error('invalid x axis resolution');
-                }
-            }
+        // function handleDButton(numberOfLastDaysToShow: X_AXIS_RESOLUTION) {
+        //     let startIndex;
+        //
+        //     const runAsync = () => {
+        //         switch (numberOfLastDaysToShow) {
+        //             case X_AXIS_RESOLUTION.ONE_DAY:
+        //             case X_AXIS_RESOLUTION.FIVE_DAYS:
+        //             case X_AXIS_RESOLUTION.ONE_MONTH:
+        //             case X_AXIS_RESOLUTION.THREE_MONTH:
+        //                 startIndex = fullTimeRangeData.length - numberOfLastDaysToShow;
+        //                 // // setVisibleData(fullTimeRangeData.slice(startIndex));
+        //                 setLastIndex(fullTimeRangeData.slice(startIndex).length - 1);
+        //                 break;
+        //             case X_AXIS_RESOLUTION.SIX_MONTH:
+        //                 startIndex = fullTimeRangeData.length - numberOfLastDaysToShow;
+        //                 //set visible range and take out every 3rd element
+        //                 const thirdRangeData = fullTimeRangeData.slice(startIndex).filter((_, i) => {
+        //                     return i % 3 === 0
+        //                 });
+        //                 // // setVisibleData(thirdRangeData);
+        //                 setLastIndex(thirdRangeData.length - 1);
+        //                 break;
+        //
+        //             case X_AXIS_RESOLUTION.ONE_YEAR:
+        //             case X_AXIS_RESOLUTION.FIVE_YEARS:
+        //                 startIndex = fullTimeRangeSevenDayData.length - numberOfLastDaysToShow;
+        //                 // // setVisibleData(fullTimeRangeSevenDayData.slice(startIndex));
+        //                 setLastIndex(fullTimeRangeSevenDayData.slice(startIndex).length - 1);
+        //                 break;
+        //             default:
+        //                 console.error('invalid x axis resolution');
+        //         }
+        //     }
 
 
             runAsync();
