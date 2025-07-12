@@ -108,6 +108,7 @@ export function transformToCandleStickSeries(tickData: {
         const lowHigh = [low, high];
         const openClose = [open, close];
         const movingAverage = '';
+        const movingAverage50 = '';
         const rsi = '';
 
         return {
@@ -119,6 +120,7 @@ export function transformToCandleStickSeries(tickData: {
             lowHigh,
             openClose,
             movingAverage,
+            movingAverage50,
             rsi
         };
     });

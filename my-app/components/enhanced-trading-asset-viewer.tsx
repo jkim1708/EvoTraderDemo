@@ -159,6 +159,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                 lowHigh: [number, number],
                 openClose: [string, string],
                 movingAverage: string,
+                movingAverage50: string,
                 rsi: string
             }[] = [];
 
@@ -172,6 +173,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                 lowHigh: [number, number],
                 openClose: [number, number],
                 movingAverage: string,
+                movingAverage50: string,
                 rsi: string
             }[] = [];
             let currentStartTime: Date | null = null;
@@ -204,6 +206,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                         lowHigh: [low, high],
                         openClose: [open, close],
                         movingAverage: '',
+                        movingAverage50: '',
                         rsi: ''
                     });
 
@@ -258,17 +261,33 @@ const EnhancedTradingAssetViewer = observer(() => {
     }
 
     function attachMovingAverageData(data: CandleStickChart[]): CandleStickChart[] {
+            //SMA period
+
         data.map((tickData, index) => {
-            const movingAverage = data.slice(Math.max(0, index - (14*24)), index)
+            const movingAverage = data.slice(Math.max(0, index - (10*24)), index)
                     .reduce((acc, tickData) => {
                         return acc + parseFloat(tickData.close);
                     }, 0)
 
-                / (14*24);
-            if (index < (14*24)) {
+                / (10*24);
+            if (index < (10*24)) {
                 tickData['movingAverage'] = tickData.close;
             } else {
                 tickData['movingAverage'] = movingAverage.toString();
+            }
+        });
+
+        data.map((tickData, index) => {
+            const movingAverage = data.slice(Math.max(0, index - (50*24)), index)
+                    .reduce((acc, tickData) => {
+                        return acc + parseFloat(tickData.close);
+                    }, 0)
+
+                / (50*24);
+            if (index < (50*24)) {
+                tickData['movingAverage50'] = tickData.close;
+            } else {
+                tickData['movingAverage50'] = movingAverage.toString();
             }
         });
 

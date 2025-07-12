@@ -99,6 +99,7 @@ type CandleStickChart = {
     close: string,
     ts: string,
     movingAverage: string,
+    movingAverage50: string,
     rsi: string,
 };
 
@@ -422,6 +423,7 @@ const CandleStickChart =
                                 <YAxis yAxisId="1" dataKey="lowHigh" domain={['auto', 'auto']} allowDecimals={true}/>
                                 <CartesianGrid strokeDasharray="3 3"/>
                                 <Line type="monotone" dataKey="movingAverage" yAxisId="1" stroke="#ff7300" dot={false}/>
+                                <Line type="monotone" dataKey="movingAverage50" yAxisId="1" stroke="#007AFF" dot={false}/>
                                 <Bar
                                     yAxisId="1"
                                     dataKey="openClose"

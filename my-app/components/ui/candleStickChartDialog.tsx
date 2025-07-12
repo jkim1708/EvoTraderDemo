@@ -118,6 +118,7 @@ interface CandleStickChartAnalyze {
     close: string,
     ts: string,
     movingAverage: string,
+    movingAverage50: string,
     rsi: string,
 }
 
@@ -144,10 +145,11 @@ const prepareData = (data: CandleStickChart[]): {
     lowHigh: [number, number],
     openClose: [number, number],
     movingAverage: string,
+    movingAverage50: string,
     rsi: string,
     trade: Trade | null,
 } [] => {
-    return data.map(({open, close, low, high, ts, movingAverage, rsi}, index) => {
+    return data.map(({open, close, low, high, ts, movingAverage, movingAverage50, rsi}, index) => {
         return {
             index,
             ts,
@@ -158,6 +160,7 @@ const prepareData = (data: CandleStickChart[]): {
             lowHigh: [parseFloat(low), parseFloat(high)] as [number, number],
             openClose: [parseFloat(open), parseFloat(close)] as [number, number],
             movingAverage: movingAverage,
+            movingAverage50: movingAverage50,
             rsi: rsi,
             trade: null,
         };
