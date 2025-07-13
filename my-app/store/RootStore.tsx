@@ -1,6 +1,6 @@
 import TradingRuleStore, {TradingRule} from "@/store/TradingRuleStore";
 import {makeAutoObservable} from "mobx";
-import {CANDLESTICK_FREQUENCY, convertToCustomDate} from "@/utils";
+import {CANDLESTICK_FREQUENCY} from "@/utils";
 import CandleStickChart from "@/components/ui/candleStickChart";
 
 

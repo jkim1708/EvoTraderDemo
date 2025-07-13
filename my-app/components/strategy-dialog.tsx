@@ -92,12 +92,11 @@ const StrategyDialog = observer((props: StrategyDialogProps) => {
             const usedEndDate = endBacktestingOffSample ? endBacktestingOffSample : strategy.backtestingOffSample.endDate;
 
             startDate = convertToCustomDate(new Date((new Date(usedEndDate).getTime() - 1000 * 60 * 60 * 24 * 180))).split(',')[0];
+            console.log("startDate", startDate, "usedEndDate", usedEndDate);
             strategy.backtestingOffSample.trades = generateRandomTrades(startDate, usedEndDate, strategy.tradingRules[0].asset)
             recentTrades.push(...transformToRecentTrades(strategy.backtestingOffSample.trades));
-
             strategy.backtestingOffSample.startDate = startDate;
             strategy.backtestingOffSample.endDate = usedEndDate;
-
             setShowChart(true);
         };
 

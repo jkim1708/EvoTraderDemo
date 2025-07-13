@@ -1,3 +1,5 @@
+import csv from 'csv-parser';
+import {DaxData} from "@/DaxData";
 
 export type ReferencedArea = {
     referencedAreaLeft: string,
@@ -126,6 +128,34 @@ export function transformToCandleStickSeries(tickData: {
     });
 }
 
+export function useDaxData() {
+
+    return DaxData.split(';').map(data => {
+
+        const [date, open, high, low, close] = data.split(",");
+        const ts = convertDaxDateToCustomDate(date);
+        const lowHigh = [low, high];
+        const openClose = [open, close];
+        const movingAverage = '';
+        const movingAverage50 = '';
+        const rsi = '';
+
+        return {
+            high,
+            low,
+            open,
+            close,
+            ts,
+            lowHigh,
+            openClose,
+            movingAverage,
+            movingAverage50,
+            rsi
+        };
+    });
+
+}
+
 export function convertToCustomDate(date: Date): string {
     const day = date.getDate();
     const dayStr = day < 10 ? "0" + day : day;
@@ -147,6 +177,15 @@ export function convertToDate(date: string): Date {
     return new Date(`${dateParts[0]}-${month}-${day}T${hourStr}:00:00`);
 }
 
+//input date format "2008-01-31 03:00:00"
+//target format: "2023-10-15T14:30:00.000Z"
+export function convertDaxDateToCustomDate(date: string): string {
+    const spaceSeperated = date.split(" ");
+    const hour = spaceSeperated[1].split(",")[0].split(":")[0].trim();
+
+    return `${spaceSeperated[0].replace(/[\r\n]+/g, "")}, ${hour}:00`;
+}
+
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
 export function findTsInDifferentFrequency(dateTs: string, tsSeries, xAxisResolution: X_AXIS_RESOLUTION, xKind: 'x1' | 'x2') {
@@ -156,7 +195,7 @@ export function findTsInDifferentFrequency(dateTs: string, tsSeries, xAxisResolu
     const lastDateInView = new Date(tsSeries[tsSeries.length - 1].ts);
     if (xKind === 'x1') {
         if (date < firstDateInView) return firstDateInView;
-        if  (date > lastDateInView) return lastDateInView;
+        if (date > lastDateInView) return lastDateInView;
     }
 
     //x2 outside of the view
@@ -173,7 +212,7 @@ export function findTsInDifferentFrequency(dateTs: string, tsSeries, xAxisResolu
         case X_AXIS_RESOLUTION.THREE_MONTH:
         case X_AXIS_RESOLUTION.SIX_MONTH:
 
-            for(let i = 0; i < tsSeries.length; i++) {
+            for (let i = 0; i < tsSeries.length; i++) {
                 //x1 and x2 inside the view
                 const isDateSame = tsSeries[i].ts.split(',')[0] === dateTs;
                 if (isDateSame) {
@@ -185,7 +224,7 @@ export function findTsInDifferentFrequency(dateTs: string, tsSeries, xAxisResolu
 
         case X_AXIS_RESOLUTION.ONE_YEAR:
         case X_AXIS_RESOLUTION.FIVE_YEARS:
-            for (let i = 0; i < tsSeries.length-1; i++) {
+            for (let i = 0; i < tsSeries.length - 1; i++) {
 
                 const isDateBetweenTwoDates = date >= convertToDate(tsSeries[i].ts) && date <= convertToDate(tsSeries[i + 1].ts);
                 if (isDateBetweenTwoDates) {
@@ -222,7 +261,7 @@ export function generateRandomDateRange(offSampleTestStartDate: Date, offSampleT
     const randomDateRange: { startDate: Date, endDate: Date }[] = [] as { startDate: Date, endDate: Date }[];
     for (let i = 0; i < 10; i++) {
         const startDate = new Date(offSampleTestStartDate.getTime() + Math.random() * (offSampleTestEndDate.getTime() - offSampleTestStartDate.getTime()));
-        if(isStartDateExistentAlready(randomDateRange, startDate)) {
+        if (isStartDateExistentAlready(randomDateRange, startDate)) {
             break;
         }
         const endDate = new Date(addMinutesToDate(startDate, 60 * 12));

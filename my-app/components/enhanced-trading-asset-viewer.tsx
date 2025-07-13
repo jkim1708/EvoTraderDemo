@@ -21,9 +21,7 @@ import {
     CANDLESTICK_FREQUENCY,
     convertToCustomDate,
     convertToDate,
-    generateData,
-    SampleAssetData,
-    transformToCandleStickSeries
+    useDaxData
 } from "@/utils";
 import CandleStickChart from "@/components/ui/candleStickChart";
 import {observer} from "mobx-react-lite";
@@ -225,6 +223,7 @@ const EnhancedTradingAssetViewer = observer(() => {
 
         // Initialize the first period
         for (let i = 0; i <= period; i++) {
+            console.log("done",data[i]);
             const change = parseFloat(data[i].close) - parseFloat(data[i +1].close);
             if (change > 0) {
                 gains += change;
@@ -239,6 +238,7 @@ const EnhancedTradingAssetViewer = observer(() => {
 
         // Calculate RSI for the rest of the data
         for (let i = period; i < data.length; i++) {
+            console.log("done 2",data[i]);
             const change = parseFloat(data[i].close) - parseFloat(data[i - 24].close);
             if (change > 0) {
                 gains = change;
@@ -262,29 +262,29 @@ const EnhancedTradingAssetViewer = observer(() => {
 
     function attachMovingAverageData(data: CandleStickChart[]): CandleStickChart[] {
             //SMA period
-
+        const SMA_PERIOD_10 = 10; // 10 hours weil data is hourly data
+        const SMA_PERIOD_50 = 50; // 50 hours weil data is hourly data
         data.map((tickData, index) => {
-            const movingAverage = data.slice(Math.max(0, index - (10*24)), index)
+            const movingAverage = data.slice(Math.max(0, index - (SMA_PERIOD_10)), index)
                     .reduce((acc, tickData) => {
                         return acc + parseFloat(tickData.close);
                     }, 0)
 
-                / (10*24);
-            if (index < (10*24)) {
+                / (SMA_PERIOD_10);
+            if (index < (SMA_PERIOD_10)) {
                 tickData['movingAverage'] = tickData.close;
             } else {
                 tickData['movingAverage'] = movingAverage.toString();
             }
         });
-
         data.map((tickData, index) => {
-            const movingAverage = data.slice(Math.max(0, index - (50*24)), index)
+            const movingAverage = data.slice(Math.max(0, index - (SMA_PERIOD_50)), index)
                     .reduce((acc, tickData) => {
                         return acc + parseFloat(tickData.close);
                     }, 0)
 
-                / (50*24);
-            if (index < (50*24)) {
+                / (SMA_PERIOD_50);
+            if (index < (SMA_PERIOD_50)) {
                 tickData['movingAverage50'] = tickData.close;
             } else {
                 tickData['movingAverage50'] = movingAverage.toString();
@@ -296,12 +296,14 @@ const EnhancedTradingAssetViewer = observer(() => {
 
 
     useEffect(() => {
-            const tickSeries: SampleAssetData =generateData(new Date('2019-10-01'), new Date(), asset, 15);
-            const candleStickSeries: CandleStickChart[] = transformToCandleStickSeries(tickSeries) ?? [];
+            // const tickSeries: SampleAssetData = generateData(new Date('2019-10-01'), new Date(), asset, 15);
+            // const candleStickSeries: CandleStickChart[] = transformToCandleStickSeries(tickSeries) ?? [];
+            const candleStickSeries: CandleStickChart[] = useDaxData() ?? [];
+
+            console.log("candleStickSeries",candleStickSeries);
 
             const dataWithMovingAverage = attachMovingAverageData(candleStickSeries);
             const allData = ((dataWithMovingAverage.length > 0) ? calculateRSI(dataWithMovingAverage) : dataWithMovingAverage);
-
 
             setFullTimeRangeData(allData);
             setData(candleStickSeries);
@@ -400,6 +402,9 @@ const EnhancedTradingAssetViewer = observer(() => {
             const {name, rules} = param;
 
             rules[0].asset = asset as 'EURUSD' | 'USDJPY' | 'GBPUSD' | 'EURCHF' | 'EURNOK';
+console.log("datasss",data)
+            console.log("start date",data[0].ts.split(',')[0])
+            console.log("end date", data[currentTradingStrategyOnSampleRange].ts.split(',')[0]);
 
             return {
                 id: uuidv4(),
@@ -486,7 +491,7 @@ const EnhancedTradingAssetViewer = observer(() => {
                 selectedEndDate: "",
                 frequency: frequency
             });
-
+            console.log("done")
             saveTradingStrategy(tradingStrategy);
 
             appRouterInstance.push('/strategy-management');
