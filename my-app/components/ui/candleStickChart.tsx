@@ -2,7 +2,7 @@
 
 import React, {Suspense, useCallback, useState} from 'react';
 import {
-    Bar,
+    Bar, Brush,
     CartesianGrid,
     ComposedChart, Line, LineChart,
     ReferenceArea, ReferenceLine,
@@ -174,11 +174,15 @@ const CandleStickChart =
         // const [isDragging, setIsDragging] = useState(false); // Bereich der X-Achse
         // const [lastMouseX, setLastMouseX] = useState(0); // Bereich der X-Achse
         const [startIndex, setStartIndex] = useState(0); // Bereich der X-Achse
+        const data = props.data;
+        // const [visibleData, setVisibleData] = useState(data.slice(startIndex, startIndex + xAxisResolution)); // Bereich der X-Achse
+        const visibleData = data.slice(startIndex, startIndex + xAxisResolution)
+        const [brushStartIndex, setBrushStartIndex] = useState(0);
+        const [brushEndIndex, setBrushEndIndex] = useState(visibleData.length-1);
 
         const asset = props.asset;
         // const dataWithMovingAverage = attachMovingAverageData(props.data);
         // const data = ((dataWithMovingAverage.length > 0) ? calculateRSI(dataWithMovingAverage) : dataWithMovingAverage);
-        const data = props.data;
 
         const [refAreaLeft, setRefAreaLeft] = useState('');
         const [refAreaRight, setRefAreaRight] = useState('');
@@ -299,11 +303,34 @@ const CandleStickChart =
         //     setIsDragging(false);
         // }, []);
 
-        const visibleData = data.slice(startIndex, startIndex + xAxisResolution)
+
 
         const handleContextMenu = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
             event.preventDefault();
         }, []);
+
+        const handleBrushChange = (brushData: {
+            startIndex?: number;
+            endIndex?: number;
+        }) => {
+
+            if (brushData && brushData.startIndex !== undefined && brushData.endIndex !== undefined) {
+                // setVisibleData(data.slice(brushData.startIndex, brushData.endIndex + 1));
+            }
+        };
+
+        const handleDragEnd = (brushData: {
+            startIndex?: number;
+            endIndex?: number;
+        }) => {
+            console.log("handleDragEnd", brushData);
+            if (brushData && brushData.startIndex !== undefined && brushData.endIndex !== undefined) {
+                console.log("handleBrushChange", brushData);
+                setBrushStartIndex(brushData.startIndex ?? 0);
+                setBrushEndIndex(brushData.endIndex ?? 0);
+            }
+        }
+
 
         return (
             <div className={"border rounded-xl p-6"}>
@@ -432,6 +459,10 @@ const CandleStickChart =
                                     isAnimationActive={false}
                                 >
                                 </Bar>
+
+                                <Brush dataKey="ts" height={30} stroke="#8884d8" onChange={handleBrushChange} onDragEnd={handleDragEnd}
+                                       startIndex={brushStartIndex} endIndex={brushEndIndex}
+                                />
 
                                 <Tooltip
                                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
