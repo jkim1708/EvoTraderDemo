@@ -4,7 +4,7 @@ import React, {Suspense, useCallback, useState} from 'react';
 import {
     Bar, Brush,
     CartesianGrid,
-    ComposedChart, Line, LineChart,
+    ComposedChart, Legend, Line, LineChart,
     ReferenceArea, ReferenceLine,
     ResponsiveContainer,
     Tooltip,
@@ -18,6 +18,8 @@ import {Button} from "@/components/ui/button";
 import {ChartContainer} from "@/components/ui/chart";
 import {CategoricalChartState} from "recharts/types/chart/types";
 import {ArrowDownCircle, ArrowUpCircle} from "lucide-react";
+import {CommitIcon} from "@radix-ui/react-icons";
+import FilledSquareIcon from "@/lib/FilledSquareIcon";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
@@ -45,49 +47,49 @@ const Candlestick = props => {
 
     return (
         // <Suspense>
-            <g stroke={color} fill={color} strokeWidth="2">
-                <path
-                    d={`
+        <g stroke={color} fill={color} strokeWidth="2">
+            <path
+                d={`
           M ${x},${y}
           L ${x},${y + height}
           L ${x + width},${y + height}
           L ${x + width},${y}
           L ${x},${y}
         `}
-                />
-                {/* bottom line */}
-                {isGrowing ? (
-                    <path
-                        d={`
+            />
+            {/* bottom line */}
+            {isGrowing ? (
+                <path
+                    d={`
             M ${x + width / 2}, ${y + height}
             v ${(open - low) * ratio}
           `}
-                    />
-                ) : (
-                    <path
-                        d={`
+                />
+            ) : (
+                <path
+                    d={`
             M ${x + width / 2}, ${y}
             v ${(close - low) * ratio}
           `}
-                    />
-                )}
-                {/* top line */}
-                {isGrowing ? (
-                    <path
-                        d={`
+                />
+            )}
+            {/* top line */}
+            {isGrowing ? (
+                <path
+                    d={`
             M ${x + width / 2}, ${y}
             v ${(close - high) * ratio}
           `}
-                    />
-                ) : (
-                    <path
-                        d={`
+                />
+            ) : (
+                <path
+                    d={`
             M ${x + width / 2}, ${y + height}
             v ${(open - high) * ratio}
           `}
-                    />
-                )}
-            </g>
+                />
+            )}
+        </g>
         // </Suspense>
     );
 };
@@ -141,7 +143,6 @@ function CustomizedTick(props: CustomizedTickProps) {
 }
 
 
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/ban-ts-comment
 // @ts-expect-error
 const customTooltipContent = ({payload}) => {
@@ -154,6 +155,125 @@ const customTooltipContent = ({payload}) => {
         <p> o {open} h {high} l {low} c {close} </p>
     )
 };
+
+// function renderLegend(value: string, entry: any) {
+//     let { color } = entry.color;
+//
+//     let valueToShow = "";
+//
+//     switch (value) {
+//         case "movingAverage":
+//             valueToShow = "SMA-10";
+//             break;
+//         case "movingAverage50":
+//             valueToShow = "SMA-50";
+//             break;
+//         case "openClose":
+//             valueToShow = "EURUSD";
+//             color = {color: "#000000"};
+//             break;
+//
+//         default:
+//             console.error("invalid value");
+//     }
+//
+//     console.log("color", {color});
+//
+//     return <span style={ color }>{valueToShow}</span>;
+// }
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/ban-ts-comment
+// @ts-expect-error
+const renderLegend = (props) => {
+    const {payload} = props;
+
+    return (
+        <ul style={{display: 'flex', listStyleType: 'none'}}>
+            {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                payload.map((entry, index) => {
+
+                    let valueToShow = "";
+
+                    let icon;
+                    let icon2;
+
+                    // Logic inside the map function
+                    switch (entry.value) {
+                        case "movingAverage":
+                            valueToShow = "SMA-10";
+                            icon = <CommitIcon color={"#ff7300"}/>;
+                            break;
+                        case "movingAverage50":
+                            valueToShow = "SMA-50";
+                            icon = <CommitIcon color={"#007AFF"}/>;
+                            break;
+                        case "openClose":
+                            valueToShow = "EURUSD";
+                            icon =<FilledSquareIcon color="red" />;
+                            icon2 =<FilledSquareIcon color="green" />;
+                            break;
+                        default:
+                            valueToShow = "Unknown";
+                            console.error("Invalid value:", entry.value);
+                    }
+
+                    return (<li style={{
+                        display: 'flex',
+                        marginRight: '1rem',
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }}
+                                key={`item-${index}`}> {icon} {icon2}{valueToShow}</li>);
+                })
+            }
+        </ul>
+    );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/ban-ts-comment
+// @ts-expect-error
+const renderRSILegend = (props) => {
+    const {payload} = props;
+
+    return (
+        <ul style={{display: 'flex', listStyleType: 'none'}}>
+            {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                payload.map((entry, index) => {
+
+                    let valueToShow = "";
+
+                    let icon;
+                    let icon2;
+
+                    // Logic inside the map function
+                    switch (entry.value) {
+                        case "rsi":
+                            valueToShow = "RSI";
+                            icon = <CommitIcon color={"#5078BE"}/>;
+                            break;
+
+                        default:
+                            valueToShow = "Unknown";
+                            console.error("Invalid value:", entry.value);
+                    }
+
+                    return (<li style={{
+                        display: 'flex',
+                        marginRight: '1rem',
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }}
+                                key={`item-${index}`}> {icon} {icon2}{valueToShow}</li>);
+                })
+            }
+        </ul>
+    );
+}
+
 
 const CandleStickChart =
     observer((props: CandleStickChartProps) => {
@@ -178,7 +298,7 @@ const CandleStickChart =
         // const [visibleData, setVisibleData] = useState(data.slice(startIndex, startIndex + xAxisResolution)); // Bereich der X-Achse
         const visibleData = data.slice(startIndex, startIndex + xAxisResolution)
         const [brushStartIndex, setBrushStartIndex] = useState(0);
-        const [brushEndIndex, setBrushEndIndex] = useState(visibleData.length-1);
+        const [brushEndIndex, setBrushEndIndex] = useState(visibleData.length - 1);
 
         const asset = props.asset;
         // const dataWithMovingAverage = attachMovingAverageData(props.data);
@@ -252,7 +372,7 @@ const CandleStickChart =
             return false;
         }
 
-        const defineReferenceArea =() => {
+        const defineReferenceArea = () => {
             if (isRefAreaSelectionDefined() && !isRefAreaSelectionOverlapping(definedRefArea, refAreaLeft, refAreaRight)) {
                 saveReferenceAreaSelection();
                 const profitNLoss = calculateProfitNLoss(refAreaLeft, refAreaRight, currentSelectedTradeKind);
@@ -302,7 +422,6 @@ const CandleStickChart =
         // const handleMouseUp = useCallback(() => {
         //     setIsDragging(false);
         // }, []);
-
 
 
         const handleContextMenu = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -408,9 +527,9 @@ const CandleStickChart =
                     }}
                                     className="h-[400px]"
                                     onMouseDown={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleMouseDown(e)}
-                                    // onMouseMove={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleMouseMove(e)}
-                                    // onMouseUp={handleMouseUp}
-                                    // onMouseLeave={handleMouseUp}
+                        // onMouseMove={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleMouseMove(e)}
+                        // onMouseUp={handleMouseUp}
+                        // onMouseLeave={handleMouseUp}
                                     onContextMenu={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleContextMenu(e)}
                     >
 
@@ -450,7 +569,9 @@ const CandleStickChart =
                                 <YAxis yAxisId="1" dataKey="lowHigh" domain={['auto', 'auto']} allowDecimals={true}/>
                                 <CartesianGrid strokeDasharray="3 3"/>
                                 <Line type="monotone" dataKey="movingAverage" yAxisId="1" stroke="#ff7300" dot={false}/>
-                                <Line type="monotone" dataKey="movingAverage50" yAxisId="1" stroke="#007AFF" dot={false}/>
+                                <Line type="monotone" dataKey="movingAverage50" yAxisId="1" stroke="#007AFF"
+                                      dot={false}/>
+                                <Legend verticalAlign="top" height={36} iconType={"line"} content={renderLegend}/>
                                 <Bar
                                     yAxisId="1"
                                     dataKey="openClose"
@@ -460,7 +581,8 @@ const CandleStickChart =
                                 >
                                 </Bar>
 
-                                <Brush dataKey="ts" height={30} stroke="#8884d8" onChange={handleBrushChange} onDragEnd={handleDragEnd}
+                                <Brush dataKey="ts" height={30} stroke="#8884d8" onChange={handleBrushChange}
+                                       onDragEnd={handleDragEnd}
                                        startIndex={brushStartIndex} endIndex={brushEndIndex}
                                 />
 
@@ -495,17 +617,18 @@ const CandleStickChart =
                     }}
 
                                     className="h-[200px] mb-10 pb-6">
-                            <LineChart data={visibleData} margin={{top: 20, right: 30, left: 20, bottom: 20}}>
-                                <XAxis dataKey="ts" tickCount={visibleData.length} tick={CustomizedTick}
-                                       padding={{'left': 5}}/>
-                                <YAxis yAxisId="1" dataKey="rsi" domain={['auto', 'auto']} allowDecimals={true}/>
-                                <ReferenceLine y={80} yAxisId="1" label={80} stroke="purple"/>
-                                <ReferenceLine y={20} yAxisId="1" label={20} stroke="purple"/>
-                                <ReferenceLine y={30} yAxisId="1" label={30} strokeDasharray={"3 3"} stroke="purple"/>
-                                <ReferenceLine y={70} yAxisId="1" label={70} strokeDasharray={"3 3"} stroke="purple"/>
-                                <CartesianGrid strokeDasharray="3 3"/>
-                                <Line type="monotone" dataKey="rsi" yAxisId="1" stroke="#5078BE" dot={false}/>
-                            </LineChart>
+                        <LineChart data={visibleData} margin={{top: 20, right: 30, left: 20, bottom: 20}}>
+                            <XAxis dataKey="ts" tickCount={visibleData.length} tick={CustomizedTick}
+                                   padding={{'left': 5}}/>
+                            <YAxis yAxisId="1" dataKey="rsi" domain={['auto', 'auto']} allowDecimals={true}/>
+                            <ReferenceLine y={80} yAxisId="1" label={80} stroke="purple"/>
+                            <ReferenceLine y={20} yAxisId="1" label={20} stroke="purple"/>
+                            <ReferenceLine y={30} yAxisId="1" label={30} strokeDasharray={"3 3"} stroke="purple"/>
+                            <ReferenceLine y={70} yAxisId="1" label={70} strokeDasharray={"3 3"} stroke="purple"/>
+                            <CartesianGrid strokeDasharray="3 3"/>
+                            <Legend verticalAlign="top" height={36} iconType={"line"} content={renderRSILegend}/>
+                            <Line type="monotone" dataKey="rsi" yAxisId="1" stroke="#5078BE" dot={false}/>
+                        </LineChart>
                     </ChartContainer>
                 </Suspense>
 
