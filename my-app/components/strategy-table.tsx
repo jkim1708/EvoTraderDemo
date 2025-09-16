@@ -127,7 +127,7 @@ const StrategyTable = observer(({onAnalyze}: { onAnalyze: (strategy: TradingStra
                 <TableCell className={strategy.status === "active" ? "text-metrics-winRate" : "text-black" }>{strategy.winRate}</TableCell>
                 <TableCell className={strategy.status === "active" ? "text-metrics-profitFactor" : "text-black" }>{strategy.profitFactor}</TableCell>
                 <TableCell className={strategy.status === "active" ? "text-metrics-sharpeRatio": "text-black" }>{strategy.sharpeRatio}</TableCell>
-                <TableCell>Lemon Markets</TableCell>
+                <TableCell>IG Markets</TableCell>
                 <TableCell>
                     <div className="space-x-2">
                         <Button variant="outline" onClick={() => onAnalyze(strategy)}>
